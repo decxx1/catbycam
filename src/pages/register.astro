@@ -3,7 +3,14 @@ export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
 import AuthForm from "@/components/auth/AuthForm.vue";
 import { UserService } from "@/services/userService";
-import { createSession } from "@/utils/auth";
+import { createSession, getSession } from "@/utils/auth";
+
+const token = Astro.cookies.get("auth_token")?.value;
+const session = token ? await getSession(token) : null;
+
+if (session) {
+	return Astro.redirect("/profile");
+}
 
 let error = "";
 
