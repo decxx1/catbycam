@@ -110,7 +110,9 @@ const { user } = Astro.props;
 		</div>
 	</div>
 
-	<div class="mt-12 text-center">
+	<div
+		class="flex flex-row items-center justify-center gap-4 mt-12 text-center"
+	>
 		<form action="/logout" method="POST">
 			<button
 				type="submit"
@@ -119,5 +121,15 @@ const { user } = Astro.props;
 				Cerrar Sesión Segura
 			</button>
 		</form>
+		{
+			user.role === "admin" && (
+				<a
+					href="/admin/dashboard"
+					class="text-white bg-primary px-4 py-2 rounded-xl font-bold uppercase text-xs hover:bg-primary-dark cursor-pointer border-b border-transparent hover:border-primary/20"
+				>
+					Ir a Dashboard
+				</a>
+			)
+		}
 	</div>
 </div>
