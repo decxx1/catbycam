@@ -1,165 +1,21 @@
 ---
+export const prerender = true;
 import Layout from "@/layouts/Layout.astro";
 import ContactForm from "@/components/web/ContactForm.vue";
+import PageHeader from "@/components/web/common/PageHeader.astro";
+import ContactInfo from "@/components/web/contact/ContactInfo.astro";
 ---
 
 <Layout title="Contacto">
-	<!-- Small Hero Header -->
-	<section class="bg-secondary pt-40 pb-20">
-		<div class="container-custom">
-			<h1 class="text-4xl md:text-6xl font-black text-white mb-6">
-				Contactanos
-			</h1>
-			<p class="text-white/60 text-lg max-w-2xl">
-				Estamos acá para asesorarte. Respondemos tus consultas de forma
-				inmediata.
-			</p>
-		</div>
-	</section>
+	<PageHeader
+		title="Contactanos"
+		subtitle="Estamos acá para asesorarte. Respondemos tus consultas de forma inmediata."
+	/>
 
 	<section class="section-padding bg-accent/20">
 		<div class="container-custom">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-				<!-- Contact Info -->
-				<div class="space-y-12">
-					<div>
-						<span
-							class="text-primary font-bold uppercase tracking-widest text-sm mb-4 block"
-							>Hablemos</span
-						>
-						<h2 class="text-4xl font-black mb-8 italic">
-							Mantente en contacto
-						</h2>
-						<p
-							class="text-secondary/60 text-lg leading-relaxed max-w-md"
-						>
-							Podés consultarnos por una máquina, un repuesto,
-							alguna información técnica o pedir una cotización
-							personalizada.
-						</p>
-					</div>
-
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-						<div
-							class="bg-white p-6 rounded-2xl border border-secondary/5"
-						>
-							<div
-								class="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path
-										d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 18.92z"
-									></path></svg
-								>
-							</div>
-							<h4 class="font-bold mb-2">Teléfono</h4>
-							<p
-								class="text-secondary/50 text-sm leading-relaxed"
-							>
-								+54 261 000 000
-							</p>
-						</div>
-
-						<div
-							class="bg-white p-6 rounded-2xl border border-secondary/5"
-						>
-							<div
-								class="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path
-										d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-									></path><polyline points="22,6 12,13 2,6"
-									></polyline></svg
-								>
-							</div>
-							<h4 class="font-bold mb-2">Email</h4>
-							<p
-								class="text-secondary/50 text-sm leading-relaxed"
-							>
-								info@catbycam.com.ar
-							</p>
-						</div>
-
-						<div
-							class="bg-white p-6 rounded-2xl border border-secondary/5 sm:col-span-2"
-						>
-							<div
-								class="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center text-primary mb-6"
-							>
-								<svg
-									xmlns="http://www.w3.org/2000/svg"
-									width="24"
-									height="24"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="2"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									><path
-										d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
-									></path><circle cx="12" cy="10" r="3"
-									></circle></svg
-								>
-							</div>
-							<h4 class="font-bold mb-2">Dirección</h4>
-							<p
-								class="text-secondary/50 text-sm leading-relaxed"
-							>
-								Santa Fe 687, Mendoza, Argentina
-							</p>
-						</div>
-					</div>
-
-					<!-- Map Placeholder -->
-					<div
-						class="bg-secondary/10 w-full aspect-video rounded-3xl overflow-hidden border border-secondary/5 flex items-center justify-center p-8 text-center"
-					>
-						<div class="max-w-xs">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="48"
-								height="48"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="text-secondary/20 mx-auto mb-4"
-								><polygon
-									points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"
-								></polygon><line x1="8" y1="2" x2="8" y2="18"
-								></line><line x1="16" y1="6" x2="16" y2="22"
-								></line></svg
-							>
-							<p
-								class="text-secondary/40 font-bold uppercase tracking-widest text-xs"
-							>
-								Ubicación en Google Maps
-							</p>
-						</div>
-					</div>
-				</div>
+				<ContactInfo />
 
 				<!-- Form -->
 				<div class="lg:sticky lg:top-32">

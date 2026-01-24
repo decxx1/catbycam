@@ -6,6 +6,11 @@ Crear una tienda online para la empresa Cat By Cam.
 - Vue (versión = 3.5.27)
 - Tailwind ( versión = 4.1.18)
 - Empaquetador: Bun 1.3.4
+- Docker
+
+## Servidor
+- VPS 2 núcleos 8gb ram
+- Coolify (con docker file)
 
 ## Características del desarrollo
 Con el framework Astro debemos utilizar:

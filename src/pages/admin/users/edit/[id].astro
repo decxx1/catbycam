@@ -1,4 +1,5 @@
 ---
+export const prerender = false;
 import AdminLayout from "@/layouts/admin.astro";
 import { UserService } from "@/services/userService";
 
@@ -160,7 +161,7 @@ if (Astro.request.method === "POST") {
 				>
 					<button
 						type="submit"
-						class="flex-grow btn-primary py-5 text-lg shadow-2xl shadow-primary/30"
+						class="grow btn-primary py-5 text-lg shadow-2xl shadow-primary/30"
 					>
 						Guardar Cambios
 					</button>

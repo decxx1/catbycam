@@ -1,0 +1,31 @@
+---
+interface Props {
+	title: string;
+	subtitle?: string;
+	theme?: "dark" | "light";
+}
+
+const { title, subtitle, theme = "dark" } = Astro.props;
+---
+
+<section
+	class={`${theme === "dark" ? "bg-secondary" : "bg-accent/20"} pt-40 pb-20`}
+>
+	<div class="container-custom">
+		<h1
+			class={`text-4xl md:text-6xl font-black ${theme === "dark" ? "text-white" : "text-secondary"} mb-6`}
+		>
+			{title}
+			<span class="text-primary tracking-tighter italic">!</span>
+		</h1>
+		{
+			subtitle && (
+				<p
+					class={`${theme === "dark" ? "text-white/60" : "text-secondary/60"} text-lg max-w-2xl`}
+				>
+					{subtitle}
+				</p>
+			)
+		}
+	</div>
+</section>

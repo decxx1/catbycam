@@ -4,6 +4,8 @@ import Sidebar from "@/components/admin/sidebar.astro";
 import Topbar from "@/components/admin/topbar.astro";
 import { getSession } from "@/utils/auth";
 import { UserService } from "@/services/userService";
+// Supports weights 100-900
+import "@fontsource-variable/inter/opsz-italic.css";
 
 interface Props {
 	title: string;
@@ -34,16 +36,12 @@ if (!user || user.role !== "admin") {
 		<title>{title} | Panel Admin - Cat By Cam</title>
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-			rel="stylesheet"
-		/>
 	</head>
 	<body class="bg-accent/10 min-h-screen flex">
 		<Sidebar />
-		<div class="flex-grow flex flex-col min-w-0">
+		<div class="grow flex flex-col min-w-0">
 			<Topbar user={user} />
-			<main class="p-8 flex-grow">
+			<main class="p-8 grow">
 				<slot />
 			</main>
 		</div>

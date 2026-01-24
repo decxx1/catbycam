@@ -1,0 +1,58 @@
+---
+import ProductCard from "@/components/catalog/ProductCard.astro";
+
+const featuredProducts = [
+	{
+		title: "Excavadora Michigan Clark 150",
+		category: "Maquinaria",
+		image: "/hero-bg.png",
+		price: "Consulte",
+	},
+	{
+		title: "Kit de Repuestos Hidráulicos",
+		category: "Repuestos",
+		image: "/hero-bg.png",
+		price: "Consulte",
+	},
+	{
+		title: "Oruga de Acero Premium",
+		category: "Repuestos",
+		image: "/hero-bg.png",
+		price: "Consulte",
+	},
+	{
+		title: "Retroexcavadora JCB 3CX",
+		category: "Maquinaria",
+		image: "/hero-bg.png",
+		price: "Consulte",
+	},
+];
+---
+
+<section class="section-padding bg-accent/30">
+	<div class="container-custom">
+		<div
+			class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16"
+		>
+			<div class="max-w-xl text-left">
+				<h2 class="text-4xl md:text-5xl font-black mb-6">
+					Equipamiento <span class="text-primary">Destacado</span>
+				</h2>
+				<p class="text-secondary/60 text-lg">
+					Una selección de nuestras máquinas y repuestos más
+					solicitados. Todo listo para entrega inmediata.
+				</p>
+			</div>
+			<a
+				href="/catalog"
+				class="text-secondary font-bold uppercase tracking-widest flex items-center gap-2 hover:text-primary transition-colors pb-2 border-b-2 border-primary/20 hover:border-primary"
+			>
+				Ver todo el catálogo
+			</a>
+		</div>
+
+		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+			{featuredProducts.map((product) => <ProductCard {...product} />)}
+		</div>
+	</div>
+</section>
