@@ -32,7 +32,7 @@ const sizes = {
       leave-from-class="opacity-100"
       leave-to-class="opacity-0"
     >
-      <div v-if="show" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+      <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center p-4">
         <!-- Backdrop -->
         <div class="absolute inset-0 bg-secondary/60 backdrop-blur-sm" @click="emit('close')"></div>
         

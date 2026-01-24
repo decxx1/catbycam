@@ -167,8 +167,8 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
   <div class="space-y-8 relative z-10">
     <!-- toolbar -->
     <div class="flex flex-col md:flex-row gap-6 items-center justify-between bg-white p-6 rounded-3xl border border-secondary/5 shadow-sm">
-        <div class="flex flex-grow gap-4 w-full md:max-w-2xl">
-            <div class="relative flex-grow">
+        <div class="flex grow gap-4 w-full md:max-w-2xl">
+            <div class="relative grow">
                 <input 
                     v-model="searchQuery"
                     type="text" 
@@ -189,13 +189,13 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
         <div class="flex items-center gap-3 w-full md:w-auto">
             <button 
                 @click="showCategoryModal = true"
-                class="flex-grow md:flex-grow-0 px-6 py-3 bg-secondary text-white font-black text-sm rounded-xl hover:bg-secondary/90 transition-all cursor-pointer"
+                class="grow md:grow-0 px-6 py-3 bg-secondary text-white font-black text-sm rounded-xl hover:bg-secondary/90 transition-all cursor-pointer"
             >
                 Categorías
             </button>
             <button 
                 @click="openCreateModal"
-                class="flex-grow md:flex-grow-0 px-6 py-3 bg-primary text-white font-black text-sm rounded-xl hover:bg-secondary transition-all shadow-lg shadow-primary/20 cursor-pointer"
+                class="grow md:grow-0 px-6 py-3 bg-primary text-white font-black text-sm rounded-xl hover:bg-secondary transition-all shadow-lg shadow-primary/20 cursor-pointer"
             >
                 + Nuevo Producto
             </button>

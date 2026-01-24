@@ -2,7 +2,7 @@
 
 ---
 
-<div id="delete-modal" class="fixed inset-0 z-[100] hidden">
+<div id="delete-modal" class="fixed inset-0 z-100 hidden">
 	<div class="absolute inset-0 bg-secondary/60 backdrop-blur-sm"></div>
 	<div class="absolute inset-0 flex items-center justify-center p-4">
 		<div
@@ -41,14 +41,14 @@
 			<div class="flex items-center gap-4">
 				<button
 					id="close-modal"
-					class="flex-grow bg-accent/50 hover:bg-accent text-secondary font-bold py-4 rounded-xl transition-all cursor-pointer"
+					class="grow bg-accent/50 hover:bg-accent text-secondary font-bold py-4 rounded-xl transition-all cursor-pointer"
 					>Cancelar</button
 				>
 				<form
 					id="delete-form"
 					method="POST"
 					action="/admin/users/delete"
-					class="flex-grow"
+					class="grow"
 				>
 					<input type="hidden" name="id" id="delete-user-id" />
 					<button

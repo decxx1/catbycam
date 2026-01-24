@@ -31,13 +31,13 @@ const variants = {
         <div class="flex items-center gap-4 w-full">
             <button 
                 @click="emit('cancel')"
-                class="flex-grow bg-accent/50 hover:bg-accent text-secondary font-bold py-5 rounded-2xl transition-all cursor-pointer"
+                class="grow bg-accent/50 hover:bg-accent text-secondary font-bold py-5 rounded-2xl transition-all cursor-pointer"
             >
                 Cancelar
             </button>
             <button 
                 @click="emit('confirm')"
-                :class="[variants[confirmVariant || 'primary'], 'flex-grow font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer']"
+                :class="[variants[confirmVariant || 'primary'], 'grow font-black py-5 rounded-2xl hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer']"
             >
                 {{ confirmLabel || 'Confirmar' }}
             </button>

@@ -209,7 +209,7 @@ const handleSubmit = () => {
       <button 
         type="submit" 
         :disabled="isUploading"
-        class="flex-grow bg-primary hover:bg-secondary text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-wait"
+        class="grow bg-primary hover:bg-secondary text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:cursor-wait"
       >
         <span v-if="isUploading">Subiendo imágenes...</span>
         <span v-else>{{ initialData ? 'Actualizar Producto' : 'Crear Producto' }}</span>

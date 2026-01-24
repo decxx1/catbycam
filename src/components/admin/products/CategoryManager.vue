@@ -26,7 +26,7 @@ const handleCreate = () => {
             type="text" 
             placeholder="Nueva categoría..."
             @keyup.enter="handleCreate"
-            class="flex-grow bg-accent/50 border border-secondary/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/40 transition-all font-bold"
+            class="grow bg-accent/50 border border-secondary/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/40 transition-all font-bold"
         />
         <button 
             @click="handleCreate"
