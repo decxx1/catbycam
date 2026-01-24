@@ -1,0 +1,66 @@
+---
+interface Props {
+	label: string;
+	value: string | number;
+	trend?: string;
+	trendType?: "positive" | "negative";
+	icon: string;
+}
+
+const { label, value, trend, trendType = "positive", icon } = Astro.props;
+---
+
+<div class="bg-white p-8 rounded-3xl border border-secondary/5 shadow-sm">
+	<div class="flex items-center justify-between mb-6">
+		<h3
+			class="text-xs font-bold uppercase tracking-widest text-secondary/40"
+		>
+			{label}
+		</h3>
+		<div
+			class="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary"
+			set:html={icon}
+		/>
+	</div>
+	<p class="text-5xl font-black">{value}</p>
+	{
+		trend && (
+			<p
+				class={`mt-4 text-xs font-bold uppercase flex items-center gap-1 ${trendType === "positive" ? "text-green-500" : "text-red-500"}`}
+			>
+				{trendType === "positive" ? (
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+						<polyline points="16 7 22 7 22 13" />
+					</svg>
+				) : (
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
+						<polyline points="16 17 22 17 22 11" />
+					</svg>
+				)}
+				{trend}
+			</p>
+		)
+	}
+</div>
