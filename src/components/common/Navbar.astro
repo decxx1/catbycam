@@ -4,6 +4,8 @@ import { getSession } from "@/utils/auth";
 const token = Astro.cookies.get("auth_token")?.value;
 const session = token ? await getSession(token) : null;
 
+const { pathname } = Astro.url;
+
 const navLinks = [
 	{ name: "Inicio", href: "/" },
 	{ name: "Catálogo", href: "/catalog" },
@@ -15,7 +17,7 @@ const navLinks = [
 	class="fixed top-0 left-0 right-0 z-50 glass border-b border-secondary/5"
 >
 	<div class="container-custom py-4 flex items-center justify-between">
-		<a href="/" class="flex items-center gap-2">
+		<a href="/" class="flex items-center gap-2 relative z-50">
 			<div
 				class="w-10 h-10 bg-primary rounded flex items-center justify-center"
 			>
@@ -38,16 +40,29 @@ const navLinks = [
 			</div>
 		</a>
 
+		<!-- Desktop Navigation -->
 		<nav class="hidden md:flex items-center gap-8">
 			{
-				navLinks.map((link) => (
-					<a
-						href={link.href}
-						class="text-sm font-semibold text-secondary/70 hover:text-primary transition-colors duration-300"
-					>
-						{link.name}
-					</a>
-				))
+				navLinks.map((link) => {
+					const isActive =
+						pathname === link.href ||
+						(link.href !== "/" && pathname.startsWith(link.href));
+					return (
+						<a
+							href={link.href}
+							class={`text-sm font-bold transition-all duration-300 relative py-1 ${
+								isActive
+									? "text-primary px-2"
+									: "text-secondary/70 hover:text-primary"
+							}`}
+						>
+							{link.name}
+							{isActive && (
+								<span class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-full" />
+							)}
+						</a>
+					);
+				})
 			}
 
 			<div id="auth-nav-container" class="contents">
@@ -55,10 +70,10 @@ const navLinks = [
 				<a
 					id="nav-profile-link"
 					href="/profile"
-					class="hidden items-center gap-3 text-sm font-bold text-secondary hover:text-primary transition-colors"
+					class={`hidden items-center gap-3 text-sm font-bold transition-colors ${pathname === "/profile" ? "text-primary" : "text-secondary hover:text-primary"}`}
 				>
 					<div
-						class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary"
+						class={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${pathname === "/profile" ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-primary/10 text-primary"}`}
 					>
 						<svg
 							xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +98,7 @@ const navLinks = [
 				<div id="nav-auth-buttons" class="hidden items-center gap-4">
 					<a
 						href="/login"
-						class="text-sm font-bold text-secondary/60 hover:text-primary transition-colors"
+						class={`text-sm font-bold transition-colors ${pathname === "/login" ? "text-primary" : "text-secondary/60 hover:text-primary"}`}
 					>
 						Ingresar
 					</a>
@@ -94,15 +109,20 @@ const navLinks = [
 			</div>
 		</nav>
 
-		<button class="md:hidden text-secondary">
+		<!-- Mobile Menu Toggle -->
+		<button
+			id="mobile-menu-toggle"
+			class="md:hidden text-secondary relative z-50 p-2 -mr-2 cursor-pointer outline-none"
+		>
 			<svg
+				id="menu-icon-open"
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"
 				height="24"
 				viewBox="0 0 24 24"
 				fill="none"
 				stroke="currentColor"
-				stroke-width="2"
+				stroke-width="2.5"
 				stroke-linecap="round"
 				stroke-linejoin="round"
 				><line x1="3" y1="12" x2="21" y2="12"></line><line
@@ -112,25 +132,169 @@ const navLinks = [
 					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
 				></line></svg
 			>
+			<svg
+				id="menu-icon-close"
+				class="hidden"
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><line x1="18" y1="6" x2="6" y2="18"></line><line
+					x1="6"
+					y1="6"
+					x2="18"
+					y2="18"></line></svg
+			>
 		</button>
+	</div>
+
+	<!-- Mobile Menu Overlay -->
+	<div
+		id="mobile-menu"
+		class="fixed inset-0 bg-white h-[500px] border border-gray-300 z-40 transform translate-x-full transition-transform duration-500 ease-in-out md:hidden"
+	>
+		<div class="flex flex-col h-full pt-32 px-8 pb-12">
+			<div class="flex flex-col gap-6 mb-12">
+				<span
+					class="text-[10px] uppercase font-bold tracking-[0.3em] text-secondary/30 mb-2"
+					>Navegación</span
+				>
+				{
+					navLinks.map((link) => {
+						const isActive =
+							pathname === link.href ||
+							(link.href !== "/" &&
+								pathname.startsWith(link.href));
+						return (
+							<a
+								href={link.href}
+								class={`text-3xl font-black transition-all ${
+									isActive
+										? "text-primary translate-x-2"
+										: "text-secondary opacity-60 hover:opacity-100"
+								}`}
+							>
+								{link.name}
+							</a>
+						);
+					})
+				}
+			</div>
+
+			<div class="mt-auto border-t border-secondary/5 pt-12">
+				<div id="mobile-auth-container" class="space-y-6">
+					<!-- Dynamic client-side content will go here to keep it flicker-free -->
+					<div id="mobile-profile-link" class="hidden">
+						<a
+							href="/profile"
+							class={`flex items-center gap-4 group ${pathname === "/profile" ? "text-primary" : "text-secondary"}`}
+						>
+							<div
+								class={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${pathname === "/profile" ? "bg-primary text-white" : "bg-accent text-secondary group-hover:bg-primary group-hover:text-white"}`}
+							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									><path
+										d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+									></path><circle cx="12" cy="7" r="4"
+									></circle></svg
+								>
+							</div>
+							<div class="text-left">
+								<span
+									class="block text-xl font-black leading-none"
+									>Mi Perfil</span
+								>
+								<span
+									class="text-xs font-bold text-secondary/40 uppercase tracking-widest"
+									>Gestionar cuenta</span
+								>
+							</div>
+						</a>
+					</div>
+					<div id="mobile-auth-buttons" class="hidden flex-col gap-4">
+						<a
+							href="/login"
+							class="w-full text-center font-bold py-4 text-secondary/60 hover:text-primary border border-secondary/10 rounded-xl transition-all"
+							>Ingresar</a
+						>
+						<a
+							href="/register"
+							class="w-full text-center btn-primary py-4 rounded-xl"
+							>Regístrate</a
+						>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </header>
 
 <script is:inline>
-	// This script runs immediately to prevent flicker
+	// This script runs immediately to prevent flicker and handle mobile menu
 	(function () {
 		const hasCookie = document.cookie
 			.split("; ")
 			.some((c) => c.trim().startsWith("cb_logged_in="));
+
+		// Desktop elements
 		const profileLink = document.getElementById("nav-profile-link");
 		const authButtons = document.getElementById("nav-auth-buttons");
+
+		// Mobile elements
+		const mobileProfileLink = document.getElementById(
+			"mobile-profile-link",
+		);
+		const mobileAuthButtons = document.getElementById(
+			"mobile-auth-buttons",
+		);
+		const mobileMenuToggle = document.getElementById("mobile-menu-toggle");
+		const mobileMenu = document.getElementById("mobile-menu");
+		const openIcon = document.getElementById("menu-icon-open");
+		const closeIcon = document.getElementById("menu-icon-close");
 
 		if (hasCookie) {
 			if (profileLink) profileLink.style.display = "flex";
 			if (authButtons) authButtons.style.display = "none";
+			if (mobileProfileLink) mobileProfileLink.style.display = "block";
+			if (mobileAuthButtons) mobileAuthButtons.style.display = "none";
 		} else {
 			if (profileLink) profileLink.style.display = "none";
 			if (authButtons) authButtons.style.display = "flex";
+			if (mobileProfileLink) mobileProfileLink.style.display = "none";
+			if (mobileAuthButtons) mobileAuthButtons.style.display = "flex";
+		}
+
+		// Mobile menu toggle logic
+		if (mobileMenuToggle && mobileMenu) {
+			mobileMenuToggle.addEventListener("click", () => {
+				const isOpen =
+					!mobileMenu.classList.contains("translate-x-full");
+				if (isOpen) {
+					mobileMenu.classList.add("translate-x-full");
+					openIcon.classList.remove("hidden");
+					closeIcon.classList.add("hidden");
+					document.body.style.overflow = "";
+				} else {
+					mobileMenu.classList.remove("translate-x-full");
+					openIcon.classList.add("hidden");
+					closeIcon.classList.remove("hidden");
+					document.body.style.overflow = "hidden";
+				}
+			});
 		}
 	})();
 </script>
