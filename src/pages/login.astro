@@ -1,0 +1,48 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AuthForm from "@/components/auth/AuthForm.vue";
+import { UserService } from "@/services/userService";
+import { createSession } from "@/utils/auth";
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await Astro.request.formData();
+		const email = formData.get("email")?.toString();
+		const password = formData.get("password")?.toString();
+
+		if (email && password) {
+			const user = await UserService.findByEmail(email);
+			if (user && (await UserService.verifyPassword(user, password))) {
+				const token = await createSession(user.id);
+
+				Astro.cookies.set("auth_token", token, {
+					path: "/",
+					httpOnly: true,
+					secure: true,
+					sameSite: "strict",
+					maxAge: 60 * 60 * 24 * 7, // 1 week
+				});
+
+				return Astro.redirect("/profile");
+			} else {
+				error = "Email o contraseña incorrectos.";
+			}
+		}
+	} catch (e) {
+		error = "Hubo un error al iniciar sesión.";
+		console.error(e);
+	}
+}
+---
+
+<Layout title="Iniciar Sesión">
+	<section
+		class="min-h-screen pt-40 pb-20 bg-accent/20 flex items-center justify-center"
+	>
+		<div class="container-custom">
+			<AuthForm mode="login" error={error} client:load />
+		</div>
+	</section>
+</Layout>

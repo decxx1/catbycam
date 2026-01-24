@@ -1,0 +1,86 @@
+---
+interface Props {
+	user: {
+		name: string;
+		role: string;
+	};
+}
+
+const { user } = Astro.props;
+---
+
+<header
+	class="h-20 bg-white border-b border-secondary/5 px-8 flex items-center justify-between sticky top-0 z-40 transition-all duration-300"
+>
+	<div class="flex items-center gap-4">
+		<button
+			id="sidebar-toggle"
+			class="w-10 h-10 flex items-center justify-center bg-accent/30 rounded-xl text-secondary hover:bg-primary/10 hover:text-primary transition-all cursor-pointer shadow-sm group"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="20"
+				height="20"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				class="transition-transform group-active:scale-90"
+				><line x1="3" y1="12" x2="21" y2="12"></line><line
+					x1="3"
+					y1="6"
+					x2="21"
+					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
+				></line></svg
+			>
+		</button>
+	</div>
+
+	<div class="flex items-center gap-6">
+		<button
+			class="relative w-10 h-10 flex items-center justify-center bg-accent/30 rounded-full text-secondary/60 hover:text-primary transition-colors cursor-pointer"
+		>
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2.5"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"
+				></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg
+			>
+			<span
+				class="absolute top-2.5 right-2.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-white"
+			></span>
+		</button>
+
+		<div class="flex items-center gap-3 pl-6 border-l border-secondary/5">
+			<div class="text-right hidden sm:block">
+				<p class="text-sm font-bold leading-none mb-1">{user.name}</p>
+				<p
+					class="text-[10px] font-bold uppercase tracking-widest text-primary"
+				>
+					Admin
+				</p>
+			</div>
+			<div
+				class="w-10 h-10 bg-secondary rounded-xl flex items-center justify-center text-white font-black shadow-lg shadow-secondary/10"
+			>
+				{user.name.charAt(0).toUpperCase()}
+			</div>
+		</div>
+	</div>
+</header>
+
+<script>
+	const toggleBtn = document.getElementById("sidebar-toggle");
+	toggleBtn?.addEventListener("click", () => {
+		window.dispatchEvent(new Event("toggle-sidebar"));
+	});
+</script>

@@ -1,0 +1,54 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AuthForm from "@/components/auth/AuthForm.vue";
+import { UserService } from "@/services/userService";
+import { createSession } from "@/utils/auth";
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await Astro.request.formData();
+		const name = formData.get("name")?.toString();
+		const email = formData.get("email")?.toString();
+		const password = formData.get("password")?.toString();
+
+		if (name && email && password) {
+			const existingUser = await UserService.findByEmail(email);
+			if (existingUser) {
+				error = "El usuario ya existe.";
+			} else {
+				const result: any = await UserService.register({
+					name,
+					email,
+					password,
+				});
+				const token = await createSession(result.insertId);
+
+				Astro.cookies.set("auth_token", token, {
+					path: "/",
+					httpOnly: true,
+					secure: true,
+					sameSite: "strict",
+					maxAge: 60 * 60 * 24 * 7, // 1 week
+				});
+
+				return Astro.redirect("/profile");
+			}
+		}
+	} catch (e) {
+		error = "Hubo un error al procesar el registro.";
+		console.error(e);
+	}
+}
+---
+
+<Layout title="Registrarse">
+	<section
+		class="min-h-screen pt-40 pb-20 bg-accent/20 flex items-center justify-center"
+	>
+		<div class="container-custom">
+			<AuthForm mode="register" error={error} client:load />
+		</div>
+	</section>
+</Layout>

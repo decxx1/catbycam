@@ -1,0 +1,119 @@
+---
+import { getSession } from "@/utils/auth";
+
+const token = Astro.cookies.get("auth_token")?.value;
+const session = token ? await getSession(token) : null;
+
+const navLinks = [
+	{ name: "Inicio", href: "/" },
+	{ name: "Catálogo", href: "/catalog" },
+	{ name: "Contacto", href: "/contact" },
+];
+---
+
+<header
+	class="fixed top-0 left-0 right-0 z-50 glass border-b border-secondary/5"
+>
+	<div class="container-custom py-4 flex items-center justify-between">
+		<a href="/" class="flex items-center gap-2">
+			<div
+				class="w-10 h-10 bg-primary rounded flex items-center justify-center"
+			>
+				<span
+					class="text-white font-black text-xl italic text-right -mr-1"
+					>C</span
+				>
+				<span class="text-white font-black text-xl italic -ml-1">B</span
+				>
+			</div>
+			<div class="flex flex-col leading-none">
+				<span
+					class="font-black text-xl tracking-tighter text-secondary uppercase"
+					>CatByCam</span
+				>
+				<span
+					class="text-[10px] text-primary font-bold uppercase tracking-widest"
+					>Maquinaria Vial</span
+				>
+			</div>
+		</a>
+
+		<nav class="hidden md:flex items-center gap-8">
+			{
+				navLinks.map((link) => (
+					<a
+						href={link.href}
+						class="text-sm font-semibold text-secondary/70 hover:text-primary transition-colors duration-300"
+					>
+						{link.name}
+					</a>
+				))
+			}
+
+			{
+				session ? (
+					<a
+						href="/profile"
+						class="flex items-center gap-3 text-sm font-bold text-secondary hover:text-primary transition-colors"
+					>
+						<div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<>
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+									<circle cx="12" cy="7" r="4" />
+								</>
+							</svg>
+						</div>
+						Mi Perfil
+					</a>
+				) : (
+					<div class="flex items-center gap-4">
+						<a
+							href="/login"
+							class="text-sm font-bold text-secondary/60 hover:text-primary transition-colors"
+						>
+							Ingresar
+						</a>
+						<a
+							href="/register"
+							class="btn-primary text-sm py-2 px-5"
+						>
+							Regístrate
+						</a>
+					</div>
+				)
+			}
+		</nav>
+
+		<!-- Mobile menu button - Simple placeholder for now -->
+		<button class="md:hidden text-secondary">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+				><line x1="3" y1="12" x2="21" y2="12"></line><line
+					x1="3"
+					y1="6"
+					x2="21"
+					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
+				></line></svg
+			>
+		</button>
+	</div>
+</header>

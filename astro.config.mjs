@@ -1,5 +1,26 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, envField } from 'astro/config';
+import vue from '@astrojs/vue';
+import tailwindcss from '@tailwindcss/vite';
+import node from '@astrojs/node';
 
 // https://astro.build/config
-export default defineConfig({});
+export default defineConfig({
+  output: 'server',
+  adapter: node({
+    mode: 'standalone'
+  }),
+  integrations: [vue()],
+  vite: {
+    plugins: [tailwindcss()]
+  },
+  env: {
+    schema: {
+      IS_PROD: envField.boolean({ context: "client", access: "public", optional: true }),
+      ADMIN_NAME: envField.string({ context: "server", access: "secret" }),
+      ADMIN_EMAIL: envField.string({ context: "server", access: "secret" }),
+      ADMIN_PASSWORD: envField.string({ context: "server", access: "secret" }),
+      JWT_SECRET: envField.string({ context: "server", access: "secret" }),
+    }
+  }
+});

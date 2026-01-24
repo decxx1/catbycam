@@ -1,0 +1,90 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AuthForm from "@/components/auth/AuthForm.vue";
+import { UserService } from "@/services/userService";
+import { createSession } from "@/utils/auth";
+
+let error = "";
+
+if (Astro.request.method === "POST") {
+	try {
+		const formData = await Astro.request.formData();
+		const email = formData.get("email")?.toString();
+		const password = formData.get("password")?.toString();
+
+		if (email && password) {
+			const user = await UserService.findByEmail(email);
+			if (
+				user &&
+				user.role === "admin" &&
+				(await UserService.verifyPassword(user, password))
+			) {
+				const token = await createSession(user.id);
+
+				Astro.cookies.set("auth_token", token, {
+					path: "/",
+					httpOnly: true,
+					secure: true,
+					sameSite: "strict",
+					maxAge: 60 * 60 * 24 * 7, // 1 week
+				});
+
+				return Astro.redirect("/admin/dashboard");
+			} else {
+				error = "Acceso denegado o credenciales incorrectas.";
+			}
+		}
+	} catch (e) {
+		error = "Hubo un error al iniciar sesión.";
+		console.error(e);
+	}
+}
+---
+
+<Layout title="Admin Login">
+	<section
+		class="min-h-screen bg-secondary flex items-center justify-center p-4"
+	>
+		<div class="w-full max-w-md">
+			<div class="text-center mb-12">
+				<div
+					class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white font-black text-2xl italic mx-auto mb-6 shadow-2xl shadow-primary/40"
+				>
+					CB
+				</div>
+				<h1
+					class="text-white text-3xl font-black uppercase tracking-tighter"
+				>
+					Admin <span class="text-primary italic">Access</span>
+				</h1>
+			</div>
+
+			<AuthForm mode="login" error={error} client:load />
+
+			<div class="mt-12 text-center">
+				<a
+					href="/"
+					class="text-white/20 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center justify-center gap-2"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="m15 18-6-6 6-6"></path></svg
+					>
+					Volver a la web
+				</a>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	/* Override AuthForm styles for dark theme if needed, but keeping it simple for now */
+</style>

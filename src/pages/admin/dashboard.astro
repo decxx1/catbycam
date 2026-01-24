@@ -1,0 +1,123 @@
+---
+import AdminLayout from "@/layouts/admin.astro";
+import pool from "@/utils/db";
+
+const [userCountResult]: any = await pool.execute(
+	"SELECT COUNT(*) as total FROM users WHERE role != 'admin'",
+);
+const totalUsers = userCountResult[0].total;
+
+const [latestUsers]: any = await pool.execute(
+	"SELECT name, email, created_at FROM users WHERE role != 'admin' ORDER BY created_at DESC LIMIT 5",
+);
+---
+
+<AdminLayout title="Dashboard">
+	<h1 class="text-3xl font-black mb-8">Dashboard</h1>
+
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+		<div
+			class="bg-white p-8 rounded-3xl border border-secondary/5 shadow-sm"
+		>
+			<div class="flex items-center justify-between mb-6">
+				<h3
+					class="text-xs font-bold uppercase tracking-widest text-secondary/40"
+				>
+					Usuarios Registrados
+				</h3>
+				<div
+					class="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary"
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="20"
+						height="20"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"
+						></path><circle cx="9" cy="7" r="4"></circle><path
+							d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path
+							d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg
+					>
+				</div>
+			</div>
+			<p class="text-5xl font-black">{totalUsers}</p>
+			<p
+				class="mt-4 text-xs font-bold text-green-500 uppercase flex items-center gap-1"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="12"
+					height="12"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="3"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"
+					></polyline><polyline points="16 7 22 7 22 13"
+					></polyline></svg
+				>
+				+12% este mes
+			</p>
+		</div>
+
+		<!-- More stat cards would go here -->
+	</div>
+
+	<div
+		class="bg-white rounded-3xl border border-secondary/5 shadow-sm overflow-hidden text-left"
+	>
+		<div
+			class="p-8 border-b border-secondary/5 flex items-center justify-between"
+		>
+			<h3 class="font-bold text-lg">Últimos usuarios registrados</h3>
+			<a
+				href="/admin/users"
+				class="text-xs font-bold uppercase tracking-widest text-primary hover:underline"
+				>Ver todos</a
+			>
+		</div>
+
+		<table class="w-full">
+			<thead>
+				<tr class="text-left bg-accent/5">
+					<th
+						class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary/40"
+						>Nombre</th
+					>
+					<th
+						class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary/40"
+						>Email</th
+					>
+					<th
+						class="px-8 py-4 text-[10px] font-bold uppercase tracking-widest text-secondary/40"
+						>Fecha Registro</th
+					>
+				</tr>
+			</thead>
+			<tbody class="divide-y divide-secondary/5">
+				{
+					latestUsers.map((user: any) => (
+						<tr>
+							<td class="px-8 py-5 font-bold text-sm tracking-tight">
+								{user.name}
+							</td>
+							<td class="px-8 py-5 text-sm text-secondary/60">
+								{user.email}
+							</td>
+							<td class="px-8 py-5 text-sm text-secondary/40">
+								{new Date(user.created_at).toLocaleDateString()}
+							</td>
+						</tr>
+					))
+				}
+			</tbody>
+		</table>
+	</div>
+</AdminLayout>
