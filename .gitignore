@@ -22,3 +22,10 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# skills
+.agents/
+.agent/
+.gemini/
+.trae/
+.windsurf/

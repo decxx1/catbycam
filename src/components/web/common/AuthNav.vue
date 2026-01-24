@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 
-const isLoggedIn = ref(false);
+const props = defineProps<{
+  initialIsLoggedIn: boolean
+}>();
+
+const isLoggedIn = ref(props.initialIsLoggedIn);
 
 onMounted(() => {
-  // Check for the presence of the auth_token cookie
+  // Check for the presence of the auxiliary auth cookie
   const cookies = document.cookie.split('; ');
-  isLoggedIn.value = cookies.some(c => c.startsWith('auth_token='));
+  const hasCookie = cookies.some(c => c.trim().startsWith('cb_logged_in='));
+  
+  // Update state if different from server (important for static pages)
+  if (hasCookie !== isLoggedIn.value) {
+    isLoggedIn.value = hasCookie;
+  }
 });
 </script>
 

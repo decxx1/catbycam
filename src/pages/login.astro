@@ -33,6 +33,14 @@ if (Astro.request.method === "POST") {
 					maxAge: 60 * 60 * 24 * 7, // 1 week
 				});
 
+				Astro.cookies.set("cb_logged_in", "true", {
+					path: "/",
+					httpOnly: false, // Accessible via JS
+					secure: true,
+					sameSite: "strict",
+					maxAge: 60 * 60 * 24 * 7,
+				});
+
 				return Astro.redirect("/profile");
 			} else {
 				error = "Email o contraseña incorrectos.";

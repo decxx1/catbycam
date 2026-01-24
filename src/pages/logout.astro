@@ -3,6 +3,7 @@ export const prerender = false;
 
 if (Astro.request.method === "POST") {
 	Astro.cookies.delete("auth_token", { path: "/" });
+	Astro.cookies.delete("cb_logged_in", { path: "/" });
 }
 
 return Astro.redirect("/login");
