@@ -32,7 +32,7 @@ const menuItems = [
 
 <aside
 	id="admin-sidebar"
-	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar w-72 data-[compact=true]:w-20 hover:data-[compact=true]:w-72 overflow-hidden border-r border-white/5"
+	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar w-72 min-w-[288px] h-screen data-[compact=true]:w-20 data-[compact=true]:min-w-[80px] hover:data-[compact=true]:w-72 hover:data-[compact=true]:min-w-[288px] overflow-hidden border-r border-white/5 relative z-30"
 >
 	<div
 		class="p-8 pb-12 flex items-center gap-3 overflow-hidden whitespace-nowrap"
@@ -54,7 +54,9 @@ const menuItems = [
 	<nav class="grow px-4 space-y-2 overflow-hidden">
 		{
 			menuItems.map((item) => {
-				const isActive = pathname === item.href;
+				const isActive =
+					pathname.replace(/\/$/, "") ===
+					item.href.replace(/\/$/, "");
 				return (
 					<a
 						href={item.href}

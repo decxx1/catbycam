@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "toastify-js/src/toastify.css";
 
 @theme {
   --color-primary: #e31e24;

@@ -1,11 +1,13 @@
 import pool from './db';
 import bcrypt from 'bcryptjs';
-import { ADMIN_NAME, ADMIN_EMAIL, ADMIN_PASSWORD } from 'astro:env/server';
+import { config } from 'dotenv';
+
+config();
 
 async function seedAdmin() {
-  const name = ADMIN_NAME;
-  const email = ADMIN_EMAIL;
-  const rawPassword = ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME;
+  const email = process.env.ADMIN_EMAIL;
+  const rawPassword = process.env.ADMIN_PASSWORD;
   
   if (!name || !email || !rawPassword) {
     console.error('Missing admin credentials in environment variables.');

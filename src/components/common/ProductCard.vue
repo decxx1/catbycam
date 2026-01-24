@@ -1,0 +1,45 @@
+<script setup lang="ts">
+const props = defineProps<{
+  title: string;
+  category: string;
+  image: string;
+  price?: string | number;
+}>();
+
+const formattedPrice = typeof props.price === 'number' 
+  ? new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(props.price)
+  : props.price;
+</script>
+
+<template>
+  <div class="group bg-white rounded-2xl overflow-hidden border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex flex-col h-full">
+    <div class="relative aspect-square overflow-hidden bg-accent">
+      <img
+        :src="image"
+        :alt="title"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+      />
+      <div class="absolute top-4 left-4">
+        <span class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full">
+          {{ category }}
+        </span>
+      </div>
+    </div>
+
+    <div class="p-6 flex flex-col grow">
+      <h3 class="font-bold text-lg mb-2 group-hover:text-primary transition-colors duration-300 text-left">
+        {{ title }}
+      </h3>
+      <div class="mt-auto pt-4 flex items-center justify-between">
+        <span v-if="price" class="text-secondary font-black text-xl">
+          {{ formattedPrice }}
+        </span>
+        <div class="text-xs font-bold uppercase tracking-widest text-secondary/40 group-hover:text-primary flex items-center gap-1 transition-colors">
+          Ver detalles
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+

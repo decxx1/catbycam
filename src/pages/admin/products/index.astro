@@ -1,0 +1,15 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/admin.astro";
+import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
+import ProductManager from "@/components/admin/products/ProductManager.vue";
+---
+
+<AdminLayout title="Gestión de Inventario">
+	<AdminPageHeader
+		title="Productos y Categorías"
+		subtitle="Administra el inventario de tu tienda y organiza por categorías."
+	/>
+
+	<ProductManager client:only="vue" />
+</AdminLayout>

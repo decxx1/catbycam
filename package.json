@@ -6,18 +6,26 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "db:setup": "bun src/utils/setup-db.ts",
+    "db:seed-admin": "bun src/utils/seed-admin.ts"
   },
   "dependencies": {
     "@astrojs/node": "^9.5.2",
     "@astrojs/vue": "^5.1.4",
     "@fontsource-variable/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.1.18",
+    "@types/toastify-js": "^1.12.4",
+    "@types/uuid": "^11.0.0",
     "astro": "^5.16.15",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
     "jose": "^6.1.3",
     "mysql2": "^3.16.1",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.1.18",
+    "toastify-js": "^1.12.0",
+    "uuid": "^13.0.0",
     "vue": "^3.5.27"
   }
 }
