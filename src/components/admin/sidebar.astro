@@ -32,21 +32,24 @@ const menuItems = [
 
 <aside
 	id="admin-sidebar"
-	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar w-72 min-w-[288px] h-screen data-[compact=true]:w-20 data-[compact=true]:min-w-[80px] hover:data-[compact=true]:w-72 hover:data-[compact=true]:min-w-[288px] overflow-hidden border-r border-white/5 relative z-30"
+	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar w-64 min-w-64 h-screen data-[compact=true]:w-20 data-[compact=true]:min-w-20 hover:data-[compact=true]:w-min-w-64 hover:data-[compact=true]:min-w-64 overflow-hidden border-r border-white/5 relative z-30"
 >
 	<div
-		class="p-8 pb-12 flex items-center gap-3 overflow-hidden whitespace-nowrap"
+		class="py-3 px-8 pb-12 flex items-center gap-3 overflow-hidden whitespace-nowrap"
 	>
-		<a href="/" class="flex items-center gap-2">
+		<a
+			href="/"
+			class="flex items-center gap-2 transition-all duration-300 group"
+		>
 			<div
 				class="w-8 h-8 bg-primary rounded flex items-center justify-center shrink-0"
 			>
 				<span class="text-white font-black text-sm italic">CB</span>
 			</div>
 			<span
-				class="font-black text-xl tracking-tighter uppercase transition-opacity duration-300 group-sidebar-[sidebar][data-compact=true]:opacity-0 group-sidebar-[sidebar][data-compact=true]:hover:opacity-100"
+				class="font-black text-xl uppercase transition-opacity duration-300 opacity-100 group-data-[compact=true]/sidebar:opacity-0 group-data-[compact=true]/sidebar:group-hover/sidebar:opacity-100"
 			>
-				Admin Panel
+				Admin
 			</span>
 		</a>
 	</div>
@@ -70,7 +73,7 @@ const menuItems = [
 							class={`shrink-0 w-5 h-5 flex items-center justify-center ${isActive ? "opacity-100" : "opacity-50 group-hover:opacity-100"}`}
 							set:html={item.icon}
 						/>
-						<span class="text-sm font-bold tracking-tight transition-opacity duration-300 group-sidebar-[sidebar][data-compact=true]:opacity-0 group-sidebar-[sidebar][data-compact=true]:hover:opacity-100">
+						<span class="text-sm font-bold tracking-tight transition-opacity duration-300 opacity-100 group-data-[compact=true]/sidebar:opacity-0 group-data-[compact=true]/sidebar:group-hover/sidebar:opacity-100">
 							{item.name}
 						</span>
 					</a>
@@ -102,7 +105,7 @@ const menuItems = [
 					>
 				</div>
 				<span
-					class="text-sm transition-opacity duration-300 group-sidebar-[sidebar][data-compact=true]:opacity-0 group-sidebar-[sidebar][data-compact=true]:hover:opacity-100"
+					class="text-sm transition-opacity duration-300 opacity-100 group-data-[compact=true]/sidebar:opacity-0 group-data-[compact=true]/sidebar:group-hover/sidebar:opacity-100"
 				>
 					Salir
 				</span>
