@@ -1,0 +1,14 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import CheckoutView from "@/components/web/checkout/CheckoutView.vue";
+import { getSession } from "@/utils/auth";
+
+const token = Astro.cookies.get("auth_token")?.value;
+const session = token ? await getSession(token) : null;
+---
+
+<Layout title="Finalizar Compra">
+	<main class="pt-20">
+		<CheckoutView client:load initialSession={session} />
+	</main>
+</Layout>

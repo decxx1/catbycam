@@ -11,11 +11,17 @@ interface Props {
 const { id, title, category, image, price } = Astro.props;
 ---
 
-<a
-	href={`/catalog/${id}`}
-	class="group bg-white rounded-2xl overflow-hidden border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex flex-col h-full"
+<div
+	class="group bg-white rounded-2xl overflow-hidden border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex flex-col h-full relative"
 >
-	<div class="relative aspect-square overflow-hidden bg-accent shrink-0">
+	<a
+		href={`/catalog/${id}`}
+		class="absolute inset-0 z-0"
+		aria-label={`Ver detalles de ${title}`}></a>
+
+	<div
+		class="relative aspect-square overflow-hidden bg-accent shrink-0 z-10 pointer-events-none"
+	>
 		<img
 			src={image}
 			alt={title}
@@ -30,21 +36,55 @@ const { id, title, category, image, price } = Astro.props;
 		</div>
 	</div>
 
-	<div class="p-6 flex flex-col grow gap-2">
-		<h3
-			class="font-black text-lg group-hover:text-primary transition-colors duration-300 leading-tight"
+	<div class="p-6 flex flex-col grow gap-2 z-10">
+		<a
+			href={`/catalog/${id}`}
+			class="hover:text-primary transition-colors duration-300"
 		>
-			{title}
-		</h3>
+			<h3 class="font-black text-lg leading-tight">
+				{title}
+			</h3>
+		</a>
 		<div class="mt-auto pt-2 flex flex-col gap-1">
 			{
 				price && (
-					<span class="text-secondary font-black text-2xl tracking-tighter">
-						{formatMoney(price, 0, "$")}
-					</span>
+					<div class="flex items-center justify-between gap-2 relative z-20">
+						<span class="text-secondary font-black text-2xl tracking-tighter">
+							{formatMoney(price, 0, "$")}
+						</span>
+						<button
+							type="button"
+							class="add-to-cart-btn p-2 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-all duration-300 group/btn"
+							data-product={JSON.stringify({
+								id,
+								title,
+								category,
+								image,
+								price,
+							})}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="20"
+								height="20"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="transition-transform group-hover/btn:scale-110"
+							>
+								<circle cx="8" cy="21" r="1" />
+								<circle cx="19" cy="21" r="1" />
+								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+							</svg>
+						</button>
+					</div>
 				)
 			}
-			<div
+			<a
+				href={`/catalog/${id}`}
 				class="text-[10px] font-black uppercase tracking-widest text-secondary/30 group-hover:text-primary flex items-center gap-1 transition-colors"
 			>
 				Ver detalles
@@ -57,9 +97,32 @@ const { id, title, category, image, price } = Astro.props;
 					stroke="currentColor"
 					stroke-width="4"
 					stroke-linecap="round"
-					stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg
+					stroke-linejoin="round"
 				>
-			</div>
+					<path d="m9 18 6-6-6-6"></path>
+				</svg>
+			</a>
 		</div>
 	</div>
-</a>
+</div>
+
+<script>
+	import { addItem } from "@/stores/cartStore";
+	import { toast } from "@/utils/toast";
+
+	const buttons = document.querySelectorAll(".add-to-cart-btn");
+
+	buttons.forEach((button) => {
+		button.addEventListener("click", (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const productData = (button as HTMLElement).dataset.product;
+			if (productData) {
+				const product = JSON.parse(productData);
+				addItem(product);
+				toast.success(`¡${product.title} añadido al carrito!`);
+			}
+		});
+	});
+</script>

@@ -1,5 +1,6 @@
 ---
 import { getSession } from "@/utils/auth";
+import CartManager from "./CartManager.vue";
 
 const token = Astro.cookies.get("auth_token")?.value;
 const session = token ? await getSession(token) : null;
@@ -65,98 +66,112 @@ const navLinks = [
 				})
 			}
 
-			<div id="auth-nav-container" class="contents">
-				<!-- Logged In State -->
-				<a
-					id="nav-profile-link"
-					href="/profile"
-					class={`hidden items-center gap-3 text-sm font-bold transition-colors ${pathname === "/profile" ? "text-primary" : "text-secondary hover:text-primary"}`}
-				>
-					<div
-						class={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${pathname === "/profile" ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-primary/10 text-primary"}`}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="16"
-							height="16"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2.5"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-						>
-							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
-							></path>
-							<circle cx="12" cy="7" r="4"></circle>
-						</svg>
-					</div>
-					Mi Perfil
-				</a>
+			<div class="flex items-center gap-6">
+				<CartManager client:load />
 
-				<!-- Logged Out State -->
-				<div id="nav-auth-buttons" class="hidden items-center gap-4">
+				<div id="auth-nav-container" class="contents">
+					<!-- Logged In State -->
 					<a
-						href="/login"
-						class={`text-sm font-bold transition-colors ${pathname === "/login" ? "text-primary" : "text-secondary/60 hover:text-primary"}`}
+						id="nav-profile-link"
+						href="/profile"
+						class={`hidden items-center gap-3 text-sm font-bold transition-colors ${pathname === "/profile" ? "text-primary" : "text-secondary hover:text-primary"}`}
 					>
-						Ingresar
+						<div
+							class={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${pathname === "/profile" ? "bg-primary text-white shadow-lg shadow-primary/20" : "bg-primary/10 text-primary"}`}
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"
+								></path>
+								<circle cx="12" cy="7" r="4"></circle>
+							</svg>
+						</div>
+						Mi Perfil
 					</a>
-					<a href="/register" class="btn-primary text-sm py-2 px-5">
-						Regístrate
-					</a>
+
+					<!-- Logged Out State -->
+					<div
+						id="nav-auth-buttons"
+						class="hidden items-center gap-4"
+					>
+						<a
+							href="/login"
+							class={`text-sm font-bold transition-colors ${pathname === "/login" ? "text-primary" : "text-secondary/60 hover:text-primary"}`}
+						>
+							Ingresar
+						</a>
+						<a
+							href="/register"
+							class="btn-primary text-sm py-2 px-5 cursor-pointer"
+						>
+							Regístrate
+						</a>
+					</div>
 				</div>
 			</div>
 		</nav>
 
 		<!-- Mobile Menu Toggle -->
-		<button
-			id="mobile-menu-toggle"
-			class="md:hidden text-secondary relative z-50 p-2 -mr-2 cursor-pointer outline-none"
-		>
-			<svg
-				id="menu-icon-open"
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				><line x1="3" y1="12" x2="21" y2="12"></line><line
-					x1="3"
-					y1="6"
-					x2="21"
-					y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
-				></line></svg
+		<div class="flex items-center gap-4 md:hidden relative z-50">
+			<CartManager client:load />
+			<button
+				id="mobile-menu-toggle"
+				class="text-secondary p-2 -mr-2 cursor-pointer outline-none"
 			>
-			<svg
-				id="menu-icon-close"
-				class="hidden"
-				xmlns="http://www.w3.org/2000/svg"
-				width="24"
-				height="24"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				><line x1="18" y1="6" x2="6" y2="18"></line><line
-					x1="6"
-					y1="6"
-					x2="18"
-					y2="18"></line></svg
-			>
-		</button>
+				<svg
+					id="menu-icon-open"
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><line x1="3" y1="12" x2="21" y2="12"></line><line
+						x1="3"
+						y1="6"
+						x2="21"
+						y2="6"></line><line x1="3" y1="18" x2="21" y2="18"
+					></line></svg
+				>
+				<svg
+					id="menu-icon-close"
+					class="hidden"
+					xmlns="http://www.w3.org/2000/svg"
+					width="24"
+					height="24"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					><line x1="18" y1="6" x2="6" y2="18"></line><line
+						x1="6"
+						y1="6"
+						x2="18"
+						y2="18"></line></svg
+				>
+			</button>
+		</div>
 	</div>
 
 	<!-- Mobile Menu Overlay -->
 	<div
 		id="mobile-menu"
-		class="fixed inset-0 bg-white h-[500px] border border-gray-300 z-40 transform translate-x-full transition-transform duration-500 ease-in-out md:hidden"
+		class="fixed inset-0 bg-white h-screen z-40 transform translate-x-full transition-transform duration-500 ease-in-out md:hidden"
 	>
 		<div class="flex flex-col h-full pt-32 px-8 pb-12">
 			<div class="flex flex-col gap-6 mb-12">
@@ -188,7 +203,6 @@ const navLinks = [
 
 			<div class="mt-auto border-t border-secondary/5 pt-12">
 				<div id="mobile-auth-container" class="space-y-6">
-					<!-- Dynamic client-side content will go here to keep it flicker-free -->
 					<div id="mobile-profile-link" class="hidden">
 						<a
 							href="/profile"
@@ -244,17 +258,17 @@ const navLinks = [
 </header>
 
 <script is:inline>
-	// This script runs immediately to prevent flicker and handle mobile menu
 	(function () {
-		const hasCookie = document.cookie
-			.split("; ")
-			.some((c) => c.trim().startsWith("cb_logged_in="));
+		const getCookie = (name) => {
+			const value = `; ${document.cookie}`;
+			const parts = value.split(`; ${name}=`);
+			if (parts.length === 2) return parts.pop().split(";").shift();
+		};
 
-		// Desktop elements
+		const hasCookie = !!getCookie("cb_logged_in");
+
 		const profileLink = document.getElementById("nav-profile-link");
 		const authButtons = document.getElementById("nav-auth-buttons");
-
-		// Mobile elements
 		const mobileProfileLink = document.getElementById(
 			"mobile-profile-link",
 		);
@@ -278,7 +292,6 @@ const navLinks = [
 			if (mobileAuthButtons) mobileAuthButtons.style.display = "flex";
 		}
 
-		// Mobile menu toggle logic
 		if (mobileMenuToggle && mobileMenu) {
 			mobileMenuToggle.addEventListener("click", () => {
 				const isOpen =

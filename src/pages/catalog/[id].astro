@@ -120,9 +120,17 @@ const formattedPrice =
 								Consultar por WhatsApp
 							</a>
 							<button
-								class="w-full bg-accent/50 hover:bg-accent text-secondary font-black py-6 rounded-2xl transition-all"
+								id="buy-now-btn"
+								class="w-full bg-accent/50 hover:bg-accent text-secondary font-black py-6 rounded-2xl transition-all cursor-pointer"
+								data-product={JSON.stringify({
+									id: product.id,
+									title: product.title,
+									category: product.category_name,
+									image: product.main_image,
+									price: product.price,
+								})}
 							>
-								Ver Especificaciones Técnicas
+								Comprar Ahora
 							</button>
 						</div>
 
@@ -260,3 +268,20 @@ const formattedPrice =
 		)
 	}
 </Layout>
+
+<script>
+	import { addItem } from "@/stores/cartStore";
+
+	const buyNowBtn = document.getElementById("buy-now-btn");
+
+	if (buyNowBtn) {
+		buyNowBtn.addEventListener("click", () => {
+			const productData = buyNowBtn.getAttribute("data-product");
+			if (productData) {
+				const product = JSON.parse(productData);
+				addItem(product);
+				window.location.href = "/cart";
+			}
+		});
+	}
+</script>
