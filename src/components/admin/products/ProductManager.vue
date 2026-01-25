@@ -32,7 +32,8 @@ const fetchProducts = async () => {
       page: currentPage.value.toString(),
       limit: limit.toString(),
       search: searchQuery.value,
-      categoryId: selectedCategory.value
+      categoryId: selectedCategory.value,
+      _t: Date.now().toString() // Prevent browser caching
     });
     const res = await fetch(`/api/admin/products?${params}`);
     const data = await res.json();

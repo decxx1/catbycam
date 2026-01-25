@@ -1,0 +1,207 @@
+# Mercado Pago Developers
+
+> Documentación para integrar soluciones de pago de Mercado Pago
+
+## Checkout API (vía Payments)
+
+- [Resumen](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/overview.md): Con Checkout API, el proceso de compra se realiza en un único entorno, optimizando los pagos de tu tienda.
+- INTEGRACIÓN: Conoce los requisitos y todos los pasos de integración con el Checkout API.
+- [Tipos de integración](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/types-of-integration.md): Conozca los tipos de integración disponibles para Checkout API.
+- [Requisitos previos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/prerequisites.md): Conozca los requisitos previos necesarios para integrarse con Checkout API.
+- Configuración de la integración: Descubra qué medios de pago están disponibles para la integración con Checkout API.
+  - [Tarjeta](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/card/integrate-via-cardform.md): Aprende a configurar pagos con tarjeta en Checkout API.
+    - [Integrar para sitios web](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/card/integration-via-cardform.md): Aprende a configurar pagos con tarjeta en Checkout API para sitios web.
+    - [Integrar para aplicaciones móviles](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/card/integration-via-core-methods-native.md): Aprende a configurar pagos con tarjeta en Checkout API para aplicaciones móviles.
+  - [Cuenta Mercado Pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/integrate-mp-wallet.md): Permitir el procesamiento automático de pagos a través de la billetera digital de Mercado Pago.
+  - [Otros medios de pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/other-payment-methods.md): Descubra otros medios de pago disponibles para la integración con Checkout API.
+  - [Financiación sin tarjeta](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-configuration/installments-without-card.md): Descubra cómo configurar pagos con Mercado Crédito, la opción de pago en financiación sin tarjeta de crédito.
+- [Gestión de tarjetas y clientes](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/customer-management.md): Conozca las configuraciones adicionales que se pueden realizar después de integrar Checkout API.
+  - [Crear cliente y tarjeta](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/create-customer-and-card.md): Aprende a crear clientes y asociarlos a una tarjeta.
+  - [Modificar cliente](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/modify-customer.md): Aprenda a realizar cambios en los datos de clientes creados anteriormente.
+  - [Buscar cliente](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/search-customers.md): Aprenda a buscar datos de clientes específicos desde su correo electrónico.
+  - [ Agregar nuevas tarjetas a un cliente](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/add-new-cards-to-customer.md): Conozca las formas de agregar nuevas tarjetas a ciertos clientes.
+  - [Consultar lista de tarjetas](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/get-cards-list.md)
+  - [ Recibir pagos con tarjetas guardadas](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/cards-and-customers-management/receive-payments-with-saved-cards.md): Aprenda cómo permitir que un cliente realice pagos con sus tarjetas previamente guardadas en su cuenta.
+- [Gestión de pagos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/payment-management.md): Mejora el control financiero de tu caja gestionando los pagos realizados en tu tienda.
+  - [Reservar fondos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/payment-management/make-value-reserve.md): Conozca los pasos necesarios para realizar una reserva de valores para un pago.
+  - [Capturar pago autorizado](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/payment-management/capture-authorized-payment.md): Aprenda a capturar un pago después de su autorización.
+  - [Cancelar reserva](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/payment-management/cancel-reserve.md): Conozca los pasos necesarios para realizar una reserva de valores.
+  - [Reembolsos y cancelaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/payment-management/cancellations-and-refunds.md): Conozca la diferencia y cómo proceder para realizar devoluciones y/o cancelaciones de un cargo en particular.
+- Prueba de integración: Conoce los pasos necesarios para probar la integración con Checkout API y asegurarte de que funciona correctamente.
+  - [Hacer compra de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-test/make-test-purchase.md): Aprende a simular el flujo de pago y haz una compra de prueba en tu tienda.
+  - [Tarjetas de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/test/cards.md): Conozca las tarjetas de prueba necesarias para simular el flujo de compra con tarjetas.
+  - [Requisitos para salir a producción](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/integration-test/go-to-production-requirements.md): Conozca los requisitos necesarios para salir a producción y realizar ventas reales.
+- Mensajes de respuesta: Vea los principales mensajes de respuesta que pueden aparecer al integrarse con Checkout API.
+  - [Errores en la creación del token de tarjeta](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/error-messages/card-token-creation-errors.md): Consulte los posibles errores que se pueden mostrar al crear el token de la tarjeta.
+  - [Errores de ingreso de datos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/response-handling/data-insertion-errors.md): Conoce los posibles errores que se pueden mostrar al ingresar los datos de la tarjeta para el pago.
+  - [Resultados de creación de un cobro](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/response-handling/collection-results.md): Consulte los principales mensajes de respuesta que pueden aparecer al crear un cobro.
+    - [Resultados de creación de un pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-api/response-handling/collection-results.md): Consulta los principales estados en los que puede resultar la creación de un cobro.
+    - [Consulta sobre el estado de un pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/response-handling/query-results.md): Consulta los principales estados que puede tener un pago al consultar su información.
+- CÓMO HACER: CÓMO HACER
+- [Cómo integrar el checkout en marketplace](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/integrate-marketplace.md): Vea cómo integrar el Checkout de Mercado Pago con Marketplaces.
+- [Cómo medir la calidad de la integración](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/integration-quality.md): Vea cómo medir la calidad de su aplicación, identificando puntos de mejora en su integración.
+- Cómo mejorar la aprobación de tus pagos: Ve escenarios clave que pueden ayudar a mejorar la aprobación de pagos en su tienda.
+  - [¿Por qué se rechaza un pago?](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/reasons-for-rejection.md): Conoce cuáles son las principales razones por las que se rechaza un pago.
+  - [Recomendaciones para mejorar la aprobación de pagos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/improve-payment-approval.md): Ve escenarios clave que pueden ayudar a mejorar la aprobación de pagos.
+  - [3DS 2.0](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/improve-payment-approval/3ds.md): Conoce 3DS, una tecnología que permite la autenticación de transacciones con tarjeta de crédito y débito en e-commerces.
+  - [Datos de industria](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data.md): Conoce los datos adicionales de industria que puedes enviar al crear un pago para mejorar tu aprobación.
+    - [Apparel](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/apparel.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria apparel.
+    - [Electro](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/electro.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de electro.
+    - [Tickets y entretenimiento](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/tickets-and-entretainment.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de tickets y entretenimiento.
+    - [Home & deco](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/home-and-deco.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de home & deco.
+    - [Aplicaciones y plataformas online](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/applications-online-platforms.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria aplicaciones y plataformas online.
+    - [Retail](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/retail.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de retail.
+    - [Gobierno y servicios públicos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/goverment-public-services.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de gobierno y servicios públicos.
+    - [Turismo](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/tourism.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de turismo.
+    - [Hotelería](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/hospitality.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de hotelería.
+    - [Utilities](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/utilities.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de utilities.
+    - [Venta directa](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/direct-sale.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de venta directa.
+    - [Automóviles y náuticas](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/automobiles-and-nautical.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de automóviles y náuticas.
+    - [Transporte urbano](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/urban-transport.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de transporte urbano.
+    - [Gambling](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/industry-data/gambling.md): Conoce los datos que puedes enviar para integraciones relacionadas con la industria de gambling.
+- [Cómo integrar 3DS con Checkout API](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/how-tos/integrate-3ds.md): Aprende a integrar la tecnología de autenticación 3DS con Checkout API.
+- CONTENIDO ADICIONAL: CONTENIDO ADICIONAL
+- [MCP Server](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/mcp-server.md): Conoce el Mercado Pago MCP Server.
+  - [Troubleshooting](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/mcp-server/mcp-server-troubleshooting.md): Encontra las soluciones para posibles errores con el MCP
+- [Consideraciones especiales para Argentina](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/considerations-argentina.md): Consideraciones especiales para Argentina
+- [Your integrations](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/introduction.md)
+  - [Panel del desarrollador](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/dashboard.md): Cree nuevas y visualice todas sus aplicaciones.
+  - [Detalles de la aplicación](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/application-details.md): Aprende dónde acceder a los datos generales de tu aplicación y cómo medir su calidad.
+  - [Credenciales](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/credentials.md): Credenciales son contraseñas únicas con las que identificamos una integración en su cuenta. Descubre cómo conseguirlas.
+  - Prueba: Prueba las integraciones: simula diferentes transacciones con credenciales, cuentas y tarjetas de prueba.
+    - [Cuentas de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/test/accounts.md): Aprenda los pasos necesarios para crear usuarios de prueba y probar la integración.
+    - [Tarjetas de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/test/cards.md): Ve las tarjetas de prueba locales utilizadas para simular diferentes respuestas de pago.
+  - [Notificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/notifications.md): Notificaciones son mensajes enviados por el servidor de Mercado Pago desde eventos que se realizan en su aplicación.
+    - [Webhooks](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/notifications/webhooks.md): Conozca las notificaciones de webhooks y aprenda a configurarlas para sus aplicaciones.
+    - [IPN](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/notifications/ipn.md): Conoce las notificaciones de IPN y aprende a configurarlo.
+    - [Información adicional sobre notificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/your-integrations/notifications/additional-info.md): Accede a información extra sobre tópicos de notificación, particularidades por producto, y más.
+- [Tus certificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/certifications.md): Obtenga más información sobre la página de Sus certificaciones y el Integrator ID.
+- [Gestión de contracargos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/chargebacks.md): Encuentra toda la información sobre los contracargos, cómo prevenirlos y gestionarlos por API.
+  - [Cómo evitar un contracargo](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/chargebacks/how-to-prevent.md): Encuentre información sobre cómo disminuir la probabilidad de que un pago se convierta en un contracargo.
+  - [Cómo gestionar disputas de contracargos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/chargebacks/how-to-manage.md): Consulte información sobre cómo encontrar, administrar y revisar sus disputas.
+- [Reportes](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/introduction.md): Set of financial information that help you visualize the movements of your account.
+  - [Liberaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/released-money.md): Allows you to know how your available balance is made up in Mercado Pago.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/released-money/how-to-use.md): Más información sobre cómo utilizar el informe.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/released-money/generate.md): Aprenda a generar el informe
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/released-money/report-fields.md): Learn how to read the report.
+  - [Todas las transacciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/account-money/introduction.md): Te permite consultar las transacciones que afectaron tu saldo en Mercado Pago.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/account-money/how-to-use.md): Más información sobre cómo utilizar el informe.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/account-money/generate.md): Aprenda a generar el informe.
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/account-money/report-fields.md): Aprenda a leer el informe.
+  - [Reporte de ventas de la solución split de pagos](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/introduction.md): El reporte de ventas ofrece una visión completa de las transacciones de vendedores vinculados.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/how-to-use.md): Aprende cómo consultarlo en hojas de cálculo o importarlo en el programa de conciliación de tu elección.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/generate-report.md): Aprende cómo configurar, crear y generar el reporte.
+    - [Descargar el reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/download-report.md): Aprende cómo descargar el reporte.
+    - [Consultas y validaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/queries-and-validations.md): Aprende cómo validar la estructura y las notificaciones del reporte.
+    - [Modificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/modifications.md): Aprenda a realizar cambios en la configuración de estructuras, notificaciones o eventos.
+    - [Desactivación](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/deactivation.md): Aprende cómo desactivar una estructura, notificación o evento.
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/reports/sales-report/report-fields.md): Conoce la descripción de cada campo presente en el reporte.
+- Seguridad: Seguridad
+  - [OAuth](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/introduction.md): Protocolo de autorización que permite a las aplicaciones tener acceso limitado a la información privada de las cuentas.
+    - [Creación](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/creation.md): Aprenda a crear un authorization_code para generar un access token.
+    - [Renovación](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/renewal.md): Aprenda a renovar un access token caducado.
+    - [Administración](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/management.md): Aprenda a deshabilitar e invalidar access tokens y temporal grants.
+    - [Buenas prácticas](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/best-practices.md): Conoce cuáles son las buenas prácticas para integrar OAuth.
+    - [APIs map](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/oauth/api-map.md)
+  - [PCI DSS](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/additional-content/security/pci.md): Para operar con tarjetas se debe cumplir con el estándar de seguridad de la industria de pagos: PCI DSS.
+- BUENAS PRÁCTICAS: BUENAS PRÁCTICAS
+- Buenas prácticas de UX: Buenas prácticas de UX
+  - [UX para Checkouts](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/best-practices/ux-best-practices/ux-for-checkouts/introduction.md): Una guía de buenas prácticas de UX para checkouts que te ayudarán a mejorar la experiencia de pago de tus clientes
+    - [Optimized experience](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/best-practices/ux-best-practices/ux-for-checkouts/optimized-experience.md)
+    - [Ease of conversion](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/best-practices/ux-best-practices/ux-for-checkouts/ease-of-conversion.md)
+- [Credentials best practices](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/best-practices/credentials-best-practices/introduction.md)
+  - [Mantén tus credenciales seguras](https://www.mercadopago.com.ar/developers/es/docs/checkout-api-payments/best-practices/credentials-best-practices/secure-credentials.md): Ve cómo manejar datos confidenciales y aprenda cómo protegerlos de pérdidas o vulnerabilidades.
+
+## Checkout Pro
+
+- [Resumen](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/overview.md): Procesa pagos en el ambiente de Mercado Pago, de manera simple y segura con un diseño listo para configurar.
+- Etapas de integración: Conoce las etapas de configuración necesarias para integrar Checkout Pro.
+  - [Crear aplicación](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/create-application.md): Comienza a integrar Checkout Pro creando tu aplicación.
+  - [Configurar ambiente de desarrollo](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/configure-development-enviroment.md): Instala el SDK de Mercado Pago y configura tu backend.
+  - [Crear y configurar una preferencia de pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/create-payment-preference.md): Crea la preferencia de pago que te permitirá cobrar con Mercado Pago.
+  - Integración para sitios web: Sigue los pasos para completar tu integración de Checkout Pro en un sitio web.
+    - [Configurar URLs de retorno](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/configure-back-urls.md): Configura el sitio al que tu cliente será redirigido al finalizar la compra.
+    - [Agregar el SDK al frontend e inicializar el checkout](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/web-integration/add-frontend-sdk.md): Configura la experiencia de pago del cliente en tu frontend.
+  - [Integración para aplicaciones móviles](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration.md): Conoce cómo integrar Checkout Pro de Mercado Pago para proyectos mobile.
+    - [Flutter](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration/flutter.md): Integra Checkout Pro en una aplicación mobile utilizando Flutter.
+    - [React Native CLI](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration/react-native-cli.md): Integra Checkout Pro en una aplicación mobile utilizando React Native CLI.
+    - [React Native Expo Go](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration/react-native-expo-go.md): Integra Checkout Pro en una aplicación mobile utilizando React Native Expo Go.
+    - [Java o Kotlin](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration/java-kotlin.md): Integra Checkout Pro en una aplicación mobile utilizando Java o Kotlin.
+    - [Swift](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/mobile-integration/swift.md): Integra Checkout Pro en una aplicación mobile utilizando Swift.
+  - [Configurar notificaciones de pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/payment-notifications.md): Configura las notificaciones para obtener un seguimiento de los eventos realizados en tu aplicación.
+  - [Prueba de integración](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/integration-test.md): Prueba tu integración antes de salir a producción.
+
+
+    - [Realizar compras de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/integration-test/test-purchases.md): Realiza pruebas con diferentes medios de pago para comprobar su funcionamiento.
+  - [Salir a producción](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/go-to-production.md): Con tu integración configurada y verificada, es momento de salir a producción.
+- Configuraciones adicionales
+  - [Configurar reembolsos y cancelaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/refunds-and-cancellations.md): Conoce las instrucciones necesarias para realizar un reembolso total, parcial y cancelar una compra en su sitio web.
+  - [Excluir medios de pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/payment-methods.md): Aprende a configurar un medio de pago, excluir cualquier medio de pago no deseado o definir el número de cuotas.
+  - [Restringir compras a usuarios registrados](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/mp-wallet.md): Conoce cómo configurar pagos con una cuenta de Mercado Pago como único método de pago.
+  - [Crear preferencia para múltiples ítems](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/preference-multiple-items.md): Consulta los pasos necesarios para crear una preferencia para más de un artículo.
+  - [Mostrar valor de envío](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/shipping-cost.md): Aprende cómo mostrar el monto del envío por separado del monto total de la compra al finalizar la compra.
+  - [Cambiar fecha de vencimiento](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/expiration-date.md): Consulta los pasos necesarios para cambiar la fecha de vencimiento predeterminada para los pagos en efectivo.
+  - [Esquema de apertura con redirect externo](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/opening-schema.md): Aprende a definir la forma en que Checkout Pro se abre para el usuario.
+  - [Configurar descripción de factura](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/invoice-description.md): Aprende a configurar el nombre del establecimiento que aparecerá en la factura del comprador.
+  - [Configurar la apariencia del botón de pago](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/configure-button-appearance.md): Personaliza el botón de pago para que se ajuste a tu tienda.
+
+
+
+  - [Conversión de anuncios](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/ads-conversion.md): Aprende a analizar y evaluar la relevancia y el retorno de los anuncios creados.
+  - [Habilitar modo binario](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/binary-mode.md): Aprende a habilitar el modo binario si tu modelo de negocio requiere una aprobación de pago instantánea.
+  - [Definir vigencia de preferencia](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-settings/term-of-preference.md): Conoce cómo establecer una fecha de inicio y una fecha de vencimiento de preferencia.
+  - [Configurar notificaciones de contracargos](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/chargebacks/notifications.md): Aprenda cómo configurar notificaciones de contracargos.
+- How-tos: Sigue los instructivos para completar configuraciones opcionales en tu integración.
+  - [Cómo medir la calidad de la integración](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/how-tos/integration-quality.md): Conoce cómo medir la calidad de su aplicación, identificando puntos de mejora en su integración.
+  - Cómo mejorar la aprobación de tus pagos: Revisa escenarios clave que pueden ayudar a mejorar la aprobación de pagos en su tienda.
+    - [¿Por qué se rechaza un pago?](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/how-tos/improve-payment-approval/reasons-for-rejection.md): Conoce cuáles son las principales razones por las que se rechaza un pago.
+    - [Cómo mejorar la aprobación de pagos](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/how-tos/improve-payment-approval/recommendations.md): Ve escenarios clave que pueden ayudar a mejorar la aprobación de pagos.
+    - [Datos de industria](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/how-tos/improve-payment-approval/industry-data.md): Conoce los datos adicionales de industria que puedes enviar al crear un pago para mejorar tu aprobación.
+  - [Cómo integrar el checkout en marketplace](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/how-tos/integrate-marketplace.md): Conoce los pasos para integrar Mercado Pago Checkout en los marketplaces y aumentar las posibilidades de pago.
+- Recursos: Conoce la información adicional para tu integración de Mercado pago. 
+  - [MCP Server](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/mcp-server.md): Conoce el Mercado Pago MCP Server
+    - [Troubleshooting](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/mcp-server/mcp-server-troubleshooting.md): Encontra las soluciones para posibles errores con el MCP
+  - [Credenciales](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/credentials.md): Credenciales son contraseñas únicas con las que identificamos una integración en su cuenta. Descubre cómo conseguirlas.
+  - [Datos de integración](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/your-integrations/application-details.md): Aprende dónde acceder a los datos generales de tu aplicación y cómo medir su calidad.
+  - [ Notificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/notifications.md): Las notificaciones son mensajes enviados por el servidor de Mercado Pago desde eventos que se realizan en su aplicación.
+    - [Webhooks](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/notifications/webhooks.md): Conoce las notificaciones de webhooks y aprenda a configurarlas para sus aplicaciones.
+    - [IPN](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/notifications/ipn.md): Conoce las notificaciones de IPN y aprende a configurarlo.
+    - [Información adicional sobre notificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/notifications/additional-info.md): Accede a información extra sobre tópicos de notificación, particularidades por producto, y más.
+  - [Cuentas de prueba](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/your-integrations/test/accounts.md): Aprenda los pasos necesarios para crear usuarios de prueba y probar la integración.
+  - [Contracargos](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/chargebacks.md): Aprenda más sobre los contracargos y cómo gestionarlos.
+    - [Gestionar contracargos](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/chargebacks/manage.md): Aprenda cómo gestionar contracargos y enviar la documentación necesaria para la disputa.
+  - [Demo de la experiencia visual](https://www.mercadopago.com.ar/developers/es/live-demo/checkout-pro.md): Construye la experiencia visual de Checkout Pro en tiempo real.
+  - [Seguridad](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/security/landing-hub.md): Conoce los protocolos y medidas de seguridad que aplicamos en Mercado Pago.
+  - [Buenas prácticas de credenciales](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/credentials-best-practices/introduction.md): Conoce nuestra guía de mejores prácticas de seguridad y aprende a proteger tus datos y los de las cuentas que administra
+    - [Buenas prácticas de credenciales](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/best-practices/credentials-best-practices/introduction.md): Conoce nuestra guía de mejores prácticas de seguridad y aprende a proteger tus datos y los de las cuentas que administra
+    - [Mantén tus credenciales seguras](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/best-practices/credentials-best-practices/secure-credentials.md): Aprende a mantener sus credenciales seguras.
+- [Reportes](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/introduction.md): Conjunto de información financiera que te ayuda a visualizar los movimientos de tu cuenta.
+  - [Liquidaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/released-money/introduction.md): Te permite conocer cómo se integra tu saldo disponible en Mercado Pago.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/released-money/how to use.md): Más información sobre cómo utilizar el reporte.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/released-money/generate.md): Conoce los pasos necesarios para generar el reporte de liberaciones.
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/released-money/report-use.md): Obtenga información sobre los campos del reporte y cómo leer sus resultados.
+  - [Todas las transacciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/account-money/introduction.md): Te permite consultar las transacciones que afectaron tu saldo en Mercado Pago.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/account-money/how-to-use.md): Más información sobre cómo utilizar el reporte.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/account-money/generate.md): Conoce los pasos necesarios para generar el reporte de Todas las transacciones.
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/account-money/report-fields.md): Obtenga información sobre los campos del reporte y cómo leer sus resultados.
+  - [Reporte de ventas de la solución split de pagos](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/introduction.md): El reporte de ventas ofrece una visión completa de las transacciones de vendedores vinculados.
+    - [Usos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/how-to-use.md): Aprende cómo consultarlo en hojas de cálculo o importarlo en el programa de conciliación de tu elección.
+    - [Generar reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/generate-report.md): Aprende cómo configurar, crear y generar el reporte.
+    - [Descargar el reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/download-report.md): Aprende cómo descargar el reporte.
+    - [Consultas y validaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/queries-and-validations.md): Aprende cómo validar la estructura y las notificaciones del reporte.
+    - [Modificaciones](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/modifications.md): Aprenda a realizar cambios en la configuración de estructuras, notificaciones o eventos.
+    - [Desactivación](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/deactivation.md): Aprende cómo desactivar una estructura, notificación o evento.
+    - [Campos del reporte](https://www.mercadopago.com.ar/developers/es/docs/checkout-pro/additional-content/reports/sales-report/report-fields.md): Conoce la descripción de cada campo presente en el reporte.
+
+
+## Seguridad
+
+- [Seguridad](https://www.mercadopago.com.ar/developers/es/docs/security/landing-hub.md): Conoce los protocolos y medidas de seguridad que aplicamos en Mercado Pago.
+- [OAuth](https://www.mercadopago.com.ar/developers/es/docs/security/oauth.md): Protocolo de autorización que permite a las aplicaciones tener acceso limitado a la información privada de las cuentas.
+  - [Obtener Access Token](https://www.mercadopago.com.ar/developers/es/docs/security/oauth/creation.md): Aprende a utilizar los flujos (grant types) para obtener un Access Token y acceder a los datos expuestos por una API.
+  - [Renovar Access Token](https://www.mercadopago.com.ar/developers/es/docs/security/oauth/renewal.md): Aprende a utilizar un 'refresh_token' para renovar un Access Token expirado.
+  - [Gestionar Access Token](https://www.mercadopago.com.ar/developers/es/docs/security/oauth/management.md): Aprende a deshabilitar e invalidar Access Tokens y temporary grants.
+  - [Buenas prácticas](https://www.mercadopago.com.ar/developers/es/docs/security/oauth/best-practices.md): Conoce cuáles son las buenas prácticas para integrar OAuth.
+  - [Mapa de APIs](https://www.mercadopago.com.ar/developers/es/docs/security/oauth/apis-map.md): Vea las API disponibles.
+- [OWASP](https://www.mercadopago.com.ar/developers/es/docs/security/owasp.md): Conoce OWASP, una comunidad abierta que proporciona herramientas para desarrollar y mantener aplicaciones web seguras.
+- [PCI DSS](https://www.mercadopago.com.ar/developers/es/docs/security/pci.md): Para operar con tarjetas se debe cumplir con el estándar de seguridad de la industria de pagos: PCI DSS.

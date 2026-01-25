@@ -96,5 +96,22 @@ export const ProductService = {
 
   async delete(id: number | string) {
     await pool.execute('DELETE FROM products WHERE id = ?', [id]);
+  },
+
+  async findById(id: number | string): Promise<Product | null> {
+    const [rows]: any = await pool.execute(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.id = ?
+    `, [id]);
+
+    if (rows.length === 0) return null;
+
+    const product = rows[0];
+    const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [product.id]);
+    product.images = imgs.map((i: any) => i.url);
+
+    return product;
   }
 };

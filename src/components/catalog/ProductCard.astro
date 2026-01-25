@@ -1,18 +1,21 @@
 ---
+import { formatMoney } from "@/utils/formatters";
 interface Props {
+	id: number;
 	title: string;
 	category: string;
 	image: string;
-	price?: string;
+	price?: number;
 }
 
-const { title, category, image, price } = Astro.props;
+const { id, title, category, image, price } = Astro.props;
 ---
 
-<div
+<a
+	href={`/catalog/${id}`}
 	class="group bg-white rounded-2xl overflow-hidden border border-secondary/5 hover:border-primary/20 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex flex-col h-full"
 >
-	<div class="relative aspect-square overflow-hidden bg-accent">
+	<div class="relative aspect-square overflow-hidden bg-accent shrink-0">
 		<img
 			src={image}
 			alt={title}
@@ -20,44 +23,43 @@ const { title, category, image, price } = Astro.props;
 		/>
 		<div class="absolute top-4 left-4">
 			<span
-				class="bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full"
+				class="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full italic"
 			>
 				{category}
 			</span>
 		</div>
 	</div>
 
-	<div class="p-6 flex flex-col grow">
+	<div class="p-6 flex flex-col grow gap-2">
 		<h3
-			class="font-bold text-lg mb-2 group-hover:text-primary transition-colors duration-300"
+			class="font-black text-lg group-hover:text-primary transition-colors duration-300 leading-tight"
 		>
 			{title}
 		</h3>
-		<div class="mt-auto pt-4 flex items-center justify-between">
+		<div class="mt-auto pt-2 flex flex-col gap-1">
 			{
 				price && (
-					<span class="text-secondary font-black text-xl">
-						{price}
+					<span class="text-secondary font-black text-2xl tracking-tighter">
+						{formatMoney(price, 0, "$")}
 					</span>
 				)
 			}
-			<a
-				href="/catalog"
-				class="text-xs font-bold uppercase tracking-widest text-secondary/40 group-hover:text-primary flex items-center gap-1 transition-colors"
+			<div
+				class="text-[10px] font-black uppercase tracking-widest text-secondary/30 group-hover:text-primary flex items-center gap-1 transition-colors"
 			>
 				Ver detalles
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					width="14"
-					height="14"
+					width="12"
+					height="12"
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
-					stroke-width="3"
+					stroke-width="4"
 					stroke-linecap="round"
 					stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg
 				>
-			</a>
+			</div>
 		</div>
 	</div>
-</div>
+</a>
