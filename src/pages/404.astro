@@ -1,0 +1,81 @@
+---
+import Layout from "@/layouts/Layout.astro";
+---
+
+<Layout title="Página no encontrada">
+	<section class="py-24 md:py-32 bg-accent">
+		<div class="container mx-auto px-4">
+			<div class="max-w-2xl mx-auto text-center">
+				<!-- Ilustración de excavadora perdida -->
+				<div class="mb-8 relative">
+					<div class="text-[180px] md:text-[240px] font-black text-primary/10 leading-none select-none">
+						404
+					</div>
+					<div class="absolute inset-0 flex items-center justify-center">
+						<svg class="w-32 h-32 md:w-40 md:h-40 text-primary animate-bounce-slow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+							<path d="M9 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+							<path d="M19 17a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" />
+							<path d="M5 17H3v-4l2-3h4l1 3" />
+							<path d="M15 17h4v-4h-6l-1-6H8" />
+							<path d="M6 10V6h3" />
+							<path d="M15 13V8" />
+							<path d="M18 10l2-2" />
+						</svg>
+					</div>
+				</div>
+
+				<h1 class="text-3xl md:text-4xl font-black text-secondary mb-4">
+					¡Ups! Parece que esta pieza no está en stock
+				</h1>
+				
+				<p class="text-secondary/60 text-lg mb-8 max-w-md mx-auto">
+					La página que buscas se perdió en el camino. Quizás fue a buscar repuestos...
+				</p>
+
+				<div class="flex flex-col sm:flex-row gap-4 justify-center">
+					<a 
+						href="/" 
+						class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all hover:scale-105 shadow-lg shadow-primary/20"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+						</svg>
+						Volver al inicio
+					</a>
+					<a 
+						href="/catalog" 
+						class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-secondary font-bold rounded-xl border-2 border-secondary/10 hover:border-primary/30 transition-all hover:scale-105"
+					>
+						<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+						</svg>
+						Ver catálogo
+					</a>
+				</div>
+
+				<!-- Decoración -->
+				<div class="mt-16 flex items-center justify-center gap-2 text-secondary/30">
+					<div class="w-12 h-px bg-secondary/20"></div>
+					<svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+						<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+					</svg>
+					<div class="w-12 h-px bg-secondary/20"></div>
+				</div>
+			</div>
+		</div>
+	</section>
+</Layout>
+
+<style>
+	@keyframes bounce-slow {
+		0%, 100% {
+			transform: translateY(0);
+		}
+		50% {
+			transform: translateY(-10px);
+		}
+	}
+	.animate-bounce-slow {
+		animation: bounce-slow 3s ease-in-out infinite;
+	}
+</style>
