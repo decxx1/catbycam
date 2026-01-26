@@ -12,7 +12,10 @@ export default defineConfig({
   }),
   integrations: [vue()],
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      allowedHosts: ['mp-astro.px.com.ar', 'localhost', '127.0.0.1']
+    }
   },
   env: {
     schema: {

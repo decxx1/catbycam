@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { toast } from '@/utils/toast';
+import ConfirmModal from '@/components/common/ConfirmModal.vue';
 
 const addresses = ref<any[]>([]);
 const isLoading = ref(true);
@@ -13,6 +14,9 @@ const currentAddress = ref({
   phone: '',
   is_default: false
 });
+
+const showDeleteModal = ref(false);
+const addressToDelete = ref<number | null>(null);
 
 const fetchAddresses = async () => {
   try {
@@ -58,8 +62,15 @@ const editAddress = (addr: any) => {
     isEditing.value = true;
 };
 
-const deleteAddress = async (id: number) => {
-    if (!confirm('¿Estás seguro de eliminar esta dirección?')) return;
+const deleteAddress = (id: number) => {
+    addressToDelete.value = id;
+    showDeleteModal.value = true;
+};
+
+const confirmDelete = async () => {
+    if (addressToDelete.value === null) return;
+    showDeleteModal.value = false;
+    const id = addressToDelete.value;
     try {
         const res = await fetch('/api/shipping', {
             method: 'DELETE',
@@ -72,6 +83,8 @@ const deleteAddress = async (id: number) => {
         }
     } catch (e) {
         toast.error('Error al eliminar');
+    } finally {
+        addressToDelete.value = null;
     }
 };
 
@@ -134,7 +147,7 @@ const addNew = () => {
         <div v-if="isLoading" class="py-12 text-center text-secondary/30 font-bold uppercase tracking-widest text-xs animate-pulse">
             Cargando direcciones...
         </div>
-        <div v-else-if="addresses.length === 0" class="bg-accent/30 rounded-[2rem] py-12 text-center text-secondary/30 border border-secondary/5 border-dashed">
+        <div v-else-if="addresses.length === 0" class="bg-accent/30 rounded py-12 text-center text-secondary/30 border border-secondary/5 border-dashed">
             <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"><path d="m2 22 1-1h3l9-9"/><path d="M20 21v-2a4 4 0 0 0-3-3.87"/><path d="M4 3.13V3c0-.55.45-1 1-1h2c.55 0 1 .45 1 1v1.13c0 .5-.35.93-.84 1.05L5.73 6.13a1 1 0 0 0-.63.63L4.13 8.19c-.12.49-.55.84-1.05.84H2c-.55 0-1-.45-1-1v-2c0-.55.45-1 1-1h1.13c.5 0 .93.35 1.05.84Z"/><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
             </div>
@@ -159,5 +172,14 @@ const addNew = () => {
             </div>
         </div>
     </div>
+
+    <ConfirmModal 
+        :show="showDeleteModal"
+        title="¿Eliminar dirección?"
+        message="Esta dirección se borrará permanentemente de tu cuenta."
+        confirm-label="Eliminar"
+        @confirm="confirmDelete"
+        @cancel="showDeleteModal = false"
+    />
   </div>
 </template>

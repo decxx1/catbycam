@@ -1,0 +1,17 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/admin.astro";
+import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
+import OrdersDashboard from "@/components/admin/OrdersDashboard.vue";
+---
+
+<AdminLayout title="Gestión de Pedidos">
+	<AdminPageHeader
+		title="Pedidos"
+		subtitle="Administra los pedidos de tus clientes."
+	/>
+
+	<div class="mt-8">
+		<OrdersDashboard client:only="vue" />
+	</div>
+</AdminLayout>

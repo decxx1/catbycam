@@ -1,5 +1,6 @@
 ---
 import AddressManager from "./AddressManager.vue";
+import OrderHistory from "./OrderHistory.vue";
 const { user } = Astro.props;
 ---
 
@@ -82,36 +83,16 @@ const { user } = Astro.props;
 				</div>
 
 				<div>
-					<h4 class="font-bold text-sm mb-4">Pedidos recientes</h4>
-					<div
-						class="bg-accent/30 rounded-2xl p-8 text-center text-secondary/30 border border-secondary/5"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							width="32"
-							height="32"
-							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="2"
-							stroke-linecap="round"
-							stroke-linejoin="round"
-							class="mx-auto mb-4 opacity-20"
-							><path
-								d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"
-							></path><path d="M3 6h18"></path><path
-								d="M16 10a4 4 0 0 1-8 0"></path></svg
-						>
-						<p class="text-xs font-bold uppercase tracking-widest">
-							Aún no realizaste ninguna compra
-						</p>
-					</div>
+					<h4 class="font-bold text-sm mb-6">Mis Pedidos</h4>
+					<OrderHistory client:only />
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<AddressManager client:load />
+	<div class="mt-8">
+		<AddressManager client:only />
+	</div>
 
 	<div
 		class="flex flex-row items-center justify-center gap-4 mt-12 text-center"

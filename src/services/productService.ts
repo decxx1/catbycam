@@ -16,6 +16,14 @@ export interface Product {
   category_name?: string;
 }
 
+// Helper to convert DB row to proper Product type
+const normalizeProduct = (row: any): Product => ({
+  ...row,
+  price: Number(row.price),
+  stock: Number(row.stock),
+  category_id: row.category_id ? Number(row.category_id) : null
+});
+
 export const ProductService = {
   async getAll({ page = 1, limit = 10, search = '', categoryId = '' }): Promise<{ products: Product[], total: number }> {
     const offset = (page - 1) * limit;
@@ -45,12 +53,16 @@ export const ProductService = {
     const [rows]: any = await pool.execute(query, params);
     
     // Fetch extra images for each product
-    for (const product of rows) {
-      const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [product.id]);
-      product.images = imgs.map((i: any) => i.url);
+    const products: Product[] = [];
+    for (const row of rows) {
+      const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
+      products.push({
+        ...normalizeProduct(row),
+        images: imgs.map((i: any) => i.url)
+      });
     }
 
-    return { products: rows, total: totalRows[0].count };
+    return { products, total: totalRows[0].count };
   },
 
   async create(data: Product): Promise<number> {
@@ -108,10 +120,12 @@ export const ProductService = {
 
     if (rows.length === 0) return null;
 
-    const product = rows[0];
-    const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [product.id]);
-    product.images = imgs.map((i: any) => i.url);
+    const row = rows[0];
+    const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
 
-    return product;
+    return {
+      ...normalizeProduct(row),
+      images: imgs.map((i: any) => i.url)
+    };
   }
 };

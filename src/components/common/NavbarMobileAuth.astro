@@ -1,0 +1,59 @@
+---
+import { getSession } from "@/utils/auth";
+
+const token = Astro.cookies.get("auth_token")?.value;
+const session = token ? await getSession(token) : null;
+const isLoggedIn = !!session;
+---
+
+<!-- Mobile Auth -->
+<div id="mobile-auth-container" class="space-y-6">
+	{
+		isLoggedIn ? (
+			<a
+				href="/profile"
+				class="flex items-center gap-4 group text-secondary"
+			>
+				<div class="w-12 h-12 rounded-2xl flex items-center justify-center transition-all bg-accent text-secondary group-hover:bg-primary group-hover:text-white">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.5"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+					>
+						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+						<circle cx="12" cy="7" r="4" />
+					</svg>
+				</div>
+				<div class="text-left">
+					<span class="block text-xl font-black leading-none">
+						Mi Perfil
+					</span>
+					<span class="text-xs font-bold text-secondary/40 uppercase tracking-widest">
+						Gestionar cuenta
+					</span>
+				</div>
+			</a>
+		) : (
+			<div class="flex flex-col gap-4">
+				<a
+					href="/login"
+					class="w-full text-center font-bold py-4 text-secondary/60 hover:text-primary border border-secondary/10 rounded-xl transition-all"
+				>
+					Ingresar
+				</a>
+				<a
+					href="/register"
+					class="w-full text-center btn-primary py-4 rounded-xl"
+				>
+					Regístrate
+				</a>
+			</div>
+		)
+	}
+</div>

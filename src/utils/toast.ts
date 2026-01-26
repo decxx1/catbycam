@@ -5,7 +5,7 @@ export const toast = {
         Toastify({
             text: message,
             duration: 3000,
-            gravity: "top",
+            gravity: "bottom",
             position: "right",
             stopOnFocus: true,
             style: {

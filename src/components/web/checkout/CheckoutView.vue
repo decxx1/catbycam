@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { cartList, cartTotal, cartCount } from '@/stores/cartStore';
 import { formatMoney } from '@/utils/formatters';
@@ -27,6 +27,10 @@ const shippingData = ref({
   phone: '',
   comments: ''
 });
+
+const isPreferenceLoading = ref(false);
+const preferenceId = ref<string | null>(null);
+const isSandbox = ref(import.meta.env.PUBLIC_MP_SANDBOX === 'true');
 
 const fetchAddresses = async () => {
     if (!session.value) return;
@@ -85,6 +89,65 @@ const useNewAddress = () => {
     };
 };
 
+const createPreference = async () => {
+    isPreferenceLoading.value = true;
+    try {
+        const res = await fetch('/api/checkout/preference', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                items: items.value.map(i => ({
+                    product_id: i.id,
+                    title: i.title,
+                    price: i.price,
+                    quantity: i.quantity
+                })),
+                total: total.value,
+                shippingAddress: `${shippingData.value.address}, ${shippingData.value.city}, ${shippingData.value.state} (CP: ${shippingData.value.zip})`
+            })
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            preferenceId.value = data.preferenceId;
+            initMPButton(data.preferenceId);
+        }
+    } catch (e) {
+        console.error('Error creating preference', e);
+    } finally {
+        isPreferenceLoading.value = false;
+    }
+};
+
+const initMPButton = (prefId: string) => {
+    // @ts-ignore
+    const mp = new window.MercadoPago(import.meta.env.PUBLIC_MP_PUBLIC_KEY, {
+        locale: 'es-AR'
+    });
+    const bricksBuilder = mp.bricks();
+
+    const renderComponent = async () => {
+        if (window.checkoutButton) window.checkoutButton.unmount();
+        // @ts-ignore
+        window.checkoutButton = await bricksBuilder.create('wallet', 'wallet_container', {
+            initialization: {
+                preferenceId: prefId,
+                redirectMode: 'modal'
+            },
+            customization: {
+                texts: {
+                    valueProp: 'smart_option',
+                },
+                visual: {
+                    buttonBackground: 'default',
+                    borderRadius: '16px',
+                }
+            },
+        });
+    };
+    renderComponent();
+};
+
 const handleShippingSubmit = async () => {
   if (!shippingData.value.address || !shippingData.value.city || !shippingData.value.phone) {
     alert('Por favor completa los campos obligatorios');
@@ -108,6 +171,7 @@ const handleShippingSubmit = async () => {
   }
 
   step.value = 3;
+  createPreference();
 };
 
 const goToLogin = () => {
@@ -117,6 +181,13 @@ const goToLogin = () => {
 const goToRegister = () => {
   window.location.href = `/register?redirect=/checkout`;
 };
+
+// Re-generate preference if cart changes while on the last step
+watch([items, total], () => {
+    if (step.value === 3) {
+        createPreference();
+    }
+}, { deep: true });
 </script>
 
 <template>
@@ -237,16 +308,23 @@ const goToRegister = () => {
               <h2 class="text-3xl font-black text-secondary tracking-tighter uppercase italic">Pago</h2>
             </div>
 
-            <div class="bg-white rounded-3xl p-10 border border-secondary/5 shadow-xl flex flex-col items-center justify-center text-center gap-6">
+            <div class="bg-white rounded-3xl p-10 border border-secondary/5 shadow-xl flex flex-col items-center justify-center text-center gap-6 relative overflow-hidden">
+              <div v-if="isSandbox" class="absolute top-0 right-0 bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest px-6 py-1 rotate-45 translate-x-4 translate-y-2 shadow-lg">
+                Modo Sandbox
+              </div>
               <div class="w-20 h-20 bg-primary/10 text-primary rounded-full flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
               </div>
               <h3 class="text-2xl font-black text-secondary tracking-tighter uppercase italic">Mercado Pago</h3>
-              <p class="text-secondary/60 font-bold max-w-sm">Próximamente integraremos el botón de pago oficial de Mercado Pago para que puedas finalizar tu compra de forma segura.</p>
-              <button disabled class="w-full py-5 bg-secondary/10 text-secondary/30 rounded-2xl font-black uppercase tracking-widest cursor-not-allowed">
-                Pagar con Mercado Pago
-              </button>
-              <button @click="step = 2" class="text-xs font-bold uppercase text-secondary/40 hover:text-primary transition-colors underline">Volver a datos de envío</button>
+              <p class="text-secondary/60 font-bold max-w-sm">Haz click en el botón de abajo para finalizar tu compra de forma segura con Mercado Pago.</p>
+              
+              <div id="wallet_container" class="w-full min-h-[48px]">
+                <div v-if="isPreferenceLoading" class="w-full h-12 bg-secondary/10 animate-pulse rounded-2xl flex items-center justify-center font-bold text-secondary/30 uppercase tracking-widest text-xs">
+                    Generando botón de pago...
+                </div>
+              </div>
+
+              <button @click="step = 2" class="text-xs font-bold uppercase text-secondary/40 hover:text-primary transition-colors underline mt-4">Volver a datos de envío</button>
             </div>
           </div>
 

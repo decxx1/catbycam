@@ -21,7 +21,9 @@ const isLoading = ref(false);
 const showProductModal = ref(false);
 const showCategoryModal = ref(false);
 const showDeleteConfirm = ref(false);
+const showCategoryDeleteConfirm = ref(false);
 const productToDelete = ref<number | null>(null);
+const categoryToDelete = ref<number | null>(null);
 const editingProduct = ref<Product | null>(null);
 
 // Fetch Data
@@ -129,22 +131,27 @@ const createCategory = async (name: string) => {
     }
 };
 
-const deleteCategory = async (id: number) => {
-    // For categories we still use a simple confirmation or we could use another ConfirmModal
-    // Let's use ConfirmModal for everything later, for now just avoid window.confirm
-    if (confirm('¿Eliminar categoría? Esto afectará a los productos asociados.')) {
-        try {
-            const res = await fetch('/api/admin/categories', {
-                method: 'DELETE',
-                body: JSON.stringify({ id })
-            });
-            if (res.ok) {
-                toast.success('Categoría eliminada');
-                fetchCategories();
-            }
-        } catch (e) {
-            toast.error('Error al eliminar categoría');
+const deleteCategory = (id: number) => {
+    categoryToDelete.value = id;
+    showCategoryDeleteConfirm.value = true;
+};
+
+const confirmDeleteCategory = async () => {
+    if (categoryToDelete.value === null) return;
+    showCategoryDeleteConfirm.value = false;
+    try {
+        const res = await fetch('/api/admin/categories', {
+            method: 'DELETE',
+            body: JSON.stringify({ id: categoryToDelete.value })
+        });
+        if (res.ok) {
+            toast.success('Categoría eliminada');
+            fetchCategories();
         }
+    } catch (e) {
+        toast.error('Error al eliminar categoría');
+    } finally {
+        categoryToDelete.value = null;
     }
 };
 
@@ -281,7 +288,7 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
     <Modal 
         :show="showCategoryModal" 
         title="Gestionar Categorías"
-        size="sm"
+        size="md"
         @close="showCategoryModal = false"
     >
         <CategoryManager 
@@ -297,9 +304,18 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
         title="¿Eliminar producto?"
         message="Esta acción eliminará el producto y todas sus imágenes de forma permanente. No se puede deshacer."
         confirm-label="Eliminar para siempre"
-        confirm-variant="danger"
         @confirm="handleDelete"
         @cancel="showDeleteConfirm = false"
+    />
+
+    <!-- Confirm Modal: Delete Category -->
+    <ConfirmModal 
+        :show="showCategoryDeleteConfirm"
+        title="¿Eliminar categoría?"
+        message="Los productos asociados quedarán sin categoría asignada."
+        confirm-label="Eliminar"
+        @confirm="confirmDeleteCategory"
+        @cancel="showCategoryDeleteConfirm = false"
     />
   </div>
 </template>
