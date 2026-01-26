@@ -1,13 +1,23 @@
 <script setup lang="ts">
 import { formatMoney } from "@/utils/formatters";
+import { computed } from 'vue';
 
 const props = defineProps<{
   title: string;
   category: string;
   image: string;
   price?: number;
+  status?: 'active' | 'inactive' | 'out_of_stock' | 'paused';
 }>();
 
+const statusConfig = computed(() => {
+  const configs: Record<string, { label: string; color: string }> = {
+    inactive: { label: 'Inactivo', color: 'bg-gray-500' },
+    out_of_stock: { label: 'Agotado', color: 'bg-red-500' },
+    paused: { label: 'Pausado', color: 'bg-amber-500' }
+  };
+  return props.status && props.status !== 'active' ? configs[props.status] : null;
+});
 </script>
 
 <template>
@@ -22,6 +32,17 @@ const props = defineProps<{
         <span class="bg-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full italic">
           {{ category }}
         </span>
+      </div>
+      <!-- Status Ribbon (admin view) -->
+      <div v-if="statusConfig" class="absolute top-0 right-0 overflow-hidden w-24 h-24">
+        <div 
+          :class="[
+            'absolute top-3 -right-8 w-32 text-center py-1 text-[9px] font-black uppercase tracking-widest text-white transform rotate-45 shadow-lg',
+            statusConfig.color
+          ]"
+        >
+          {{ statusConfig.label }}
+        </div>
       </div>
     </div>
 

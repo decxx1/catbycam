@@ -10,13 +10,14 @@ const categoryId = Astro.url.searchParams.get("category") || "";
 const page = Number(Astro.url.searchParams.get("page") || 1);
 const limit = 12;
 
-const { products: allProducts, total } = await ProductService.getAll({
+const { products: rawProducts, total } = await ProductService.getAll({
 	page,
 	limit,
 	categoryId,
 });
 const categories = await CategoryService.getAll();
 
+const allProducts = rawProducts.filter(p => p.status !== 'inactive');
 const totalPages = Math.ceil(total / limit);
 ---
 
@@ -70,6 +71,7 @@ const totalPages = Math.ceil(total / limit);
 							category={p.category_name || "Sin categoría"}
 							image={p.main_image}
 							price={p.price}
+							status={p.status}
 						/>
 					))
 				}

@@ -158,6 +158,36 @@ const handleSubmit = () => {
         </div>
 
         <div class="flex flex-col gap-2">
+          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Estado del Producto</label>
+          <div class="grid grid-cols-4 gap-2">
+            <label 
+              v-for="option in [
+                { value: 'active', label: 'Activo', color: 'bg-green-500' },
+                { value: 'inactive', label: 'Inactivo', color: 'bg-gray-400' },
+                { value: 'out_of_stock', label: 'Agotado', color: 'bg-red-500' },
+                { value: 'paused', label: 'Pausado', color: 'bg-amber-500' }
+              ]"
+              :key="option.value"
+              :class="[
+                'flex items-center gap-2 p-3 rounded-xl border-2 cursor-pointer transition-all',
+                product.status === option.value 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-secondary/10 hover:border-secondary/20'
+              ]"
+            >
+              <input 
+                type="radio" 
+                v-model="product.status" 
+                :value="option.value" 
+                class="hidden"
+              />
+              <span :class="['w-3 h-3 rounded-full', option.color]"></span>
+              <span class="text-xs font-bold">{{ option.label }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
           <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Descripción</label>
           <textarea 
             v-model="product.description"

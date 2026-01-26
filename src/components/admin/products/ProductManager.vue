@@ -136,6 +136,24 @@ const deleteCategory = (id: number) => {
     showCategoryDeleteConfirm.value = true;
 };
 
+const updateCategory = async ({ id, name }: { id: number; name: string }) => {
+    try {
+        const res = await fetch('/api/admin/categories', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name })
+        });
+        if (res.ok) {
+            toast.success('Categoría actualizada');
+            fetchCategories();
+        } else {
+            throw new Error();
+        }
+    } catch (e) {
+        toast.error('Error al actualizar categoría');
+    }
+};
+
 const confirmDeleteCategory = async () => {
     if (categoryToDelete.value === null) return;
     showCategoryDeleteConfirm.value = false;
@@ -195,6 +213,7 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
         </div>
 
         <div class="flex items-center gap-3 w-full md:w-auto">
+            
             <button 
                 @click="showCategoryModal = true"
                 class="grow md:grow-0 px-6 py-3 bg-secondary text-white font-black text-sm rounded-xl hover:bg-secondary/90 transition-all cursor-pointer"
@@ -209,15 +228,21 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
             </button>
         </div>
     </div>
-
+    <a 
+        href="/admin/products/quick-edit"
+        class="grow md:grow-0 px-6 py-3 mb-8 bg-gray-500 text-white font-black text-sm rounded-xl hover:bg-gray-600 transition-all cursor-pointer text-center"
+    >
+        ⚡Edición Rápida
+    </a>
     <!-- main list -->
-    <div v-if="products.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
+    <div v-if="products.length > 0" class="mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8">
       <div v-for="product in products" :key="product.id" class="relative group">
         <ProductCard 
             :title="product.title"
             :category="product.category_name || 'Sin categoría'"
             :image="product.main_image"
             :price="product.price"
+            :status="product.status"
         />
         <!-- Admin Controls Overlay -->
         <div class="absolute top-4 right-4 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -295,6 +320,7 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
             :categories="categories"
             @create="createCategory"
             @delete="deleteCategory"
+            @update="updateCategory"
         />
     </Modal>
 

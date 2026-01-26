@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   price: number;
   stock: number;
-  status: 'active' | 'inactive';
+  status: 'active' | 'inactive' | 'out_of_stock' | 'paused';
   item_condition: 'new' | 'used' | 'not_specified';
   category_id: number | null;
   main_image: string;
@@ -127,5 +127,45 @@ export const ProductService = {
       ...normalizeProduct(row),
       images: imgs.map((i: any) => i.url)
     };
+  },
+
+  async bulkUpdatePrices(percentage: number, categoryId?: number | string): Promise<number> {
+    const multiplier = 1 + (percentage / 100);
+    let query = 'UPDATE products SET price = ROUND(price * ?, 2)';
+    const params: any[] = [multiplier];
+
+    if (categoryId) {
+      query += ' WHERE category_id = ?';
+      params.push(categoryId);
+    }
+
+    const [result]: any = await pool.execute(query, params);
+    return result.affectedRows;
+  },
+
+  async quickUpdate(id: number | string, data: { title?: string; price?: number; stock?: number; status?: string; category_id?: number | null }) {
+    const fields: string[] = [];
+    const params: any[] = [];
+
+    if (data.title !== undefined) { fields.push('title = ?'); params.push(data.title); }
+    if (data.price !== undefined) { fields.push('price = ?'); params.push(data.price); }
+    if (data.stock !== undefined) { fields.push('stock = ?'); params.push(data.stock); }
+    if (data.status !== undefined) { fields.push('status = ?'); params.push(data.status); }
+    if (data.category_id !== undefined) { fields.push('category_id = ?'); params.push(data.category_id); }
+
+    if (fields.length === 0) return;
+
+    params.push(id);
+    await pool.execute(`UPDATE products SET ${fields.join(', ')} WHERE id = ?`, params);
+  },
+
+  async getAllSimple(): Promise<Pick<Product, 'id' | 'title' | 'price' | 'stock' | 'status' | 'category_id' | 'category_name'>[]> {
+    const [rows]: any = await pool.execute(`
+      SELECT p.id, p.title, p.price, p.stock, p.status, p.category_id, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      ORDER BY p.title ASC
+    `);
+    return rows.map(normalizeProduct);
   }
 };

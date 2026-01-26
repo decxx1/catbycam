@@ -13,13 +13,24 @@ if (!product) {
 	return Astro.redirect("/404");
 }
 
-// Fetch suggested products (same category, different ID)
+if (product.status === 'inactive') {
+	return Astro.redirect("/catalog");
+}
+
+const canPurchase = product.status === 'active';
+const statusConfig: Record<string, { label: string; color: string }> = {
+	out_of_stock: { label: 'Agotado', color: 'bg-red-500' },
+	paused: { label: 'Pausado', color: 'bg-amber-500' }
+};
+const showStatusBadge = product.status === 'out_of_stock' || product.status === 'paused';
+
+// Fetch suggested products (same category, different ID, only active)
 const { products: suggested } = await ProductService.getAll({
 	limit: 4,
 	categoryId: String(product.category_id),
 });
 
-const filteredSuggested = suggested.filter((p) => p.id !== product.id);
+const filteredSuggested = suggested.filter((p) => p.id !== product.id && p.status === 'active');
 
 const formattedPrice =
 	`$ ` +
@@ -61,15 +72,24 @@ const formattedPrice =
 					<div
 						class="bg-white p-10 rounded-[2.5rem] border border-secondary/5 shadow-sm sticky top-32"
 					>
-						<span
-							class="inline-block px-4 py-1 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-full mb-6 italic"
-						>
-							{
-								product.item_condition === "new"
-									? "Nuevo Ingreso"
-									: "Usado Seleccionado"
-							}
-						</span>
+						<div class="flex items-center gap-3 mb-6">
+							<span
+								class="inline-block px-4 py-1 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-full italic"
+							>
+								{
+									product.item_condition === "new"
+										? "Nuevo Ingreso"
+										: "Usado Seleccionado"
+								}
+							</span>
+							{showStatusBadge && statusConfig[product.status] && (
+								<span
+									class={`inline-block px-4 py-1 text-white text-[10px] font-black uppercase tracking-widest rounded-full ${statusConfig[product.status].color}`}
+								>
+									{statusConfig[product.status].label}
+								</span>
+							)}
+						</div>
 
 						<h1
 							class="text-4xl font-black text-secondary leading-tight mb-4"
@@ -119,19 +139,25 @@ const formattedPrice =
 								>
 								Consultar por WhatsApp
 							</a>
-							<button
-								id="buy-now-btn"
-								class="w-full bg-accent/50 hover:bg-accent text-secondary font-black py-6 rounded-2xl transition-all cursor-pointer"
-								data-product={JSON.stringify({
-									id: product.id,
-									title: product.title,
-									category: product.category_name,
-									image: product.main_image,
-									price: product.price,
-								})}
-							>
-								Comprar Ahora
-							</button>
+							{canPurchase ? (
+								<button
+									id="buy-now-btn"
+									class="w-full bg-accent/50 hover:bg-accent text-secondary font-black py-6 rounded-2xl transition-all cursor-pointer"
+									data-product={JSON.stringify({
+										id: product.id,
+										title: product.title,
+										category: product.category_name,
+										image: product.main_image,
+										price: product.price,
+									})}
+								>
+									Comprar Ahora
+								</button>
+							) : (
+								<div class="w-full bg-secondary/10 text-secondary/50 font-black py-6 rounded-2xl text-center cursor-not-allowed">
+									{product.status === 'out_of_stock' ? 'Producto Agotado' : 'No Disponible'}
+								</div>
+							)}
 						</div>
 
 						<div

@@ -6,9 +6,18 @@ interface Props {
 	category: string;
 	image: string;
 	price?: number;
+	status?: 'active' | 'inactive' | 'out_of_stock' | 'paused';
 }
 
-const { id, title, category, image, price } = Astro.props;
+const { id, title, category, image, price, status = 'active' } = Astro.props;
+
+const statusConfig: Record<string, { label: string; color: string }> = {
+	out_of_stock: { label: 'Agotado', color: 'bg-red-500' },
+	paused: { label: 'Pausado', color: 'bg-amber-500' }
+};
+
+const showRibbon = status === 'out_of_stock' || status === 'paused';
+const canAddToCart = status === 'active';
 ---
 
 <div
@@ -34,6 +43,15 @@ const { id, title, category, image, price } = Astro.props;
 				{category}
 			</span>
 		</div>
+		{showRibbon && statusConfig[status] && (
+			<div class="absolute top-0 right-0 overflow-hidden w-24 h-24">
+				<div 
+					class={`absolute top-3 -right-8 w-32 text-center py-1 text-[9px] font-black uppercase tracking-widest text-white transform rotate-45 shadow-lg ${statusConfig[status].color}`}
+				>
+					{statusConfig[status].label}
+				</div>
+			</div>
+		)}
 	</div>
 
 	<div class="p-6 flex flex-col grow gap-2 z-10">
@@ -52,34 +70,54 @@ const { id, title, category, image, price } = Astro.props;
 						<span class="text-secondary font-black text-2xl tracking-tighter">
 							{formatMoney(price, 0, "$")}
 						</span>
-						<button
-							type="button"
-							class="add-to-cart-btn p-2 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-all duration-300 group/btn"
-							data-product={JSON.stringify({
-								id,
-								title,
-								category,
-								image,
-								price,
-							})}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="20"
-								height="20"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="2.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								class="transition-transform group-hover/btn:scale-110"
+						{canAddToCart ? (
+							<button
+								type="button"
+								class="add-to-cart-btn p-2 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-all duration-300 group/btn"
+								data-product={JSON.stringify({
+									id,
+									title,
+									category,
+									image,
+									price,
+								})}
 							>
-								<circle cx="8" cy="21" r="1" />
-								<circle cx="19" cy="21" r="1" />
-								<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-							</svg>
-						</button>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									class="transition-transform group-hover/btn:scale-110"
+								>
+									<circle cx="8" cy="21" r="1" />
+									<circle cx="19" cy="21" r="1" />
+									<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+								</svg>
+							</button>
+						) : (
+							<span class="p-2 bg-secondary/10 text-secondary/40 rounded-xl cursor-not-allowed" title="No disponible">
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="20"
+									height="20"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<circle cx="8" cy="21" r="1" />
+									<circle cx="19" cy="21" r="1" />
+									<path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+								</svg>
+							</span>
+						)}
 					</div>
 				)
 			}

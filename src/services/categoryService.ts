@@ -29,5 +29,18 @@ export const CategoryService = {
 
   async delete(id: number | string) {
     await pool.execute('DELETE FROM categories WHERE id = ?', [id]);
+  },
+
+  async update(id: number | string, name: string) {
+    const slug = name.toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '');
+      
+    await pool.execute(
+      'UPDATE categories SET name = ?, slug = ? WHERE id = ?',
+      [name, slug, id]
+    );
   }
 };

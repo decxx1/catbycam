@@ -1,0 +1,38 @@
+---
+import AdminLayout from '@/layouts/admin.astro';
+import QuickEditManager from '@/components/admin/products/QuickEditManager.vue';
+import { getSession } from '@/utils/auth';
+import { UserService } from '@/services/userService';
+
+const token = Astro.cookies.get('auth_token')?.value;
+const session = token ? await getSession(token) : null;
+
+if (!session) {
+  return Astro.redirect('/login?redirect=/admin/products/quick-edit');
+}
+
+const user = await UserService.findById(session.userId);
+if (!user || user.role !== 'admin') {
+  return Astro.redirect('/');
+}
+---
+
+<AdminLayout title="Edición Rápida de Productos">
+  <div class="space-y-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-black text-secondary tracking-tight">Edición Rápida</h1>
+        <p class="text-secondary/50 font-medium mt-1">Edita precios, stock y estado de forma masiva</p>
+      </div>
+      <a href="/admin/products" class="px-6 py-3 bg-secondary/10 text-secondary font-bold text-sm rounded-xl hover:bg-secondary hover:text-white transition-all">
+        ← Volver a Productos
+      </a>
+    </div>
+
+    <QuickEditManager client:only="vue" />
+  </div>
+</AdminLayout>
+
+<script>
+  import QuickEditManager from '@/components/admin/products/QuickEditManager.vue';
+</script>

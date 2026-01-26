@@ -46,7 +46,7 @@ async function setup() {
         description TEXT,
         price DECIMAL(15, 2) DEFAULT 0.00,
         stock INT DEFAULT 0,
-        status ENUM('active', 'inactive') DEFAULT 'active',
+        status ENUM('active', 'inactive', 'out_of_stock', 'paused') DEFAULT 'active',
         item_condition ENUM('new', 'used', 'not_specified') DEFAULT 'not_specified',
         category_id INT,
         main_image TEXT NOT NULL,
