@@ -1,5 +1,5 @@
 import pool from '@/utils/db';
-import { mp } from '@/utils/mercadopago';
+import { createPreference } from '@/utils/mercadopago';
 
 export interface Order {
   id?: number;
@@ -153,7 +153,7 @@ export const PaymentService = {
     };
     
     try {
-        const preference = await mp.preference.create(preferenceBody);
+        const preference = await createPreference(preferenceBody);
 
         // Update order with preference ID
         await pool.execute('UPDATE orders SET preference_id = ?, external_reference = ? WHERE id = ?', [

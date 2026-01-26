@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { PaymentService } from '@/services/paymentService';
 import { NotificationService } from '@/services/notificationService';
+import { getAccessTokenForWebhook } from '@/utils/mercadopago';
 
 // Allow GET for diagnostics/testing
 export const GET: APIRoute = async () => {
@@ -45,9 +46,10 @@ export const POST: APIRoute = async ({ request }) => {
         console.log(`Webhook: Processing payment ${paymentId}...`);
 
         // Fetch actual payment details from MP to verify status
+        const accessToken = await getAccessTokenForWebhook();
         const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
             headers: {
-                'Authorization': `Bearer ${import.meta.env.MP_ACCESS_TOKEN}`
+                'Authorization': `Bearer ${accessToken}`
             }
         });
 

@@ -1,0 +1,13 @@
+---
+import AdminLayout from "@/layouts/admin.astro";
+import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
+import SettingsManager from "@/components/admin/SettingsManager.vue";
+---
+
+<AdminLayout title="Configuración">
+  <AdminPageHeader 
+    title="Configuración" 
+    subtitle="Administra las configuraciones del sistema"
+  />
+  <SettingsManager client:load />
+</AdminLayout>

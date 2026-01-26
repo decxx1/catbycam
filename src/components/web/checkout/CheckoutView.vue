@@ -31,6 +31,19 @@ const shippingData = ref({
 const isPreferenceLoading = ref(false);
 const preferenceId = ref<string | null>(null);
 const isSandbox = ref(import.meta.env.PUBLIC_MP_SANDBOX === 'true');
+const mpPublicKey = ref<string>('');
+
+const getMPPublicKey = async () => {
+  try {
+    const res = await fetch('/api/config/mercadopago');
+    if (res.ok) {
+      const data = await res.json();
+      mpPublicKey.value = data.publicKey;
+    }
+  } catch (e) {
+    console.error('Error fetching MP public key', e);
+  }
+};
 
 const fetchAddresses = async () => {
     if (!session.value) return;
@@ -59,6 +72,7 @@ const fetchAddresses = async () => {
 
 onMounted(async () => {
   isMounted.value = true;
+  await getMPPublicKey();
   if (session.value) {
     step.value = 2;
     await fetchAddresses();
@@ -121,7 +135,7 @@ const createPreference = async () => {
 
 const initMPButton = (prefId: string) => {
     // @ts-ignore
-    const mp = new window.MercadoPago(import.meta.env.PUBLIC_MP_PUBLIC_KEY, {
+    const mp = new window.MercadoPago(mpPublicKey.value, {
         locale: 'es-AR'
     });
     const bricksBuilder = mp.bricks();
