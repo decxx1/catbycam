@@ -64,5 +64,21 @@ export const UserService = {
     const params = excludeUserId ? [email, excludeUserId] : [email];
     const [rows]: any = await pool.execute(query, params);
     return rows.length > 0;
+  },
+
+  async changePassword(userId: number | string, currentPassword: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
+    const [rows]: any = await pool.execute('SELECT password FROM users WHERE id = ?', [userId]);
+    if (rows.length === 0) {
+      return { success: false, error: 'Usuario no encontrado' };
+    }
+
+    const isValid = await bcrypt.compare(currentPassword, rows[0].password);
+    if (!isValid) {
+      return { success: false, error: 'La contraseña actual es incorrecta' };
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await pool.execute('UPDATE users SET password = ? WHERE id = ?', [hashedPassword, userId]);
+    return { success: true };
   }
 };

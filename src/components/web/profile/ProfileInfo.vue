@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import ProfileEditor from './ProfileEditor.vue';
+import PasswordChanger from './PasswordChanger.vue';
 
 const props = defineProps<{
   userName: string;
@@ -8,6 +9,7 @@ const props = defineProps<{
 }>();
 
 const showEditor = ref(false);
+const showPasswordChanger = ref(false);
 const currentName = ref(props.userName);
 const currentEmail = ref(props.userEmail);
 
@@ -21,12 +23,20 @@ const handleUpdated = (data: { name: string; email: string }) => {
   <div class="space-y-8">
     <div class="flex items-center justify-between mb-8 pb-4 border-b border-secondary/5">
       <h3 class="font-bold text-lg">Información de la cuenta</h3>
-      <button 
-        @click="showEditor = true"
-        class="text-primary font-bold text-xs uppercase tracking-widest hover:underline cursor-pointer"
-      >
-        Editar
-      </button>
+      <div class="flex items-center gap-4">
+        <button 
+          @click="showPasswordChanger = true"
+          class="text-secondary/50 font-bold text-xs uppercase tracking-widest hover:text-primary hover:underline cursor-pointer"
+        >
+          Cambiar contraseña
+        </button>
+        <button 
+          @click="showEditor = true"
+          class="text-primary font-bold text-xs uppercase tracking-widest hover:underline cursor-pointer"
+        >
+          Editar
+        </button>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -46,6 +56,11 @@ const handleUpdated = (data: { name: string; email: string }) => {
       :initial-email="currentEmail"
       @close="showEditor = false"
       @updated="handleUpdated"
+    />
+
+    <PasswordChanger 
+      v-if="showPasswordChanger"
+      @close="showPasswordChanger = false"
     />
   </div>
 </template>
