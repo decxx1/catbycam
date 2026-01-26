@@ -1,14 +1,34 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import PhotoSwipeLightbox from 'photoswipe/lightbox';
 import 'photoswipe/style.css';
 
+interface ImageData {
+  url: string;
+  urlFull?: string;
+  width?: number;
+  height?: number;
+}
+
 const props = defineProps<{
   mainImage: string;
-  images: string[];
+  mainImageFull?: string;
+  mainImageWidth?: number;
+  mainImageHeight?: number;
+  images: ImageData[];
 }>();
 
-const allImages = [props.mainImage, ...props.images];
+// Construir array de imágenes con toda la información
+const allImages = computed(() => {
+  const main: ImageData = {
+    url: props.mainImage,
+    urlFull: props.mainImageFull || props.mainImage,
+    width: props.mainImageWidth || 1200,
+    height: props.mainImageHeight || 800
+  };
+  return [main, ...props.images];
+});
+
 const activeIndex = ref(0);
 
 onMounted(() => {
@@ -32,14 +52,14 @@ const selectImage = (index: number) => {
       <div class="aspect-video md:aspect-4/3 rounded-2xl md:rounded-[2.5rem] overflow-hidden bg-accent relative group shadow-sm border border-secondary/5">
         <!-- Render current active image with PhotoSwipe link -->
          <a 
-          :href="allImages[activeIndex]" 
-          data-pswp-width="1200" 
-          data-pswp-height="800"
+          :href="allImages[activeIndex].urlFull || allImages[activeIndex].url" 
+          :data-pswp-width="allImages[activeIndex].width || 1200" 
+          :data-pswp-height="allImages[activeIndex].height || 800"
           target="_blank"
           class="block w-full h-full"
         >
           <img 
-            :src="allImages[activeIndex]" 
+            :src="allImages[activeIndex].url" 
             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
           />
           
@@ -54,9 +74,9 @@ const selectImage = (index: number) => {
             <a 
               v-for="(img, index) in allImages" 
               :key="'pswp-' + index"
-              :href="img" 
-              data-pswp-width="1200" 
-              data-pswp-height="800"
+              :href="img.urlFull || img.url" 
+              :data-pswp-width="img.width || 1200" 
+              :data-pswp-height="img.height || 800"
             ></a>
          </div>
       </div>
@@ -73,7 +93,7 @@ const selectImage = (index: number) => {
           activeIndex === index ? 'border-primary shadow-lg shadow-primary/20' : 'border-transparent opacity-60 hover:opacity-100'
         ]"
       >
-        <img :src="img" class="w-full h-full object-cover" />
+        <img :src="img.url" class="w-full h-full object-cover" />
       </button>
     </div>
 
@@ -88,7 +108,7 @@ const selectImage = (index: number) => {
           activeIndex === index ? 'border-primary' : 'border-transparent opacity-60'
         ]"
       >
-        <img :src="img" class="w-full h-full object-cover" />
+        <img :src="img.url" class="w-full h-full object-cover" />
       </button>
     </div>
   </div>

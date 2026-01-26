@@ -1,5 +1,12 @@
 import pool from '@/utils/db';
 
+export interface ProductImage {
+  url: string;
+  urlFull?: string;
+  width?: number;
+  height?: number;
+}
+
 export interface Product {
   id?: number;
   title: string;
@@ -10,7 +17,10 @@ export interface Product {
   item_condition: 'new' | 'used' | 'not_specified';
   category_id: number | null;
   main_image: string;
-  images?: string[]; // Extra images
+  main_image_full?: string;
+  main_image_width?: number;
+  main_image_height?: number;
+  images?: ProductImage[]; // Extra images con thumbnail, full y dimensiones
   created_at?: string;
   updated_at?: string;
   category_name?: string;
@@ -55,10 +65,15 @@ export const ProductService = {
     // Fetch extra images for each product
     const products: Product[] = [];
     for (const row of rows) {
-      const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
+      const [imgs]: any = await pool.execute('SELECT url, url_full, width, height FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
       products.push({
         ...normalizeProduct(row),
-        images: imgs.map((i: any) => i.url)
+        images: imgs.map((i: any) => ({
+          url: i.url,
+          urlFull: i.url_full,
+          width: i.width,
+          height: i.height
+        }))
       });
     }
 
@@ -67,18 +82,19 @@ export const ProductService = {
 
   async create(data: Product): Promise<number> {
     const [result]: any = await pool.execute(
-      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image]
+      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
     );
 
     const productId = result.insertId;
 
     if (data.images && data.images.length > 0) {
       for (let i = 0; i < data.images.length; i++) {
+        const img = data.images[i];
         await pool.execute(
-          'INSERT INTO product_images (product_id, url, position) VALUES (?, ?, ?)',
-          [productId, data.images[i], i]
+          'INSERT INTO product_images (product_id, url, url_full, width, height, position) VALUES (?, ?, ?, ?, ?, ?)',
+          [productId, img.url, img.urlFull || null, img.width || 0, img.height || 0, i]
         );
       }
     }
@@ -89,18 +105,19 @@ export const ProductService = {
   async update(id: number | string, data: Product) {
     await pool.execute(
       `UPDATE products 
-       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?
+       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?
        WHERE id = ?`,
-      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image, id]
+      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
     );
 
     // Update images: simplest way is delete and re-insert
     await pool.execute('DELETE FROM product_images WHERE product_id = ?', [id]);
     if (data.images && data.images.length > 0) {
       for (let i = 0; i < data.images.length; i++) {
+        const img = data.images[i];
         await pool.execute(
-          'INSERT INTO product_images (product_id, url, position) VALUES (?, ?, ?)',
-          [id, data.images[i], i]
+          'INSERT INTO product_images (product_id, url, url_full, width, height, position) VALUES (?, ?, ?, ?, ?, ?)',
+          [id, img.url, img.urlFull || null, img.width || 0, img.height || 0, i]
         );
       }
     }
@@ -108,6 +125,28 @@ export const ProductService = {
 
   async delete(id: number | string) {
     await pool.execute('DELETE FROM products WHERE id = ?', [id]);
+  },
+
+  async updateImages(
+    id: number | string, 
+    mainImage: { url: string; urlFull?: string; width?: number; height?: number }, 
+    extraImages: ProductImage[]
+  ) {
+    await pool.execute(
+      'UPDATE products SET main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ? WHERE id = ?', 
+      [mainImage.url, mainImage.urlFull || null, mainImage.width || 0, mainImage.height || 0, id]
+    );
+    
+    await pool.execute('DELETE FROM product_images WHERE product_id = ?', [id]);
+    if (extraImages && extraImages.length > 0) {
+      for (let i = 0; i < extraImages.length; i++) {
+        const img = extraImages[i];
+        await pool.execute(
+          'INSERT INTO product_images (product_id, url, url_full, width, height, position) VALUES (?, ?, ?, ?, ?, ?)',
+          [id, img.url, img.urlFull || null, img.width || 0, img.height || 0, i]
+        );
+      }
+    }
   },
 
   async findById(id: number | string): Promise<Product | null> {
@@ -121,11 +160,16 @@ export const ProductService = {
     if (rows.length === 0) return null;
 
     const row = rows[0];
-    const [imgs]: any = await pool.execute('SELECT url FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
+    const [imgs]: any = await pool.execute('SELECT url, url_full, width, height FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
 
     return {
       ...normalizeProduct(row),
-      images: imgs.map((i: any) => i.url)
+      images: imgs.map((i: any) => ({
+        url: i.url,
+        urlFull: i.url_full,
+        width: i.width,
+        height: i.height
+      }))
     };
   },
 

@@ -16,13 +16,20 @@ const { title } = Astro.props;
 const token = Astro.cookies.get("auth_token")?.value;
 const session = token ? await getSession(token) : null;
 
+// Si no hay sesión válida (token inexistente, expirado o corrupto)
 if (!session) {
+	// Limpiar cookie si existe pero es inválida
+	if (token) {
+		Astro.cookies.delete("auth_token", { path: "/" });
+	}
 	return Astro.redirect("/admin/login");
 }
 
 const user = await UserService.findById(session.userId);
 
+// Si el usuario no existe o no es admin
 if (!user || user.role !== "admin") {
+	Astro.cookies.delete("auth_token", { path: "/" });
 	return Astro.redirect("/");
 }
 ---

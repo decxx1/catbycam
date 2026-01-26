@@ -50,6 +50,9 @@ async function setup() {
         item_condition ENUM('new', 'used', 'not_specified') DEFAULT 'not_specified',
         category_id INT,
         main_image TEXT NOT NULL,
+        main_image_full TEXT,
+        main_image_width INT DEFAULT 0,
+        main_image_height INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
@@ -63,6 +66,9 @@ async function setup() {
         id INT AUTO_INCREMENT PRIMARY KEY,
         product_id INT NOT NULL,
         url TEXT NOT NULL,
+        url_full TEXT,
+        width INT DEFAULT 0,
+        height INT DEFAULT 0,
         position INT DEFAULT 0,
         FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
       )

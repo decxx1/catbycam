@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { Product } from '@/services/productService';
+import type { Product, ProductImage } from '@/services/productService';
 import type { Category } from '@/services/categoryService';
 import { toast } from '@/utils/toast';
 
@@ -23,10 +23,14 @@ const product = ref<Product>(props.initialData ? { ...props.initialData } : {
   item_condition: 'new',
   category_id: null,
   main_image: '',
+  main_image_full: '',
+  main_image_width: 0,
+  main_image_height: 0,
   images: []
 });
 
-const extraImages = ref<string[]>(props.initialData?.images || []);
+// Extraer solo las URLs de thumbnail para mostrar en el formulario
+const extraImages = ref<ProductImage[]>(props.initialData?.images || []);
 
 const handleFileUpload = async (event: Event, isMain: boolean, index?: number) => {
     const target = event.target as HTMLInputElement;
@@ -43,6 +47,11 @@ const handleFileUpload = async (event: Event, isMain: boolean, index?: number) =
     try {
         const formData = new FormData();
         formData.append('image', file);
+        
+        // Si estamos editando un producto existente, pasar el ID para guardar en su carpeta
+        if (product.value.id) {
+            formData.append('productId', String(product.value.id));
+        }
 
         const res = await fetch('/api/admin/upload', {
             method: 'POST',
@@ -52,14 +61,27 @@ const handleFileUpload = async (event: Event, isMain: boolean, index?: number) =
         if (!res.ok) throw new Error();
 
         const data = await res.json();
-        const url = data.url;
+        // El endpoint ahora devuelve: { url, urlFull, width, height }
 
         if (isMain) {
-            product.value.main_image = url;
+            product.value.main_image = data.url;
+            product.value.main_image_full = data.urlFull;
+            product.value.main_image_width = data.width;
+            product.value.main_image_height = data.height;
         } else if (index !== undefined) {
-            extraImages.value[index] = url;
+            extraImages.value[index] = {
+                url: data.url,
+                urlFull: data.urlFull,
+                width: data.width,
+                height: data.height
+            };
         } else {
-            extraImages.value.push(url);
+            extraImages.value.push({
+                url: data.url,
+                urlFull: data.urlFull,
+                width: data.width,
+                height: data.height
+            });
         }
         toast.success('Imagen subida correctamente');
     } catch (e) {
@@ -80,7 +102,7 @@ const handleSubmit = () => {
         toast.error('La foto de portada es obligatoria');
         return;
     }
-    product.value.images = extraImages.value.filter(img => img.trim() !== '');
+    product.value.images = extraImages.value.filter(img => img.url && img.url.trim() !== '');
     emit('save', { ...product.value });
   }
 };
@@ -220,11 +242,11 @@ const handleSubmit = () => {
         <div class="grid grid-cols-3 gap-4">
             <template v-for="(img, index) in 6" :key="index">
                 <div class="relative group aspect-square rounded-2xl overflow-hidden bg-accent border-2 border-dashed border-secondary/10 hover:border-primary/20 transition-all flex items-center justify-center">
-                    <img v-if="extraImages[index]" :src="extraImages[index]" class="absolute inset-0 w-full h-full object-cover" />
-                    <button v-if="extraImages[index]" @click.prevent="removeExtraImage(index)" class="absolute top-2 right-2 w-6 h-6 bg-primary text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    <img v-if="extraImages[index]?.url" :src="extraImages[index].url" class="absolute inset-0 w-full h-full object-cover" />
+                    <button v-if="extraImages[index]?.url" @click.prevent="removeExtraImage(index)" class="absolute top-2 right-2 w-6 h-6 bg-primary text-white rounded-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
-                    <label v-if="!extraImages[index]" class="w-full h-full cursor-pointer flex items-center justify-center">
+                    <label v-if="!extraImages[index]?.url" class="w-full h-full cursor-pointer flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="text-secondary/20"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
                         <input type="file" accept="image/*" class="hidden" @change="handleFileUpload($event, false, index)" :disabled="isUploading" />
                     </label>

@@ -17,30 +17,63 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     const formData = await request.formData();
     const file = formData.get('image') as File;
+    const productId = formData.get('productId') as string | null;
 
     if (!file) {
       return new Response('No image provided', { status: 400 });
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = `${uuidv4()}.webp`;
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products');
+    const baseFilename = uuidv4();
+    
+    // Si hay productId, guardar en subcarpeta del producto; si no, en carpeta temporal
+    const subfolder = productId ? productId : 'temp';
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products', subfolder);
 
     // Ensure dir exists
     await fs.mkdir(uploadDir, { recursive: true });
 
-    const filePath = path.join(uploadDir, filename);
+    // Obtener metadata de la imagen original
+    const metadata = await sharp(buffer).metadata();
+    const originalWidth = metadata.width || 1920;
+    const originalHeight = metadata.height || 1080;
 
-    // Process with sharp: convert to webp, resize if too large, optimize
-    await sharp(buffer)
-      .resize(1200, 1200, { fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: 80 })
-      .toFile(filePath);
-
-    // Return the relative URL for public access
-    const url = `/uploads/products/${filename}`;
+    // 1. Crear versión FULL (max 1920px, alta calidad para PhotoSwipe)
+    // .rotate() sin argumentos auto-rota basándose en metadata EXIF
+    const fullFilename = `${baseFilename}_full.webp`;
+    const fullPath = path.join(uploadDir, fullFilename);
     
-    return new Response(JSON.stringify({ url }), {
+    await sharp(buffer)
+      .rotate() // Auto-rotar según EXIF orientation
+      .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 85 })
+      .toFile(fullPath);
+    
+    // Obtener dimensiones reales de la imagen full (después de rotar)
+    const fullMetadata = await sharp(fullPath).metadata();
+    const fullWidth = fullMetadata.width || originalWidth;
+    const fullHeight = fullMetadata.height || originalHeight;
+
+    // 2. Crear THUMBNAIL (400px, optimizado para carga rápida)
+    const thumbFilename = `${baseFilename}_thumb.webp`;
+    const thumbPath = path.join(uploadDir, thumbFilename);
+    
+    await sharp(buffer)
+      .rotate() // Auto-rotar según EXIF orientation
+      .resize(400, 400, { fit: 'inside', withoutEnlargement: true })
+      .webp({ quality: 75 })
+      .toFile(thumbPath);
+
+    // URLs para acceso público
+    const url = `/uploads/products/${subfolder}/${thumbFilename}`;
+    const urlFull = `/uploads/products/${subfolder}/${fullFilename}`;
+    
+    return new Response(JSON.stringify({ 
+      url,           // Thumbnail para mostrar en cards y galería
+      urlFull,       // Full para PhotoSwipe lightbox
+      width: fullWidth,
+      height: fullHeight
+    }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
     });
