@@ -28,16 +28,16 @@ if (Astro.request.method === "POST") {
 				Astro.cookies.set("auth_token", token, {
 					path: "/",
 					httpOnly: true,
-					secure: true,
-					sameSite: "strict",
+					secure: import.meta.env.PROD,
+					sameSite: "lax",
 					maxAge: 60 * 60 * 24 * 7, // 1 week
 				});
 
 				Astro.cookies.set("cb_logged_in", "true", {
 					path: "/",
 					httpOnly: false, // Accessible via JS
-					secure: true,
-					sameSite: "strict",
+					secure: import.meta.env.PROD,
+					sameSite: "lax",
 					maxAge: 60 * 60 * 24 * 7,
 				});
 

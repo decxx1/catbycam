@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   if (!session) return new Response('Unauthorized', { status: 401 });
 
   try {
-    const { items, total, shippingAddress } = await request.json();
+    const { items, total, shippingAddress, phone, comments } = await request.json();
 
     // 0. Get user info for payer details
     const user = await UserService.findById(session.userId);
@@ -19,7 +19,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       session.userId,
       total,
       shippingAddress,
-      items
+      items,
+      phone,
+      comments
     );
 
     // 2. Generate preference

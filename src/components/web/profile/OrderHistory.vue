@@ -85,6 +85,33 @@ const getStatusLabel = (status: string) => {
         default: return status;
     }
 };
+
+const getShippingStatusColor = (status: string) => {
+    switch (status) {
+        case 'processing': return 'bg-amber-100 text-amber-700 border border-amber-200';
+        case 'shipped': return 'bg-blue-100 text-blue-700 border border-blue-200';
+        case 'delivered': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+        default: return 'bg-gray-100 text-gray-600 border border-gray-200';
+    }
+};
+
+const getShippingStatusLabel = (status: string) => {
+    switch (status) {
+        case 'processing': return 'En Proceso';
+        case 'shipped': return 'Enviado';
+        case 'delivered': return 'Entregado';
+        default: return 'Preparando';
+    }
+};
+
+const getShippingIcon = (status: string) => {
+    switch (status) {
+        case 'processing': return 'package';
+        case 'shipped': return 'truck';
+        case 'delivered': return 'check-circle';
+        default: return 'clock';
+    }
+};
 </script>
 
 <template>
@@ -126,7 +153,40 @@ const getStatusLabel = (status: string) => {
                 </div>
             </div>
 
-            <div class="pt-6 border-t border-secondary/5 flex flex-col gap-2">
+            <!-- Shipping Status for paid orders -->
+            <div v-if="order.status === 'paid'" class="pt-6 border-t border-secondary/5">
+                <div class="bg-accent/30 rounded-2xl p-4 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <p class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Estado del Envío</p>
+                        <span :class="[getShippingStatusColor(order.shipping_status || 'processing'), 'text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full']">
+                            {{ getShippingStatusLabel(order.shipping_status || 'processing') }}
+                        </span>
+                    </div>
+                    
+                    <!-- Progress bar -->
+                    <div class="flex items-center gap-2">
+                        <div class="flex-1 h-2 bg-secondary/10 rounded-full overflow-hidden">
+                            <div 
+                                class="h-full bg-primary rounded-full transition-all duration-500"
+                                :style="{ width: order.shipping_status === 'delivered' ? '100%' : order.shipping_status === 'shipped' ? '66%' : '33%' }"
+                            ></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between text-[9px] font-bold text-secondary/40 uppercase">
+                        <span :class="{'text-primary': true}">En proceso</span>
+                        <span :class="{'text-primary': order.shipping_status === 'shipped' || order.shipping_status === 'delivered'}">Enviado</span>
+                        <span :class="{'text-primary': order.shipping_status === 'delivered'}">Entregado</span>
+                    </div>
+
+                    <div v-if="order.tracking_number" class="pt-2 border-t border-secondary/10">
+                        <p class="text-[9px] font-bold text-secondary/40 uppercase">Nº de Seguimiento</p>
+                        <p class="text-sm font-black text-primary mt-1">{{ order.tracking_number }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 border-t border-secondary/5 flex flex-col gap-2">
                 <p class="text-[10px] font-black uppercase text-secondary/30 tracking-widest">Envío a</p>
                 <p class="text-xs font-bold text-secondary/60 leading-relaxed italic">{{ order.shipping_address }}</p>
             </div>

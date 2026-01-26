@@ -117,7 +117,9 @@ const createPreference = async () => {
                     quantity: i.quantity
                 })),
                 total: total.value,
-                shippingAddress: `${shippingData.value.address}, ${shippingData.value.city}, ${shippingData.value.state} (CP: ${shippingData.value.zip})`
+                shippingAddress: `${shippingData.value.address}, ${shippingData.value.city}, ${shippingData.value.state} (CP: ${shippingData.value.zip})`,
+                phone: shippingData.value.phone,
+                comments: shippingData.value.comments
             })
         });
 

@@ -85,6 +85,71 @@ const getStatusLabel = (status: string) => {
         default: return status;
     }
 };
+
+const getShippingStatusColor = (status: string) => {
+    switch (status) {
+        case 'processing': return 'bg-amber-100 text-amber-700 border-amber-200';
+        case 'shipped': return 'bg-blue-100 text-blue-700 border-blue-200';
+        case 'delivered': return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+        default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+};
+
+const getShippingStatusLabel = (status: string) => {
+    switch (status) {
+        case 'processing': return 'En Proceso';
+        case 'shipped': return 'Enviado';
+        case 'delivered': return 'Entregado';
+        default: return 'Sin estado';
+    }
+};
+
+const expandedOrder = ref<number | null>(null);
+const editingShipping = ref<number | null>(null);
+const shippingForm = ref({
+    status: 'processing' as 'processing' | 'shipped' | 'delivered',
+    tracking_number: ''
+});
+
+const toggleExpand = (orderId: number) => {
+    expandedOrder.value = expandedOrder.value === orderId ? null : orderId;
+};
+
+const startEditShipping = (order: any) => {
+    editingShipping.value = order.id;
+    shippingForm.value = {
+        status: order.shipping_status || 'processing',
+        tracking_number: order.tracking_number || ''
+    };
+};
+
+const cancelEditShipping = () => {
+    editingShipping.value = null;
+};
+
+const saveShippingStatus = async (orderId: number) => {
+    try {
+        const res = await fetch('/api/admin/orders', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: orderId,
+                shipping_status: shippingForm.value.status,
+                tracking_number: shippingForm.value.tracking_number || null
+            })
+        });
+        if (res.ok) {
+            toast.success('Estado de envío actualizado');
+            editingShipping.value = null;
+            fetchOrders(pagination.value.page);
+        } else {
+            const data = await res.json();
+            toast.error(data.error || 'Error al actualizar');
+        }
+    } catch (e) {
+        toast.error('Error de red');
+    }
+};
 </script>
 
 <template>
@@ -111,10 +176,11 @@ const getStatusLabel = (status: string) => {
         </div>
 
         <div v-else class="grid grid-cols-1 gap-6">
-            <div v-for="order in orders" :key="order.id" class="bg-white rounded-[2rem] border border-secondary/5 shadow-xl shadow-secondary/5 overflow-hidden group hover:border-primary/20 transition-all">
-                <div class="p-8 flex flex-col lg:flex-row justify-between gap-8">
+            <div v-for="order in orders" :key="order.id" class="bg-white rounded-3xl border border-secondary/5 shadow-xl shadow-secondary/5 overflow-hidden group hover:border-primary/20 transition-all">
+                <!-- Header clickable -->
+                <div @click="toggleExpand(order.id)" class="p-6 flex flex-col lg:flex-row justify-between gap-6 cursor-pointer">
                     <!-- Left: Basic Info -->
-                    <div class="flex-1 space-y-4">
+                    <div class="flex-1 space-y-3">
                         <div class="flex items-center gap-4">
                             <div class="w-12 h-12 bg-primary/5 rounded-2xl flex items-center justify-center text-primary font-black italic shadow-inner">
                                 #{{ order.id }}
@@ -124,38 +190,144 @@ const getStatusLabel = (status: string) => {
                                 <p class="text-xs font-bold text-secondary/30 uppercase tracking-widest">{{ order.user_email }}</p>
                             </div>
                         </div>
-                        <div class="flex flex-wrap gap-4 items-center pt-2">
-                             <span :class="[getStatusColor(order.status), 'text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border shadow-sm']">
-                                {{ getStatusLabel(order.status) }}
-                            </span>
-                            <p class="text-[10px] font-bold text-secondary/40 uppercase tracking-widest border-l border-secondary/10 pl-4">{{ new Date(order.created_at).toLocaleString('es-AR') }}</p>
-                             <p v-if="order.payment_id" class="text-[10px] font-bold text-secondary/20 uppercase tracking-widest">ID Pago: {{ order.payment_id }}</p>
+                        
+                        <!-- Status badges con etiquetas claras -->
+                        <div class="flex flex-wrap gap-3 items-center">
+                            <div class="flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary/40"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                                <span class="text-[9px] font-bold text-secondary/40 uppercase">Pago:</span>
+                                <span :class="[getStatusColor(order.status), 'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border shadow-sm']">
+                                    {{ getStatusLabel(order.status) }}
+                                </span>
+                            </div>
+                            <div v-if="order.status === 'paid'" class="flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary/40"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                                <span class="text-[9px] font-bold text-secondary/40 uppercase">Envío:</span>
+                                <span :class="[getShippingStatusColor(order.shipping_status || 'processing'), 'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border shadow-sm']">
+                                    {{ getShippingStatusLabel(order.shipping_status || 'processing') }}
+                                </span>
+                            </div>
+                            <p class="text-[10px] font-bold text-secondary/40 uppercase tracking-widest">{{ new Date(order.created_at).toLocaleString('es-AR') }}</p>
+                        </div>
+
+                        <!-- Teléfono y comentarios visibles -->
+                        <div v-if="order.phone || order.comments" class="flex flex-wrap gap-4 pt-2 border-t border-secondary/5">
+                            <div v-if="order.phone" class="flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                                <span class="text-xs font-bold text-secondary">{{ order.phone }}</span>
+                            </div>
+                            <div v-if="order.comments" class="flex items-center gap-2 max-w-md">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-500 shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                                <span class="text-xs font-medium text-secondary/60 italic line-clamp-1">{{ order.comments }}</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Middle: Items Summary -->
-                    <div class="flex-1 border-y lg:border-y-0 lg:border-x border-secondary/5 px-0 lg:px-8 py-6 lg:py-0">
-                         <div class="space-y-3">
-                            <div v-for="item in order.items" :key="item.id" class="flex justify-between items-center text-xs">
-                                <span class="text-secondary/60 font-bold"><span class="text-primary">{{ item.quantity }}x</span> {{ item.title }}</span>
-                                <span class="font-black text-secondary/40 tabular-nums">{{ formatMoney(item.price * item.quantity, 0, '$') }}</span>
+                    <!-- Right: Total -->
+                    <div class="lg:w-48 text-left lg:text-right flex flex-col justify-center gap-2">
+                        <p class="text-[10px] font-black uppercase text-secondary/20 tracking-widest">Total</p>
+                        <p class="text-2xl font-black text-primary tracking-tighter">{{ formatMoney(order.total_amount, 0, '$') }}</p>
+                        <div class="flex items-center gap-2 justify-start lg:justify-end text-secondary/40">
+                            <span class="text-[10px] font-bold uppercase">{{ expandedOrder === order.id ? 'Ocultar' : 'Ver detalles' }}</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" :class="{'rotate-180': expandedOrder === order.id}" class="transition-transform"><path d="m6 9 6 6 6-6"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Expanded Details -->
+                <div v-if="expandedOrder === order.id" class="border-t border-secondary/10 bg-accent/20 p-6 space-y-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Items -->
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Productos</h4>
+                            <div class="space-y-2">
+                                <div v-for="item in order.items" :key="item.id" class="flex justify-between items-center text-xs bg-white p-3 rounded-xl">
+                                    <span class="text-secondary/60 font-bold"><span class="text-primary font-black">{{ item.quantity }}x</span> {{ item.title }}</span>
+                                    <span class="font-black text-secondary tabular-nums">{{ formatMoney(item.price * item.quantity, 0, '$') }}</span>
+                                </div>
                             </div>
-                         </div>
+                        </div>
+
+                        <!-- Shipping Info -->
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Datos de Envío</h4>
+                            <div class="bg-white p-4 rounded-xl space-y-3">
+                                <div>
+                                    <p class="text-[9px] font-bold text-secondary/40 uppercase">Dirección</p>
+                                    <p class="text-sm font-medium text-secondary">{{ order.shipping_address }}</p>
+                                </div>
+                                <div v-if="order.phone">
+                                    <p class="text-[9px] font-bold text-secondary/40 uppercase">Teléfono</p>
+                                    <p class="text-sm font-medium text-secondary">{{ order.phone }}</p>
+                                </div>
+                                <div v-if="order.comments">
+                                    <p class="text-[9px] font-bold text-secondary/40 uppercase">Comentarios</p>
+                                    <p class="text-sm font-medium text-secondary/70 italic">{{ order.comments }}</p>
+                                </div>
+                                <div v-if="order.tracking_number">
+                                    <p class="text-[9px] font-bold text-secondary/40 uppercase">Nº Seguimiento</p>
+                                    <p class="text-sm font-black text-primary">{{ order.tracking_number }}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Status Management -->
+                        <div class="space-y-3">
+                            <h4 class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Gestión de Envío</h4>
+                            <div class="bg-white p-4 rounded-xl space-y-4">
+                                <div v-if="order.status !== 'paid'" class="text-center py-4">
+                                    <p class="text-xs font-bold text-secondary/40">El pedido debe estar pagado para gestionar el envío</p>
+                                </div>
+                                <template v-else>
+                                    <div v-if="editingShipping !== order.id">
+                                        <div class="flex items-center justify-between mb-4">
+                                            <div>
+                                                <p class="text-[9px] font-bold text-secondary/40 uppercase">Estado actual</p>
+                                                <span :class="[getShippingStatusColor(order.shipping_status || 'processing'), 'text-xs font-black uppercase px-3 py-1 rounded-full border inline-block mt-1']">
+                                                    {{ getShippingStatusLabel(order.shipping_status || 'processing') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <button @click.stop="startEditShipping(order)" class="w-full btn-primary py-3 rounded-xl text-xs font-black uppercase tracking-widest">
+                                            Actualizar Estado
+                                        </button>
+                                    </div>
+                                    <div v-else class="space-y-4" @click.stop>
+                                        <div>
+                                            <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-2">Estado de Envío</label>
+                                            <select v-model="shippingForm.status" class="w-full bg-accent/50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-primary outline-none">
+                                                <option value="processing">En Proceso</option>
+                                                <option value="shipped">Enviado</option>
+                                                <option value="delivered">Entregado</option>
+                                            </select>
+                                        </div>
+                                        <div v-if="shippingForm.status === 'shipped' || shippingForm.status === 'delivered'">
+                                            <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-2">Nº de Seguimiento</label>
+                                            <input v-model="shippingForm.tracking_number" type="text" placeholder="Ej: AR123456789" class="w-full bg-accent/50 border-none rounded-xl py-3 px-4 font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button @click.stop="cancelEditShipping" class="flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest border border-secondary/20 hover:bg-accent transition-all">
+                                                Cancelar
+                                            </button>
+                                            <button @click.stop="saveShippingStatus(order.id)" class="flex-1 btn-primary py-3 rounded-xl text-xs font-black uppercase tracking-widest">
+                                                Guardar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Right: Total and Actions -->
-                    <div class="lg:w-48 text-left lg:text-right flex flex-col justify-center gap-4">
-                         <div>
-                            <p class="text-[10px] font-black uppercase text-secondary/20 tracking-widest mb-1">Total del Pedido</p>
-                            <p class="text-3xl font-black text-primary tracking-tighter">{{ formatMoney(order.total_amount, 0, '$') }}</p>
-                         </div>
-                         <div class="flex flex-col gap-2">
-                            <p class="text-[9px] font-bold text-secondary/40 uppercase leading-none">Envío a:</p>
-                            <p class="text-[10px] font-medium text-secondary/60 line-clamp-2 italic">{{ order.shipping_address }}</p>
-                         </div>
-                         <div v-if="(order.status === 'pending' || order.status === 'cancelled') && !order.payment_id" class="pt-4">
-                             <button @click="deleteOrder(order.id)" class="text-[10px] font-black uppercase text-red-500 hover:underline tracking-widest cursor-pointer">Eliminar Pedido</button>
-                         </div>
+                    <!-- Footer Actions -->
+                    <div class="flex flex-wrap gap-4 items-center justify-between pt-4 border-t border-secondary/10">
+                        <div class="flex flex-wrap gap-4 text-[10px] font-bold text-secondary/40 uppercase tracking-widest">
+                            <span v-if="order.payment_id">ID Pago: <span class="text-secondary">{{ order.payment_id }}</span></span>
+                            <span v-if="order.external_reference">Ref: <span class="text-secondary">{{ order.external_reference }}</span></span>
+                        </div>
+                        <div v-if="(order.status === 'pending' || order.status === 'cancelled') && !order.payment_id">
+                            <button @click.stop="deleteOrder(order.id)" class="text-[10px] font-black uppercase text-red-500 hover:underline tracking-widest cursor-pointer">Eliminar Pedido</button>
+                        </div>
                     </div>
                 </div>
             </div>

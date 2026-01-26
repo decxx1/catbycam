@@ -7,6 +7,10 @@ export interface Order {
   total_amount: number;
   status: 'pending' | 'paid' | 'cancelled' | 'refunded';
   shipping_address: string;
+  phone?: string;
+  comments?: string;
+  shipping_status?: 'processing' | 'shipped' | 'delivered';
+  tracking_number?: string;
   payment_id?: string;
   preference_id?: string;
   external_reference?: string;
@@ -36,7 +40,7 @@ export const PaymentService = {
     return rows[0];
   },
 
-  async createOrUpdateOrder(userId: number, total: number, shippingAddress: string, items: OrderItem[]) {
+  async createOrUpdateOrder(userId: number, total: number, shippingAddress: string, items: OrderItem[], phone?: string, comments?: string) {
     const existingOrder = await this.getLatestPendingOrder(userId);
     
     // Check if we can reuse the existing pending order
@@ -49,8 +53,8 @@ export const PaymentService = {
        try {
          await conn.beginTransaction();
          await conn.execute(
-           'UPDATE orders SET total_amount = ?, shipping_address = ?, preference_id = NULL, external_reference = ? WHERE id = ?',
-           [total, shippingAddress, `ORDER_${userId}_${Date.now()}`, existingOrder.id]
+           'UPDATE orders SET total_amount = ?, shipping_address = ?, phone = ?, comments = ?, preference_id = NULL, external_reference = ? WHERE id = ?',
+           [total, shippingAddress, phone || null, comments || null, `ORDER_${userId}_${Date.now()}`, existingOrder.id]
          );
          await conn.execute('DELETE FROM order_items WHERE order_id = ?', [existingOrder.id]);
          for (const item of items) {
@@ -75,8 +79,8 @@ export const PaymentService = {
 
       // 1. Create order
       const [orderResult]: any = await conn.execute(
-        'INSERT INTO orders (user_id, total_amount, status, shipping_address, external_reference) VALUES (?, ?, ?, ?, ?)',
-        [userId, total, 'pending', shippingAddress, `ORDER_${userId}_${Date.now()}`]
+        'INSERT INTO orders (user_id, total_amount, status, shipping_address, phone, comments, external_reference) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [userId, total, 'pending', shippingAddress, phone || null, comments || null, `ORDER_${userId}_${Date.now()}`]
       );
       const orderId = orderResult.insertId;
 
@@ -238,5 +242,34 @@ export const PaymentService = {
       limit,
       totalPages: Math.ceil(countResult[0].total / limit)
     };
+  },
+
+  async updateShippingStatus(orderId: number, shippingStatus: Order['shipping_status'], trackingNumber?: string) {
+    if (trackingNumber) {
+      await pool.execute(
+        'UPDATE orders SET shipping_status = ?, tracking_number = ? WHERE id = ?',
+        [shippingStatus, trackingNumber, orderId]
+      );
+    } else {
+      await pool.execute(
+        'UPDATE orders SET shipping_status = ? WHERE id = ?',
+        [shippingStatus, orderId]
+      );
+    }
+  },
+
+  async getOrderById(orderId: number) {
+    const [rows]: any = await pool.execute(
+      'SELECT o.*, u.name as user_name, u.email as user_email FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?',
+      [orderId]
+    );
+    if (rows.length === 0) return null;
+    
+    const [items]: any = await pool.execute(
+      'SELECT * FROM order_items WHERE order_id = ?',
+      [orderId]
+    );
+    rows[0].items = items;
+    return rows[0];
   }
 };

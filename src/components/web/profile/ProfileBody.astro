@@ -1,9 +1,11 @@
 ---
 import AddressManager from "./AddressManager.vue";
 import OrderHistory from "./OrderHistory.vue";
+import PaymentSuccessHandler from "./PaymentSuccessHandler.vue";
 const { user } = Astro.props;
 ---
 
+<PaymentSuccessHandler client:only />
 <div class="max-w-4xl mx-auto">
 	<div class="flex flex-col md:flex-row gap-8 items-start mb-12 text-left">
 		<div
