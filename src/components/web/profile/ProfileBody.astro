@@ -2,6 +2,7 @@
 import AddressManager from "./AddressManager.vue";
 import OrderHistory from "./OrderHistory.vue";
 import PaymentSuccessHandler from "./PaymentSuccessHandler.vue";
+import ProfileInfo from "./ProfileInfo.vue";
 const { user } = Astro.props;
 ---
 
@@ -56,38 +57,11 @@ const { user } = Astro.props;
 		<div
 			class="bg-white p-8 rounded-3xl border border-secondary/5 shadow-xl shadow-secondary/5 md:col-span-2 text-left"
 		>
-			<div
-				class="flex items-center justify-between mb-8 pb-4 border-b border-secondary/5"
-			>
-				<h3 class="font-bold text-lg">Información de la cuenta</h3>
-				<button
-					class="text-primary font-bold text-xs uppercase tracking-widest hover:underline cursor-pointer"
-					>Editar</button
-				>
-			</div>
+			<ProfileInfo client:only userName={user.name} userEmail={user.email} />
 
-			<div class="space-y-8">
-				<div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
-					<div>
-						<label
-							class="block text-[10px] uppercase font-bold tracking-widest text-secondary/30 mb-1"
-							>Nombre</label
-						>
-						<p class="font-bold text-secondary">{user.name}</p>
-					</div>
-					<div>
-						<label
-							class="block text-[10px] uppercase font-bold tracking-widest text-secondary/30 mb-1"
-							>Email</label
-						>
-						<p class="font-bold text-secondary">{user.email}</p>
-					</div>
-				</div>
-
-				<div>
-					<h4 class="font-bold text-sm mb-6">Mis Pedidos</h4>
-					<OrderHistory client:only />
-				</div>
+			<div class="mt-8">
+				<h4 class="font-bold text-sm mb-6">Mis Pedidos</h4>
+				<OrderHistory client:only />
 			</div>
 		</div>
 	</div>

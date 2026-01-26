@@ -48,5 +48,21 @@ export const UserService = {
       'UPDATE users SET name = ?, email = ?, role = ? WHERE id = ?',
       [name, email, role, id]
     );
+  },
+
+  async updateProfile(id: number | string, { name, email }: { name: string; email: string }) {
+    await pool.execute(
+      'UPDATE users SET name = ?, email = ? WHERE id = ?',
+      [name, email, id]
+    );
+  },
+
+  async emailExists(email: string, excludeUserId?: number | string): Promise<boolean> {
+    const query = excludeUserId 
+      ? 'SELECT id FROM users WHERE email = ? AND id != ?'
+      : 'SELECT id FROM users WHERE email = ?';
+    const params = excludeUserId ? [email, excludeUserId] : [email];
+    const [rows]: any = await pool.execute(query, params);
+    return rows.length > 0;
   }
 };
