@@ -30,9 +30,16 @@ const menuItems = [
 ];
 ---
 
+<!-- Mobile Overlay -->
+<div
+	id="sidebar-overlay"
+	class="fixed inset-0 bg-black/50 z-40 opacity-0 invisible transition-all duration-300 lg:hidden"
+></div>
+
 <aside
 	id="admin-sidebar"
-	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar w-64 min-w-64 h-screen data-[compact=true]:w-20 data-[compact=true]:min-w-20 hover:data-[compact=true]:w-min-w-64 hover:data-[compact=true]:min-w-64 overflow-hidden border-r border-white/5 relative z-30"
+	class="bg-secondary text-white flex flex-col shrink-0 transition-all duration-300 ease-in-out group/sidebar h-screen overflow-hidden border-r border-white/5 fixed lg:sticky lg:top-0 z-50 -translate-x-full lg:translate-x-0 data-[open=true]:translate-x-0"
+	style="width: 256px; min-width: 256px;"
 >
 	<div
 		class="py-3 px-8 pb-12 flex items-center gap-3 overflow-hidden whitespace-nowrap"
@@ -116,16 +123,104 @@ const menuItems = [
 
 <script>
 	const sidebar = document.getElementById("admin-sidebar");
+	const overlay = document.getElementById("sidebar-overlay");
+	const EXPANDED_WIDTH = "256px";
+	const COMPACT_WIDTH = "80px";
+
+	const isMobile = () => window.innerWidth < 1024;
+
+	const setSidebarCompact = (compact: boolean) => {
+		if (!sidebar) return;
+		if (compact) {
+			sidebar.style.width = COMPACT_WIDTH;
+			sidebar.style.minWidth = COMPACT_WIDTH;
+			sidebar.setAttribute("data-compact", "true");
+		} else {
+			sidebar.style.width = EXPANDED_WIDTH;
+			sidebar.style.minWidth = EXPANDED_WIDTH;
+			sidebar.removeAttribute("data-compact");
+		}
+	};
+
+	// Initialize compact state from localStorage (only for desktop)
 	const isCompact = localStorage.getItem("sidebar-compact") === "true";
-	if (isCompact && sidebar) {
-		sidebar.setAttribute("data-compact", "true");
+	if (isCompact && !isMobile()) {
+		setSidebarCompact(true);
 	}
 
+	// Hover to expand when compact (desktop only)
+	sidebar?.addEventListener("mouseenter", () => {
+		if (!isMobile() && sidebar.getAttribute("data-compact") === "true") {
+			sidebar.style.width = EXPANDED_WIDTH;
+			sidebar.style.minWidth = EXPANDED_WIDTH;
+		}
+	});
+
+	sidebar?.addEventListener("mouseleave", () => {
+		if (!isMobile() && sidebar.getAttribute("data-compact") === "true") {
+			sidebar.style.width = COMPACT_WIDTH;
+			sidebar.style.minWidth = COMPACT_WIDTH;
+		}
+	});
+
+	const openMobileDrawer = () => {
+		if (sidebar && overlay) {
+			sidebar.setAttribute("data-open", "true");
+			sidebar.style.width = EXPANDED_WIDTH;
+			sidebar.style.minWidth = EXPANDED_WIDTH;
+			overlay.classList.remove("opacity-0", "invisible");
+			overlay.classList.add("opacity-100", "visible");
+			document.body.style.overflow = "hidden";
+		}
+	};
+
+	const closeMobileDrawer = () => {
+		if (sidebar && overlay) {
+			sidebar.removeAttribute("data-open");
+			overlay.classList.add("opacity-0", "invisible");
+			overlay.classList.remove("opacity-100", "visible");
+			document.body.style.overflow = "";
+		}
+	};
+
 	window.addEventListener("toggle-sidebar", () => {
-		if (sidebar) {
-			const current = sidebar.getAttribute("data-compact") === "true";
-			sidebar.setAttribute("data-compact", String(!current));
-			localStorage.setItem("sidebar-compact", String(!current));
+		if (isMobile()) {
+			const isOpen = sidebar?.getAttribute("data-open") === "true";
+			if (isOpen) {
+				closeMobileDrawer();
+			} else {
+				openMobileDrawer();
+			}
+		} else {
+			if (sidebar) {
+				const current = sidebar.getAttribute("data-compact") === "true";
+				setSidebarCompact(!current);
+				localStorage.setItem("sidebar-compact", String(!current));
+			}
+		}
+	});
+
+	overlay?.addEventListener("click", closeMobileDrawer);
+
+	// Close drawer on navigation (for mobile)
+	const navLinks = sidebar?.querySelectorAll("a");
+	navLinks?.forEach(link => {
+		link.addEventListener("click", () => {
+			if (isMobile()) {
+				closeMobileDrawer();
+			}
+		});
+	});
+
+	// Handle resize
+	window.addEventListener("resize", () => {
+		if (!isMobile() && sidebar?.getAttribute("data-open") === "true") {
+			closeMobileDrawer();
+		}
+		// Reset sidebar width on resize based on compact state
+		if (!isMobile()) {
+			const compact = localStorage.getItem("sidebar-compact") === "true";
+			setSidebarCompact(compact);
 		}
 	});
 </script>

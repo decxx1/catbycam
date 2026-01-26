@@ -1,0 +1,17 @@
+---
+export const prerender = false;
+import AdminLayout from "@/layouts/admin.astro";
+import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
+import NotificationsManager from "@/components/admin/NotificationsManager.vue";
+---
+
+<AdminLayout title="Notificaciones">
+	<AdminPageHeader
+		title="Notificaciones"
+		subtitle="Gestiona todas las notificaciones del sistema."
+	/>
+
+	<div class="mt-8">
+		<NotificationsManager client:only="vue" />
+	</div>
+</AdminLayout>

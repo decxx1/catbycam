@@ -43,6 +43,8 @@ All commands are run from the root of the project, from a terminal:
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
 
 # 1. Limpiar y recrear todas las tablas (incluye categorías iniciales)
-npm run db:setup
+bun run db:setup
 # 2. Restaurar el usuario administrador (CatByCam Admin)
-npm run db:seed-admin
+bun run db:seed-admin
+# 3. Crear la tabla de notificaciones
+bunx tsx src/utils/setup-notifications.ts

@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { PaymentService } from '@/services/paymentService';
+import { NotificationService } from '@/services/notificationService';
 
 // Allow GET for diagnostics/testing
 export const GET: APIRoute = async () => {
@@ -66,6 +67,25 @@ export const POST: APIRoute = async ({ request }) => {
                     String(paymentId), 
                     orderStatus
                 );
+
+                // Crear notificación para administradores cuando el pago es aprobado
+                if (status === 'approved') {
+                    const amount = paymentData.transaction_amount || 0;
+                    const payerEmail = paymentData.payer?.email || 'Cliente';
+                    
+                    await NotificationService.create({
+                        type: 'payment_approved',
+                        title: '¡Nuevo pago aprobado!',
+                        message: `Se recibió un pago de $${amount.toLocaleString('es-AR')} de ${payerEmail}`,
+                        data: JSON.stringify({
+                            order_reference: externalReference,
+                            payment_id: paymentId,
+                            amount: amount,
+                            payer_email: payerEmail
+                        })
+                    });
+                    console.log(`Webhook: Notification created for approved payment ${paymentId}`);
+                }
             } else {
                 console.warn(`Webhook: Payment ${paymentId} has no external_reference`);
             }
