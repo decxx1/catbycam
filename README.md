@@ -46,5 +46,3 @@ Feel free to check [our documentation](https://docs.astro.build) or jump into ou
 bun run db:setup
 # 2. Restaurar el usuario administrador (CatByCam Admin)
 bun run db:seed-admin
-# 3. Crear la tabla de notificaciones
-bunx tsx src/utils/setup-notifications.ts

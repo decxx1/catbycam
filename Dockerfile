@@ -31,11 +31,11 @@ COPY --from=build /app/astro.config.mjs ./astro.config.mjs
 
 # Set environment variables
 ENV HOST=0.0.0.0
-ENV PORT=4321
+ENV PORT=3000
 ENV NODE_ENV=production
 
 # Expose the application port
-EXPOSE 4321
+EXPOSE 3000
 
 # Start the application
 CMD ["bun", "./dist/server/entry.mjs"]
