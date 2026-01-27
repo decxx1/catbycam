@@ -1,12 +1,46 @@
-import pool from './db-standalone';
+import mysql from 'mysql2/promise';
+
+const DB_HOST = process.env.DB_HOST || '127.0.0.1';
+const DB_USER = process.env.DB_USER || 'root';
+const DB_PASSWORD = process.env.DB_PASSWORD || '';
+const DB_NAME = process.env.DB_NAME || 'catbycam';
+const DB_PORT = Number(process.env.DB_PORT) || 3306;
 
 async function setup() {
-  try {
-    console.log('--- Initializing Database Setup ---');
+  console.log('--- Initializing Database Setup ---');
+  console.log(`Connecting to ${DB_HOST}:${DB_PORT} as ${DB_USER}...`);
 
+  // First, create connection without database to create it if needed
+  const initConnection = await mysql.createConnection({
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    port: DB_PORT,
+  });
+
+  // Create database if not exists
+  console.log(`Creating database '${DB_NAME}' if not exists...`);
+  await initConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
+  await initConnection.end();
+
+  // Now connect to the database
+  const pool = mysql.createPool({
+    host: DB_HOST,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    database: DB_NAME,
+    port: DB_PORT,
+    waitForConnections: true,
+    connectionLimit: 10,
+  });
+
+  try {
     // 1. DROP Existing Tables (in correct order due to foreign keys)
     await pool.query('SET FOREIGN_KEY_CHECKS = 0');
     console.log('Dropping old tables...');
+    await pool.query('DROP TABLE IF EXISTS order_items');
+    await pool.query('DROP TABLE IF EXISTS orders');
+    await pool.query('DROP TABLE IF EXISTS admin_notifications');
     await pool.query('DROP TABLE IF EXISTS product_images');
     await pool.query('DROP TABLE IF EXISTS products');
     await pool.query('DROP TABLE IF EXISTS categories');
@@ -74,7 +108,56 @@ async function setup() {
       )
     `);
 
-    // 6. Seed Initial Data
+    // 6. Create Orders Table
+    console.log('Creating orders table...');
+    await pool.query(`
+      CREATE TABLE orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        total_amount DECIMAL(15, 2) NOT NULL,
+        status ENUM('pending', 'paid', 'cancelled', 'refunded') DEFAULT 'pending',
+        shipping_address TEXT,
+        phone VARCHAR(50),
+        comments TEXT,
+        shipping_status ENUM('processing', 'shipped', 'delivered') DEFAULT 'processing',
+        tracking_number VARCHAR(100),
+        payment_id VARCHAR(100),
+        preference_id VARCHAR(100),
+        external_reference VARCHAR(100),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
+    // 7. Create Order Items Table
+    console.log('Creating order_items table...');
+    await pool.query(`
+      CREATE TABLE order_items (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        order_id INT NOT NULL,
+        product_id INT,
+        title VARCHAR(255) NOT NULL,
+        price DECIMAL(15, 2) NOT NULL,
+        quantity INT NOT NULL,
+        FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+      )
+    `);
+
+    // 8. Create Admin Notifications Table
+    console.log('Creating admin_notifications table...');
+    await pool.query(`
+      CREATE TABLE admin_notifications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        type ENUM('payment_approved', 'new_order', 'low_stock', 'system') NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        data JSON,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 9. Seed Initial Data
     console.log('Seeding initial categories...');
     const initialCats = ['Maquinaria', 'Repuestos', 'Filtros', 'Lubricantes', 'Orugas'];
     for (const cat of initialCats) {
@@ -83,7 +166,7 @@ async function setup() {
     }
 
     console.log('--- Setup Completed Successfully ---');
-    console.log('NOTE: You might need to re-run the admin seed script if you want the admin user back.');
+    console.log('Run "bun run db:seed-admin" to create the admin user.');
   } catch (error) {
     console.error('CRITICAL: Setup failed:', error);
   } finally {
