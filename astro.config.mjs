@@ -28,6 +28,7 @@ export default defineConfig({
       DB_USER: envField.string({ context: "server", access: "secret", default: "root" }),
       DB_PASSWORD: envField.string({ context: "server", access: "secret", default: "" }),
       DB_NAME: envField.string({ context: "server", access: "secret", default: "catbycam" }),
+      DB_PORT: envField.number({ context: "server", access: "secret", default: 3306 }),
     }
   }
 });
