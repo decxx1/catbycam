@@ -2,9 +2,9 @@
 FROM oven/bun:latest AS build
 WORKDIR /app
 
-# Copy package files and lockfile
+# Copy package files (lockfile is optional)
 COPY package.json ./
-COPY bun.lock ./
+COPY bun.lock* ./
 
 # Install dependencies
 RUN bun install
