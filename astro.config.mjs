@@ -24,6 +24,10 @@ export default defineConfig({
       ADMIN_EMAIL: envField.string({ context: "server", access: "secret" }),
       ADMIN_PASSWORD: envField.string({ context: "server", access: "secret" }),
       JWT_SECRET: envField.string({ context: "server", access: "secret" }),
+      DB_HOST: envField.string({ context: "server", access: "secret", default: "127.0.0.1" }),
+      DB_USER: envField.string({ context: "server", access: "secret", default: "root" }),
+      DB_PASSWORD: envField.string({ context: "server", access: "secret", default: "" }),
+      DB_NAME: envField.string({ context: "server", access: "secret", default: "catbycam" }),
     }
   }
 });
