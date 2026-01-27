@@ -185,6 +185,20 @@ export const PaymentService = {
     );
   },
 
+  async getOrderItemsByExternalReference(extRef: string): Promise<OrderItem[]> {
+    const [orders]: any = await pool.execute(
+      'SELECT id FROM orders WHERE external_reference = ?',
+      [extRef]
+    );
+    if (orders.length === 0) return [];
+    
+    const [items]: any = await pool.execute(
+      'SELECT product_id, title, price, quantity FROM order_items WHERE order_id = ?',
+      [orders[0].id]
+    );
+    return items;
+  },
+
   async getOrdersByUserId(userId: number, page: number = 1, limit: number = 5) {
     const offset = (page - 1) * limit;
     const [rows]: any = await pool.execute(

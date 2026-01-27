@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { PaymentService } from '@/services/paymentService';
 import { NotificationService } from '@/services/notificationService';
+import { ProductService } from '@/services/productService';
 import { getAccessTokenForWebhook } from '@/utils/mercadopago';
 
 // Allow GET for diagnostics/testing
@@ -17,7 +18,6 @@ export const GET: APIRoute = async () => {
 };
 
 export const POST: APIRoute = async ({ request }) => {
-  // CORS headers for Mercado Pago
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
@@ -27,25 +27,17 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    console.log('--- webhook call ---');
-    console.log('Payload:', JSON.stringify(body, null, 2));
 
-    // Mercado Pago webhooks send different types of notifications. 
-    // We care about "payment" notifications.
     if (body.type === 'payment' || body.action?.includes('payment')) {
         const paymentId = body.data?.id || body.resource?.split('/').pop();
         
         if (!paymentId) {
-            console.warn('Webhook: No payment ID found in payload');
             return new Response(JSON.stringify({ error: 'No payment ID found' }), { 
               status: 400,
               headers: corsHeaders
             });
         }
 
-        console.log(`Webhook: Processing payment ${paymentId}...`);
-
-        // Fetch actual payment details from MP to verify status
         const accessToken = await getAccessTokenForWebhook();
         const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
             headers: {
@@ -55,7 +47,7 @@ export const POST: APIRoute = async ({ request }) => {
 
         if (res.ok) {
             const paymentData = await res.json();
-            const status = paymentData.status; // approved, rejected, pending, etc.
+            const status = paymentData.status;
             const externalReference = paymentData.external_reference;
 
             if (externalReference) {
@@ -63,15 +55,26 @@ export const POST: APIRoute = async ({ request }) => {
                 if (status === 'approved') orderStatus = 'paid';
                 if (status === 'rejected' || status === 'cancelled') orderStatus = 'cancelled';
 
-                console.log(`Webhook: Updating order ${externalReference} to ${orderStatus} (Payment Status: ${status})`);
                 await PaymentService.updateOrderStatusByExternalReference(
                     externalReference, 
                     String(paymentId), 
                     orderStatus
                 );
 
-                // Crear notificación para administradores cuando el pago es aprobado
+                // Si el pago fue aprobado: descontar stock y crear notificación
                 if (status === 'approved') {
+                    // Descontar stock de los productos
+                    const orderItems = await PaymentService.getOrderItemsByExternalReference(externalReference);
+                    if (orderItems.length > 0) {
+                        await ProductService.decreaseStockBulk(
+                            orderItems.map(item => ({
+                                productId: item.product_id,
+                                quantity: item.quantity
+                            }))
+                        );
+                    }
+
+                    // Crear notificación para administradores
                     const amount = paymentData.transaction_amount || 0;
                     const payerEmail = paymentData.payer?.email || 'Cliente';
                     
@@ -86,14 +89,8 @@ export const POST: APIRoute = async ({ request }) => {
                             payer_email: payerEmail
                         })
                     });
-                    console.log(`Webhook: Notification created for approved payment ${paymentId}`);
                 }
-            } else {
-                console.warn(`Webhook: Payment ${paymentId} has no external_reference`);
             }
-        } else {
-            const errorText = await res.text();
-            console.error(`Webhook: Failed to fetch payment details for ${paymentId}:`, errorText);
         }
     }
 
@@ -102,7 +99,7 @@ export const POST: APIRoute = async ({ request }) => {
       headers: corsHeaders
     });
   } catch (error) {
-    console.error('Webhook: Unexpected error handling failed', error);
+    console.error('Webhook error:', error);
     return new Response(JSON.stringify({ error: 'Webhook handling failed' }), { 
       status: 500,
       headers: corsHeaders

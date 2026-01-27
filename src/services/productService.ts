@@ -81,10 +81,13 @@ export const ProductService = {
   },
 
   async create(data: Product): Promise<number> {
+    // Si stock es 0, forzar estado a out_of_stock
+    const status = data.stock <= 0 ? 'out_of_stock' : data.status;
+    
     const [result]: any = await pool.execute(
       `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
+      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
     );
 
     const productId = result.insertId;
@@ -103,11 +106,14 @@ export const ProductService = {
   },
 
   async update(id: number | string, data: Product) {
+    // Si stock es 0, forzar estado a out_of_stock
+    const status = data.stock <= 0 ? 'out_of_stock' : data.status;
+    
     await pool.execute(
       `UPDATE products 
        SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?
        WHERE id = ?`,
-      [data.title, data.description, data.price, data.stock, data.status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
+      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
     );
 
     // Update images: simplest way is delete and re-insert
@@ -193,8 +199,16 @@ export const ProductService = {
 
     if (data.title !== undefined) { fields.push('title = ?'); params.push(data.title); }
     if (data.price !== undefined) { fields.push('price = ?'); params.push(data.price); }
-    if (data.stock !== undefined) { fields.push('stock = ?'); params.push(data.stock); }
-    if (data.status !== undefined) { fields.push('status = ?'); params.push(data.status); }
+    if (data.stock !== undefined) { 
+      fields.push('stock = ?'); 
+      params.push(data.stock);
+      // Si stock es 0, forzar estado a out_of_stock
+      if (data.stock <= 0) {
+        fields.push('status = ?');
+        params.push('out_of_stock');
+      }
+    }
+    if (data.status !== undefined && data.stock === undefined) { fields.push('status = ?'); params.push(data.status); }
     if (data.category_id !== undefined) { fields.push('category_id = ?'); params.push(data.category_id); }
 
     if (fields.length === 0) return;
@@ -211,5 +225,38 @@ export const ProductService = {
       ORDER BY p.title ASC
     `);
     return rows.map(normalizeProduct);
+  },
+
+  async decreaseStock(productId: number, quantity: number): Promise<void> {
+    // Descontar stock y cambiar estado a out_of_stock si llega a 0
+    await pool.execute(
+      `UPDATE products 
+       SET stock = GREATEST(stock - ?, 0),
+           status = CASE WHEN stock - ? <= 0 THEN 'out_of_stock' ELSE status END
+       WHERE id = ?`,
+      [quantity, quantity, productId]
+    );
+  },
+
+  async decreaseStockBulk(items: { productId: number; quantity: number }[]): Promise<void> {
+    const conn = await pool.getConnection();
+    try {
+      await conn.beginTransaction();
+      for (const item of items) {
+        await conn.execute(
+          `UPDATE products 
+           SET stock = GREATEST(stock - ?, 0),
+               status = CASE WHEN stock - ? <= 0 THEN 'out_of_stock' ELSE status END
+           WHERE id = ?`,
+          [item.quantity, item.quantity, item.productId]
+        );
+      }
+      await conn.commit();
+    } catch (error) {
+      await conn.rollback();
+      throw error;
+    } finally {
+      conn.release();
+    }
   }
 };
