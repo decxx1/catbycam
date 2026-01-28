@@ -23,3 +23,7 @@ COPY --from=build /app/node_modules ./node_modules
 
 EXPOSE 3000
 CMD ["bun", "dist/server/entry.mjs"]
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+  CMD curl -f http://localhost:3000/health || exit 1
+
