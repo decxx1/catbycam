@@ -3,9 +3,14 @@ export const prerender = false;
 import AdminLayout from "@/layouts/admin.astro";
 import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
 import ProductManager from "@/components/admin/products/ProductManager.vue";
+import { requireAdmin } from "@/utils/adminAuth";
+
+const auth = await requireAdmin(Astro.cookies);
+if ('redirect' in auth) return Astro.redirect(auth.redirect);
+const { user } = auth;
 ---
 
-<AdminLayout title="Gestión de Inventario">
+<AdminLayout title="Gestión de Inventario" {user}>
 	<AdminPageHeader
 		title="Productos y Categorías"
 		subtitle="Administra el inventario de tu tienda y organiza por categorías."

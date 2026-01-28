@@ -3,9 +3,14 @@ export const prerender = false;
 import AdminLayout from "@/layouts/admin.astro";
 import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
 import NotificationsManager from "@/components/admin/NotificationsManager.vue";
+import { requireAdmin } from "@/utils/adminAuth";
+
+const auth = await requireAdmin(Astro.cookies);
+if ('redirect' in auth) return Astro.redirect(auth.redirect);
+const { user } = auth;
 ---
 
-<AdminLayout title="Notificaciones">
+<AdminLayout title="Notificaciones" {user}>
 	<AdminPageHeader
 		title="Notificaciones"
 		subtitle="Gestiona todas las notificaciones del sistema."

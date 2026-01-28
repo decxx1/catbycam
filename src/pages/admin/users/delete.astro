@@ -1,20 +1,12 @@
 ---
 import { UserService } from "@/services/userService";
-import { getSession } from "@/utils/auth";
+import { requireAdmin } from "@/utils/adminAuth";
 
 export const prerender = false;
 
-const token = Astro.cookies.get("auth_token")?.value;
-const session = token ? await getSession(token) : null;
-
-if (!session) {
-	return Astro.redirect("/admin/login");
-}
-
-const currentUser = await UserService.findById(session.userId);
-if (!currentUser || currentUser.role !== "admin") {
-	return Astro.redirect("/");
-}
+const auth = await requireAdmin(Astro.cookies);
+if ('redirect' in auth) return Astro.redirect(auth.redirect);
+const { user: currentUser } = auth;
 
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();

@@ -2,36 +2,16 @@
 import "@/styles/global.css";
 import Sidebar from "@/components/admin/sidebar.astro";
 import Topbar from "@/components/admin/topbar.astro";
-import { getSession } from "@/utils/auth";
-import { UserService } from "@/services/userService";
+import type { User } from "@/services/userService";
 // Supports weights 100-900
 import "@fontsource-variable/inter/opsz-italic.css";
 
 interface Props {
 	title: string;
+	user: User;
 }
 
-const { title } = Astro.props;
-
-const token = Astro.cookies.get("auth_token")?.value;
-const session = token ? await getSession(token) : null;
-
-// Si no hay sesión válida (token inexistente, expirado o corrupto)
-if (!session) {
-	// Limpiar cookie si existe pero es inválida
-	if (token) {
-		Astro.cookies.delete("auth_token", { path: "/" });
-	}
-	return Astro.redirect("/admin/login");
-}
-
-const user = await UserService.findById(session.userId);
-
-// Si el usuario no existe o no es admin
-if (!user || user.role !== "admin") {
-	Astro.cookies.delete("auth_token", { path: "/" });
-	return Astro.redirect("/");
-}
+const { title, user } = Astro.props;
 ---
 
 <!doctype html>

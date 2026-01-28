@@ -1,7 +1,16 @@
 import type { APIRoute } from 'astro';
 import { NotificationService } from '@/services/notificationService';
+import { getSession } from '@/utils/auth';
+import { UserService } from '@/services/userService';
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ request, cookies }) => {
+  const token = cookies.get('auth_token')?.value;
+  const session = token ? await getSession(token) : null;
+  if (!session) return new Response('Unauthorized', { status: 401 });
+
+  const user = await UserService.findById(session.userId);
+  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+
   try {
     const url = new URL(request.url);
     const action = url.searchParams.get('action');
@@ -40,7 +49,14 @@ export const GET: APIRoute = async ({ request }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, cookies }) => {
+  const token = cookies.get('auth_token')?.value;
+  const session = token ? await getSession(token) : null;
+  if (!session) return new Response('Unauthorized', { status: 401 });
+
+  const user = await UserService.findById(session.userId);
+  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+
   try {
     const body = await request.json();
     const { action, id } = body;
