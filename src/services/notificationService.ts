@@ -34,18 +34,18 @@ export const NotificationService = {
   },
 
   async getUnread(limit: number = 10) {
+    const safeLimit = Math.max(1, Math.min(100, Number(limit) || 10));
     const [rows]: any = await pool.execute(
-      'SELECT * FROM admin_notifications WHERE is_read = FALSE ORDER BY created_at DESC LIMIT ?',
-      [limit]
+      `SELECT * FROM admin_notifications WHERE is_read = FALSE ORDER BY created_at DESC LIMIT ${safeLimit}`
     );
     return rows;
   },
 
   async getAll(page: number = 1, limit: number = 20) {
-    const offset = (page - 1) * limit;
+    const safeLimit = Math.max(1, Math.min(100, Number(limit) || 20));
+    const safeOffset = Math.max(0, (Number(page) - 1) * safeLimit);
     const [rows]: any = await pool.execute(
-      'SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [limit, offset]
+      `SELECT * FROM admin_notifications ORDER BY created_at DESC LIMIT ${safeLimit} OFFSET ${safeOffset}`
     );
 
     const [countResult]: any = await pool.execute(
