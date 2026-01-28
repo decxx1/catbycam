@@ -5,45 +5,178 @@ import pool from "@/utils/db";
 import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
 import StatCard from "@/components/admin/dashboard/StatCard.astro";
 import LatestUsersTable from "@/components/admin/dashboard/LatestUsersTable.astro";
+import LatestProductsTable from "@/components/admin/dashboard/LatestProductsTable.astro";
+import TopSellingProducts from "@/components/admin/dashboard/TopSellingProducts.astro";
+import OrdersTable from "@/components/admin/dashboard/OrdersTable.astro";
+import AdminsTable from "@/components/admin/dashboard/AdminsTable.astro";
+import MercadoPagoAlert from "@/components/admin/dashboard/MercadoPagoAlert.astro";
 import { requireAdmin } from "@/utils/adminAuth";
+import { SettingsService } from "@/services/settingsService";
 
 const auth = await requireAdmin(Astro.cookies);
 if ('redirect' in auth) return Astro.redirect(auth.redirect);
 const { user } = auth;
 
+// Inicializar variables
 let totalUsers = 0;
+let totalProducts = 0;
+let totalOrders = 0;
+let pendingOrders = 0;
 let latestUsers: any[] = [];
+let latestProducts: any[] = [];
+let topSellingProducts: any[] = [];
+let ordersToDispatch: any[] = [];
+let dispatchedOrders: any[] = [];
+let admins: any[] = [];
+let hasMpCredentials = false;
 
 try {
+	// Usuarios
 	const [userCountResult]: any = await pool.execute(
-		"SELECT COUNT(*) as total FROM users WHERE role != 'admin'",
+		"SELECT COUNT(*) as total FROM users WHERE role != 'admin'"
 	);
 	totalUsers = userCountResult[0].total;
 
 	const [usersResult]: any = await pool.execute(
-		"SELECT name, email, created_at FROM users WHERE role != 'admin' ORDER BY created_at DESC LIMIT 5",
+		"SELECT name, email, created_at FROM users WHERE role != 'admin' ORDER BY created_at DESC LIMIT 5"
 	);
 	latestUsers = usersResult;
+
+	// Productos
+	const [productCountResult]: any = await pool.execute(
+		"SELECT COUNT(*) as total FROM products"
+	);
+	totalProducts = productCountResult[0].total;
+
+	const [productsResult]: any = await pool.execute(
+		"SELECT id, title, price, stock, status, created_at FROM products ORDER BY created_at DESC LIMIT 5"
+	);
+	latestProducts = productsResult;
+
+	// Más vendidos (basado en order_items)
+	const [topSelling]: any = await pool.execute(`
+		SELECT p.id, p.title, SUM(oi.quantity) as total_sold, SUM(oi.quantity * oi.price) as revenue
+		FROM order_items oi
+		JOIN products p ON oi.product_id = p.id
+		JOIN orders o ON oi.order_id = o.id
+		WHERE o.status = 'paid'
+		GROUP BY p.id, p.title
+		ORDER BY total_sold DESC
+		LIMIT 5
+	`);
+	topSellingProducts = topSelling;
+
+	// Pedidos
+	const [orderCountResult]: any = await pool.execute(
+		"SELECT COUNT(*) as total FROM orders"
+	);
+	totalOrders = orderCountResult[0].total;
+
+	const [pendingCountResult]: any = await pool.execute(
+		"SELECT COUNT(*) as total FROM orders WHERE status = 'paid' AND shipping_status = 'processing'"
+	);
+	pendingOrders = pendingCountResult[0].total;
+
+	// Pedidos para despachar (pagados, en procesamiento)
+	const [toDispatch]: any = await pool.execute(`
+		SELECT o.id, o.total_amount, o.status, o.shipping_status, o.created_at, u.name as user_name
+		FROM orders o
+		JOIN users u ON o.user_id = u.id
+		WHERE o.status = 'paid' AND o.shipping_status = 'processing'
+		ORDER BY o.created_at ASC
+		LIMIT 5
+	`);
+	ordersToDispatch = toDispatch;
+
+	// Pedidos despachados (enviados)
+	const [dispatched]: any = await pool.execute(`
+		SELECT o.id, o.total_amount, o.status, o.shipping_status, o.created_at, u.name as user_name
+		FROM orders o
+		JOIN users u ON o.user_id = u.id
+		WHERE o.status = 'paid' AND o.shipping_status = 'shipped'
+		ORDER BY o.created_at DESC
+		LIMIT 5
+	`);
+	dispatchedOrders = dispatched;
+
+	// Administradores
+	const [adminsResult]: any = await pool.execute(
+		"SELECT id, name, email, created_at FROM users WHERE role = 'admin' ORDER BY created_at ASC"
+	);
+	admins = adminsResult;
+
+	// Credenciales de MercadoPago
+	const mpConfig = await SettingsService.getMercadoPagoConfig();
+	hasMpCredentials = !!(mpConfig.publicKey && mpConfig.accessToken);
+
 } catch (error) {
 	console.error("Dashboard DB error:", error);
 }
 
+// Iconos
 const usersIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`;
+const productsIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+const ordersIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>`;
+const pendingIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/></svg>`;
 ---
 
 <AdminLayout title="Dashboard" {user}>
 	<AdminPageHeader title="Dashboard" />
 
-	<div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+	<!-- Alerta de MercadoPago -->
+	<div class="mb-8">
+		<MercadoPagoAlert hasCredentials={hasMpCredentials} />
+	</div>
+
+	<!-- Métricas principales -->
+	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
 		<StatCard
 			label="Usuarios Registrados"
 			value={totalUsers}
-			trend="+12% este mes"
 			icon={usersIcon}
 		/>
-
-		<!-- More stat cards would go here -->
+		<StatCard
+			label="Productos"
+			value={totalProducts}
+			icon={productsIcon}
+		/>
+		<StatCard
+			label="Pedidos Totales"
+			value={totalOrders}
+			icon={ordersIcon}
+		/>
+		<StatCard
+			label="Por Despachar"
+			value={pendingOrders}
+			icon={pendingIcon}
+			trendType={pendingOrders > 0 ? "negative" : "positive"}
+			trend={pendingOrders > 0 ? "Requiere atención" : "Todo al día"}
+		/>
 	</div>
 
-	<LatestUsersTable users={latestUsers} />
+	<!-- Productos y Más Vendidos -->
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+		<LatestProductsTable products={latestProducts} />
+		<TopSellingProducts products={topSellingProducts} />
+	</div>
+
+	<!-- Pedidos -->
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+		<OrdersTable 
+			orders={ordersToDispatch} 
+			title="Pedidos para despachar"
+			emptyMessage="No hay pedidos pendientes de despacho."
+		/>
+		<OrdersTable 
+			orders={dispatchedOrders} 
+			title="Pedidos despachados"
+			emptyMessage="No hay pedidos despachados recientemente."
+		/>
+	</div>
+
+	<!-- Usuarios y Administradores -->
+	<div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+		<LatestUsersTable users={latestUsers} />
+		<AdminsTable admins={admins} />
+	</div>
 </AdminLayout>

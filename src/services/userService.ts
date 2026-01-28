@@ -40,6 +40,16 @@ export const UserService = {
   },
 
   async deleteUser(id: number | string) {
+    // Eliminar order_items de los pedidos del usuario primero (por FK)
+    await pool.execute(
+      'DELETE oi FROM order_items oi INNER JOIN orders o ON oi.order_id = o.id WHERE o.user_id = ?',
+      [id]
+    );
+    // Eliminar pedidos del usuario
+    await pool.execute('DELETE FROM orders WHERE user_id = ?', [id]);
+    // Eliminar direcciones de envío del usuario
+    await pool.execute('DELETE FROM shipping_addresses WHERE user_id = ?', [id]);
+    // Finalmente eliminar el usuario
     await pool.execute('DELETE FROM users WHERE id = ?', [id]);
   },
 

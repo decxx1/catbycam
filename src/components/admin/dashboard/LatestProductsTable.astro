@@ -1,0 +1,59 @@
+---
+interface Product {
+	id: number;
+	title: string;
+	price: number;
+	stock: number;
+	status: string;
+	created_at: string;
+}
+
+interface Props {
+	products: Product[];
+}
+
+const { products } = Astro.props;
+
+const statusLabels: Record<string, { label: string; class: string }> = {
+	active: { label: "Activo", class: "bg-green-100 text-green-700" },
+	inactive: { label: "Inactivo", class: "bg-gray-100 text-gray-600" },
+	out_of_stock: { label: "Agotado", class: "bg-red-100 text-red-700" },
+	paused: { label: "Pausado", class: "bg-amber-100 text-amber-700" },
+};
+---
+
+<div class="bg-white rounded-3xl border border-secondary/5 shadow-sm overflow-hidden text-left">
+	<div class="p-6 border-b border-secondary/5 flex items-center justify-between">
+		<h3 class="font-bold text-lg">Últimos productos</h3>
+		<a
+			href="/admin/products"
+			class="text-xs font-bold uppercase tracking-widest text-primary hover:underline"
+		>
+			Ver todos
+		</a>
+	</div>
+
+	<div class="divide-y divide-secondary/5">
+		{products.map((product) => {
+			const status = statusLabels[product.status] || statusLabels.inactive;
+			return (
+				<div class="p-4 hover:bg-accent/5 transition-colors flex items-center gap-4">
+					<div class="flex-1 min-w-0">
+						<p class="font-bold text-sm truncate">{product.title}</p>
+						<p class="text-xs text-secondary/50">
+							Stock: {product.stock} · ${product.price.toLocaleString()}
+						</p>
+					</div>
+					<span class={`px-2 py-1 text-[10px] font-bold uppercase rounded-full ${status.class}`}>
+						{status.label}
+					</span>
+				</div>
+			);
+		})}
+		{products.length === 0 && (
+			<div class="p-8 text-center text-secondary/30 italic text-sm">
+				No hay productos aún.
+			</div>
+		)}
+	</div>
+</div>

@@ -1,0 +1,60 @@
+---
+interface Order {
+	id: number;
+	user_name: string;
+	total_amount: number;
+	status: string;
+	shipping_status: string;
+	created_at: string;
+}
+
+interface Props {
+	orders: Order[];
+	title: string;
+	emptyMessage?: string;
+}
+
+const { orders, title, emptyMessage = "No hay pedidos." } = Astro.props;
+
+const shippingLabels: Record<string, { label: string; class: string }> = {
+	processing: { label: "Por despachar", class: "bg-amber-100 text-amber-700" },
+	shipped: { label: "Despachado", class: "bg-blue-100 text-blue-700" },
+	delivered: { label: "Entregado", class: "bg-green-100 text-green-700" },
+};
+---
+
+<div class="bg-white rounded-3xl border border-secondary/5 shadow-sm overflow-hidden text-left">
+	<div class="p-6 border-b border-secondary/5 flex items-center justify-between">
+		<h3 class="font-bold text-lg">{title}</h3>
+		<a
+			href="/admin/orders"
+			class="text-xs font-bold uppercase tracking-widest text-primary hover:underline"
+		>
+			Ver todos
+		</a>
+	</div>
+
+	<div class="divide-y divide-secondary/5">
+		{orders.map((order) => {
+			const shipping = shippingLabels[order.shipping_status] || shippingLabels.processing;
+			return (
+				<a href={`/admin/orders/${order.id}`} class="p-4 hover:bg-accent/5 transition-colors flex items-center gap-4">
+					<div class="flex-1 min-w-0">
+						<p class="font-bold text-sm">Pedido #{order.id}</p>
+						<p class="text-xs text-secondary/50">
+							{order.user_name} · ${order.total_amount.toLocaleString()}
+						</p>
+					</div>
+					<span class={`px-2 py-1 text-[10px] font-bold uppercase rounded-full whitespace-nowrap ${shipping.class}`}>
+						{shipping.label}
+					</span>
+				</a>
+			);
+		})}
+		{orders.length === 0 && (
+			<div class="p-8 text-center text-secondary/30 italic text-sm">
+				{emptyMessage}
+			</div>
+		)}
+	</div>
+</div>
