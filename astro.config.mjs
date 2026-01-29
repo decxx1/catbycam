@@ -23,7 +23,6 @@ export default defineConfig({
       ADMIN_NAME: envField.string({ context: "server", access: "secret" }),
       ADMIN_EMAIL: envField.string({ context: "server", access: "secret" }),
       ADMIN_PASSWORD: envField.string({ context: "server", access: "secret" }),
-      JWT_SECRET: envField.string({ context: "server", access: "secret" }),
       BETTER_AUTH_SECRET: envField.string({ context: "server", access: "secret" }),
       BETTER_AUTH_URL: envField.string({ context: "server", access: "secret", default: "http://localhost:4321" }),
       DB_HOST: envField.string({ context: "server", access: "secret", default: "127.0.0.1" }),
