@@ -67,11 +67,19 @@ bun run db:seed
 ### Scripts disponibles
 | Comando | Descripción |
 |---------|-------------|
-| `bun run db:fresh` | Reset + auth + migrate + seed (todo en uno) |
+| `bun run db:up` | **Producción** - Crea DB/tablas si no existen, aplica migraciones pendientes |
+| `bun run db:fresh` | **Desarrollo** - Reset + auth + migrate + seed (todo en uno) |
 | `bun run db:reset` | Elimina todas las tablas |
 | `bun run db:auth` | Crea tablas de better-auth |
 | `bun run db:migrate` | Crea tablas de la aplicación |
 | `bun run db:seed` | Inserta datos iniciales |
+
+### Producción (Docker)
+El contenedor ejecuta automáticamente al iniciar:
+```bash
+bun run db:up && bun run db:auth && bun run db:seed
+```
+Esto crea la DB si no existe, aplica migraciones pendientes, y ejecuta seeds (idempotentes).
 
 ### Estructura de archivos
 ```
@@ -88,6 +96,7 @@ src/db/
 ├── seeds/               # Datos iniciales
 │   ├── 001-categories.ts
 │   └── 002-admin.ts
+├── up.ts                # Migraciones inteligentes (estilo Laravel)
 ├── migrate.ts           # Ejecuta todas las migraciones
 ├── seed.ts              # Ejecuta todos los seeds
 ├── reset.ts             # Resetea la base de datos

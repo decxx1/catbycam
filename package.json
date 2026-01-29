@@ -7,8 +7,9 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "db:up": "bun src/db/up.ts",
     "db:reset": "bun src/db/reset.ts",
-    "db:auth": "bunx @better-auth/cli migrate",
+    "db:auth": "bunx @better-auth/cli migrate --yes",
     "db:migrate": "bun src/db/migrate.ts",
     "db:seed": "bun src/db/seed.ts",
     "db:fresh": "bun src/db/fresh.ts"
