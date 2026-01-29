@@ -1,53 +1,49 @@
 ---
-import { getSession } from "@/utils/auth";
+import { auth } from "@/lib/auth";
 
-const token = Astro.cookies.get("auth_token")?.value;
-const session = token ? await getSession(token) : null;
+const session = await auth.api.getSession({ headers: Astro.request.headers });
 const isLoggedIn = !!session;
 ---
-
 <!-- Desktop Auth -->
-<div id="auth-nav-container" class="contents">
-	{
-		isLoggedIn ? (
-			<a
-				id="nav-profile-link"
-				href="/profile"
-				class="flex items-center gap-3 text-sm font-bold transition-colors text-secondary hover:text-primary"
-			>
-				<div class="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-primary/10 text-primary">
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="16"
-						height="16"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.5"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-						<circle cx="12" cy="7" r="4" />
-					</svg>
-				</div>
-				Mi Perfil
-			</a>
-		) : (
-			<div id="nav-auth-buttons" class="flex items-center gap-4">
-				<a
-					href="/login"
-					class="text-sm font-bold transition-colors text-secondary/60 hover:text-primary"
+{
+	isLoggedIn ? (
+		<a
+			id="nav-profile-link"
+			href="/profile"
+			class="w-44 flex items-center gap-3 text-sm font-bold transition-colors text-secondary hover:text-primary"
+		>
+			<div class="w-8 h-8 rounded-full flex items-center justify-center transition-colors bg-primary/10 text-primary">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
 				>
-					Ingresar
-				</a>
-				<a
-					href="/register"
-					class="btn-primary text-sm py-2 px-5 cursor-pointer"
-				>
-					Regístrate
-				</a>
+					<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+					<circle cx="12" cy="7" r="4" />
+				</svg>
 			</div>
-		)
-	}
-</div>
+			Mi Perfil
+		</a>
+	) : (
+		<div id="nav-auth-buttons" class="w-44 flex items-center gap-4">
+			<a
+				href="/login"
+				class="text-sm font-bold transition-colors text-secondary/60 hover:text-primary"
+			>
+				Ingresar
+			</a>
+			<a
+				href="/register"
+				class="btn-primary text-sm py-2 px-5 cursor-pointer"
+			>
+				Regístrate
+			</a>
+		</div>
+	)
+}

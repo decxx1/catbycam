@@ -68,14 +68,16 @@ const navLinks = [
 				<CartManager client:load />
 
 				<!-- Server Island: Auth state rendered on server -->
-				<NavbarAuth server:defer>
-					<div slot="fallback" class="flex items-center gap-4">
-						<div
-							class="w-8 h-8 bg-accent/50 rounded-full animate-pulse"
-						>
+				<div id="auth-nav-container" class="contents">
+					<NavbarAuth server:defer>
+						<div slot="fallback" class="w-44 flex items-center gap-4">
+							<div
+								class="w-8 h-8 bg-accent/50 rounded-full animate-pulse"
+							>
+							</div>
 						</div>
-					</div>
-				</NavbarAuth>
+					</NavbarAuth>
+				</div>
 			</div>
 		</nav>
 
