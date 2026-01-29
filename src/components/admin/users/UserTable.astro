@@ -3,7 +3,7 @@ import type { User } from "@/services/userService";
 
 interface Props {
 	users: User[];
-	currentUserId?: number;
+	currentUserId?: string;
 }
 
 const { users, currentUserId } = Astro.props;
@@ -77,7 +77,7 @@ const { users, currentUserId } = Astro.props;
 							</span>
 						</td>
 						<td class="px-8 py-5 text-sm text-secondary/40">
-							{new Date(user.created_at).toLocaleDateString()}
+							{new Date(user.createdAt).toLocaleDateString()}
 						</td>
 						<td class="px-8 py-5 text-right">
 							<div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

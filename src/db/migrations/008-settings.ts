@@ -8,6 +8,8 @@ export async function up() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       \`key\` VARCHAR(100) NOT NULL UNIQUE,
       value TEXT,
+      description VARCHAR(255),
+      is_encrypted BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )

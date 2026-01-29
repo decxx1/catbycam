@@ -63,7 +63,7 @@ if (Astro.request.method === "POST") {
 				<h1 class="text-3xl font-black">Editar Usuario</h1>
 				<p class="text-secondary/50 text-sm mt-1">
 					ID: #{user.id} • Miembro desde {
-						new Date(user.created_at).toLocaleDateString()
+						new Date(user.createdAt).toLocaleDateString()
 					}
 				</p>
 			</div>
