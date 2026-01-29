@@ -8,8 +8,9 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_NAME = process.env.DB_NAME || 'catbycam';
 const DB_PORT = Number(process.env.DB_PORT) || 3306;
 
-// Lista de migraciones en orden
+// Lista de migraciones en orden (000-better-auth DEBE ser primero)
 const migrations = [
+  { name: '000-better-auth', module: () => import('./migrations/000-better-auth') },
   { name: '001-categories', module: () => import('./migrations/001-categories') },
   { name: '002-products', module: () => import('./migrations/002-products') },
   { name: '003-product-images', module: () => import('./migrations/003-product-images') },
