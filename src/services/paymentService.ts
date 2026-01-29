@@ -234,7 +234,7 @@ export const PaymentService = {
     const [rows]: any = await pool.execute(`
       SELECT o.*, u.name as user_name, u.email as user_email 
       FROM orders o 
-      JOIN users u ON o.user_id = u.id 
+      JOIN user u ON o.user_id = u.id 
       ORDER BY o.created_at DESC
       LIMIT ? OFFSET ?
     `, [limit, Number(offset)]);
@@ -274,7 +274,7 @@ export const PaymentService = {
 
   async getOrderById(orderId: number) {
     const [rows]: any = await pool.execute(
-      'SELECT o.*, u.name as user_name, u.email as user_email FROM orders o JOIN users u ON o.user_id = u.id WHERE o.id = ?',
+      'SELECT o.*, u.name as user_name, u.email as user_email FROM orders o JOIN user u ON o.user_id = u.id WHERE o.id = ?',
       [orderId]
     );
     if (rows.length === 0) return null;

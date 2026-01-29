@@ -1,15 +1,10 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
-import { UserService } from '@/services/userService';
+import { requireAdmin } from '@/lib/auth-helpers';
 import { ProductService } from '@/services/productService';
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
-
-  const user = await UserService.findById(session.userId);
-  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+export const POST: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const { percentage, categoryId } = await request.json();

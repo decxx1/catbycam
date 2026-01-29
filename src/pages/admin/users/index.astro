@@ -5,16 +5,12 @@ import { UserService } from "@/services/userService";
 import AdminPageHeader from "@/components/admin/common/AdminPageHeader.astro";
 import UserTable from "@/components/admin/users/UserTable.astro";
 import DeleteUserModal from "@/components/admin/users/DeleteUserModal.astro";
-import { requireAdmin } from "@/utils/adminAuth";
 
-const auth = await requireAdmin(Astro.cookies);
-if ('redirect' in auth) return Astro.redirect(auth.redirect);
-const { user: currentUser } = auth;
-
+const currentUser = Astro.locals.user;
 const users = await UserService.getAllUsers();
 ---
 
-<AdminLayout title="Gestión de Usuarios" user={currentUser}>
+<AdminLayout title="Gestión de Usuarios">
 	<AdminPageHeader
 		title="Usuarios"
 		subtitle="Gestiona todos los usuarios registrados en la plataforma."

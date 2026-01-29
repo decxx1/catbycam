@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import { UserService } from '@/services/userService';
 
-export const PATCH: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
+export const PATCH: APIRoute = async ({ request }) => {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const { user: sessionUser } = authResult;
 
   try {
     const { currentPassword, newPassword, confirmPassword } = await request.json();
@@ -22,7 +22,7 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
       return new Response(JSON.stringify({ error: 'La contraseña debe tener al menos 6 caracteres' }), { status: 400 });
     }
 
-    const result = await UserService.changePassword(session.userId, currentPassword, newPassword);
+    const result = await UserService.changePassword(sessionUser.id, currentPassword, newPassword);
 
     if (!result.success) {
       return new Response(JSON.stringify({ error: result.error }), { status: 400 });

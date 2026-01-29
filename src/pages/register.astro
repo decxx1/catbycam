@@ -1,62 +1,19 @@
 ---
 export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
-import AuthForm from "@/components/auth/AuthForm.vue";
-import { UserService } from "@/services/userService";
-import { createSession, getSession } from "@/utils/auth";
+import UserRegisterForm from "@/components/auth/UserRegisterForm.vue";
+import { auth } from "@/lib/auth";
 
-const token = Astro.cookies.get("auth_token")?.value;
-const session = token ? await getSession(token) : null;
+// Si ya está autenticado, redirigir al perfil
+const session = await auth.api.getSession({
+	headers: Astro.request.headers,
+});
 
 if (session) {
 	return Astro.redirect("/profile");
 }
 
 let error = "";
-
-if (Astro.request.method === "POST") {
-	try {
-		const formData = await Astro.request.formData();
-		const name = formData.get("name")?.toString();
-		const email = formData.get("email")?.toString();
-		const password = formData.get("password")?.toString();
-
-		if (name && email && password) {
-			const existingUser = await UserService.findByEmail(email);
-			if (existingUser) {
-				error = "El usuario ya existe.";
-			} else {
-				const result: any = await UserService.register({
-					name,
-					email,
-					password,
-				});
-				const token = await createSession(result.insertId);
-
-				Astro.cookies.set("auth_token", token, {
-					path: "/",
-					httpOnly: true,
-					secure: import.meta.env.PROD,
-					sameSite: "lax",
-					maxAge: 60 * 60 * 24 * 7, // 1 week
-				});
-
-				Astro.cookies.set("cb_logged_in", "true", {
-					path: "/",
-					httpOnly: false, // Accessible via JS
-					secure: import.meta.env.PROD,
-					sameSite: "lax",
-					maxAge: 60 * 60 * 24 * 7,
-				});
-
-				return Astro.redirect("/profile");
-			}
-		}
-	} catch (e) {
-		error = "Hubo un error al procesar el registro.";
-		console.error(e);
-	}
-}
 ---
 
 <Layout title="Registrarse">
@@ -64,7 +21,7 @@ if (Astro.request.method === "POST") {
 		class="min-h-screen pt-40 pb-20 bg-accent/20 flex items-center justify-center"
 	>
 		<div class="container-custom">
-			<AuthForm mode="register" error={error} client:load />
+			<UserRegisterForm error={error} client:load />
 		</div>
 	</section>
 </Layout>

@@ -1,23 +1,10 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
-import { UserService } from '@/services/userService';
+import { requireAdmin } from '@/lib/auth-helpers';
 import { SettingsService } from '@/services/settingsService';
 
-async function isAdmin(cookies: any): Promise<boolean> {
-  const token = cookies.get('auth_token')?.value;
-  if (!token) return false;
-  
-  const session = await getSession(token);
-  if (!session) return false;
-  
-  const user = await UserService.findById(session.userId);
-  return user?.role === 'admin';
-}
-
-export const GET: APIRoute = async ({ cookies }) => {
-  if (!await isAdmin(cookies)) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+export const GET: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const mpConfig = await SettingsService.getMercadoPagoConfig();
@@ -35,10 +22,9 @@ export const GET: APIRoute = async ({ cookies }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-  if (!await isAdmin(cookies)) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+export const POST: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   try {
     const body = await request.json();

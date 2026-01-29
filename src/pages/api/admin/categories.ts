@@ -1,53 +1,36 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
-import { UserService } from '@/services/userService';
+import { requireAdmin } from '@/lib/auth-helpers';
 import { CategoryService } from '@/services/categoryService';
 
-export const GET: APIRoute = async ({ cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
-
-  const user = await UserService.findById(session.userId);
-  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+export const GET: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   const categories = await CategoryService.getAll();
   return new Response(JSON.stringify(categories), { status: 200 });
 };
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
-
-  const user = await UserService.findById(session.userId);
-  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+export const POST: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   const { name } = await request.json();
   const id = await CategoryService.create(name);
   return new Response(JSON.stringify({ id }), { status: 201 });
 };
 
-export const PUT: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
-
-  const user = await UserService.findById(session.userId);
-  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+export const PUT: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   const { id, name } = await request.json();
   await CategoryService.update(id, name);
   return new Response(null, { status: 200 });
 };
 
-export const DELETE: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
-
-  const user = await UserService.findById(session.userId);
-  if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
+export const DELETE: APIRoute = async ({ request }) => {
+  const authResult = await requireAdmin(request);
+  if (authResult instanceof Response) return authResult;
 
   const { id } = await request.json();
   await CategoryService.delete(id);

@@ -2,16 +2,17 @@
 import "@/styles/global.css";
 import Sidebar from "@/components/admin/sidebar.astro";
 import Topbar from "@/components/admin/topbar.astro";
-import type { User } from "@/services/userService";
 // Supports weights 100-900
 import "@fontsource-variable/inter/opsz-italic.css";
 
 interface Props {
 	title: string;
-	user: User;
 }
 
-const { title, user } = Astro.props;
+const { title } = Astro.props;
+
+// El middleware ya validó la autenticación y adjuntó el usuario
+const user = Astro.locals.user!;
 ---
 
 <!doctype html>

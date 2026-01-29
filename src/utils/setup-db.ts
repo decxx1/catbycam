@@ -36,31 +36,21 @@ async function setup() {
 
   try {
     // 1. DROP Existing Tables (in correct order due to foreign keys)
+    // NOTA: Las tablas de better-auth (user, session, account, verification) 
+    // se crean con: bunx @better-auth/cli migrate
     await pool.query('SET FOREIGN_KEY_CHECKS = 0');
-    console.log('Dropping old tables...');
+    console.log('Dropping app tables (not better-auth tables)...');
     await pool.query('DROP TABLE IF EXISTS order_items');
     await pool.query('DROP TABLE IF EXISTS orders');
     await pool.query('DROP TABLE IF EXISTS admin_notifications');
     await pool.query('DROP TABLE IF EXISTS product_images');
     await pool.query('DROP TABLE IF EXISTS products');
     await pool.query('DROP TABLE IF EXISTS categories');
-    await pool.query('DROP TABLE IF EXISTS users');
+    await pool.query('DROP TABLE IF EXISTS shipping_addresses');
+    await pool.query('DROP TABLE IF EXISTS settings');
     await pool.query('SET FOREIGN_KEY_CHECKS = 1');
 
-    // 2. Create Users Table
-    console.log('Creating users table...');
-    await pool.query(`
-      CREATE TABLE users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100) NOT NULL,
-        email VARCHAR(100) NOT NULL UNIQUE,
-        password VARCHAR(255) NOT NULL,
-        role ENUM('user', 'admin') DEFAULT 'user',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // 3. Create Categories Table
+    // 2. Create Categories Table
     console.log('Creating categories table...');
     await pool.query(`
       CREATE TABLE categories (
@@ -108,12 +98,13 @@ async function setup() {
       )
     `);
 
-    // 6. Create Orders Table
+    // 5. Create Orders Table
+    // NOTA: user_id es VARCHAR(36) porque better-auth usa UUIDs
     console.log('Creating orders table...');
     await pool.query(`
       CREATE TABLE orders (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id INT NOT NULL,
+        user_id VARCHAR(36) NOT NULL,
         total_amount DECIMAL(15, 2) NOT NULL,
         status ENUM('pending', 'paid', 'cancelled', 'refunded') DEFAULT 'pending',
         shipping_address TEXT,
@@ -125,7 +116,7 @@ async function setup() {
         preference_id VARCHAR(100),
         external_reference VARCHAR(100),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
       )
     `);
 

@@ -1,22 +1,22 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import { PaymentService } from '@/services/paymentService';
 import { UserService } from '@/services/userService';
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
+export const POST: APIRoute = async ({ request }) => {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const { user: sessionUser } = authResult;
 
   try {
     const { items, total, shippingAddress, phone, comments } = await request.json();
 
     // 0. Get user info for payer details
-    const user = await UserService.findById(session.userId);
+    const user = await UserService.findById(sessionUser.id);
 
     // 1. Create or Update existing pending order in DB
     const orderId = await PaymentService.createOrUpdateOrder(
-      session.userId,
+      sessionUser.id,
       total,
       shippingAddress,
       items,
@@ -27,7 +27,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // 2. Generate preference
     const preferenceId = await PaymentService.generatePreference(
       orderId, 
-      session.userId, 
+      sessionUser.id, 
       items, 
       user?.email
     );

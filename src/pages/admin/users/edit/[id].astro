@@ -2,11 +2,6 @@
 export const prerender = false;
 import AdminLayout from "@/layouts/admin.astro";
 import { UserService } from "@/services/userService";
-import { requireAdmin } from "@/utils/adminAuth";
-
-const auth = await requireAdmin(Astro.cookies);
-if ('redirect' in auth) return Astro.redirect(auth.redirect);
-const { user: currentUser } = auth;
 
 const { id } = Astro.params;
 
@@ -43,7 +38,7 @@ if (Astro.request.method === "POST") {
 }
 ---
 
-<AdminLayout title={`Editar Usuario: ${user.name}`} user={currentUser}>
+<AdminLayout title={`Editar Usuario: ${user.name}`}>
 	<div class="max-w-2xl mx-auto mt-12">
 		<div class="flex items-center gap-4 mb-12">
 			<a

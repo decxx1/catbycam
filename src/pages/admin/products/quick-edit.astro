@@ -2,14 +2,9 @@
 export const prerender = false;
 import AdminLayout from '@/layouts/admin.astro';
 import QuickEditManager from '@/components/admin/products/QuickEditManager.vue';
-import { requireAdmin } from "@/utils/adminAuth";
-
-const auth = await requireAdmin(Astro.cookies);
-if ('redirect' in auth) return Astro.redirect(auth.redirect);
-const { user } = auth;
 ---
 
-<AdminLayout title="Edición Rápida de Productos" {user}>
+<AdminLayout title="Edición Rápida de Productos">
   <div class="space-y-8">
     <div class="flex items-center justify-between">
       <div>

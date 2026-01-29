@@ -42,7 +42,70 @@ All commands are run from the root of the project, from a terminal:
 
 Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
 
-# 1. Limpiar y recrear todas las tablas (incluye categorías iniciales)
-bun run db:setup
-# 2. Restaurar el usuario administrador (CatByCam Admin)
-bun run db:seed-admin
+## 🗄️ Database Setup
+
+### Quick Setup (todo en uno)
+```bash
+bun run db:fresh
+```
+
+### Manual Setup (paso a paso)
+```bash
+# 1. Resetear la base de datos (elimina TODAS las tablas)
+bun run db:reset
+
+# 2. Ejecutar migraciones de better-auth (crea user, session, account, verification)
+bun run db:auth
+
+# 3. Crear tablas de la aplicación
+bun run db:migrate
+
+# 4. Crear datos iniciales (categorías + admin)
+bun run db:seed
+```
+
+### Scripts disponibles
+| Comando | Descripción |
+|---------|-------------|
+| `bun run db:fresh` | Reset + auth + migrate + seed (todo en uno) |
+| `bun run db:reset` | Elimina todas las tablas |
+| `bun run db:auth` | Crea tablas de better-auth |
+| `bun run db:migrate` | Crea tablas de la aplicación |
+| `bun run db:seed` | Inserta datos iniciales |
+
+### Estructura de archivos
+```
+src/db/
+├── migrations/          # Migraciones de tablas
+│   ├── 001-categories.ts
+│   ├── 002-products.ts
+│   ├── 003-product-images.ts
+│   ├── 004-orders.ts
+│   ├── 005-order-items.ts
+│   ├── 006-admin-notifications.ts
+│   ├── 007-shipping-addresses.ts
+│   └── 008-settings.ts
+├── seeds/               # Datos iniciales
+│   ├── 001-categories.ts
+│   └── 002-admin.ts
+├── migrate.ts           # Ejecuta todas las migraciones
+├── seed.ts              # Ejecuta todos los seeds
+├── reset.ts             # Resetea la base de datos
+└── fresh.ts             # Todo en uno
+```
+
+### Variables de entorno requeridas (.env)
+```env
+DB_HOST=127.0.0.1
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=catbycam
+DB_PORT=3306
+
+ADMIN_NAME=Admin
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=password123
+
+BETTER_AUTH_SECRET=your-secret-key
+BETTER_AUTH_URL=http://localhost:4321
+```

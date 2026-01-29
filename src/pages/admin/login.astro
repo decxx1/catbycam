@@ -1,44 +1,18 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import AuthForm from "@/components/auth/AuthForm.vue";
-import { UserService } from "@/services/userService";
-import { createSession } from "@/utils/auth";
+import AdminLoginForm from "@/components/auth/AdminLoginForm.vue";
+import { auth } from "@/lib/auth";
+
+// Si ya está autenticado como admin, redirigir al dashboard
+const session = await auth.api.getSession({
+	headers: Astro.request.headers,
+});
+
+if (session && (session.user as any).role === "admin") {
+	return Astro.redirect("/admin/dashboard");
+}
 
 let error = "";
-
-if (Astro.request.method === "POST") {
-	try {
-		const formData = await Astro.request.formData();
-		const email = formData.get("email")?.toString();
-		const password = formData.get("password")?.toString();
-
-		if (email && password) {
-			const user = await UserService.findByEmail(email);
-			if (
-				user &&
-				user.role === "admin" &&
-				(await UserService.verifyPassword(user, password))
-			) {
-				const token = await createSession(user.id);
-
-				Astro.cookies.set("auth_token", token, {
-					path: "/",
-					httpOnly: true,
-					secure: true,
-					sameSite: "strict",
-					maxAge: 60 * 60 * 24 * 7, // 1 week
-				});
-
-				return Astro.redirect("/admin/dashboard");
-			} else {
-				error = "Acceso denegado o credenciales incorrectas.";
-			}
-		}
-	} catch (e) {
-		error = "Hubo un error al iniciar sesión.";
-		console.error(e);
-	}
-}
 ---
 
 <Layout title="Admin Login">
@@ -59,7 +33,7 @@ if (Astro.request.method === "POST") {
 				</h1>
 			</div>
 
-			<AuthForm mode="login" error={error} client:load />
+			<AdminLoginForm error={error} client:load />
 
 			<div class="mt-12 text-center">
 				<a

@@ -1,21 +1,21 @@
 ---
 export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
-import { getSession } from "@/utils/auth";
+import { auth } from "@/lib/auth";
 import { UserService } from "@/services/userService";
 import ProfileBody from "@/components/web/profile/ProfileBody.astro";
 
-const token = Astro.cookies.get("auth_token")?.value;
-const session = token ? await getSession(token) : null;
+const session = await auth.api.getSession({
+	headers: Astro.request.headers,
+});
 
 if (!session) {
 	return Astro.redirect("/login");
 }
 
-const user = await UserService.findById(session.userId);
+const user = await UserService.findById(session.user.id);
 
 if (!user) {
-	Astro.cookies.delete("auth_token");
 	return Astro.redirect("/login");
 }
 ---

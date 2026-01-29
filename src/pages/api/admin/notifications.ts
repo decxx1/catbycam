@@ -1,14 +1,12 @@
 import type { APIRoute } from 'astro';
 import { NotificationService } from '@/services/notificationService';
-import { getSession } from '@/utils/auth';
-import { UserService } from '@/services/userService';
+import { auth } from '@/lib/auth';
 
-export const GET: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
+export const GET: APIRoute = async ({ request }) => {
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return new Response('Unauthorized', { status: 401 });
 
-  const user = await UserService.findById(session.userId);
+  const user = session.user as any;
   if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
 
   try {
@@ -49,12 +47,11 @@ export const GET: APIRoute = async ({ request, cookies }) => {
   }
 };
 
-export const POST: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
+export const POST: APIRoute = async ({ request }) => {
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session) return new Response('Unauthorized', { status: 401 });
 
-  const user = await UserService.findById(session.userId);
+  const user = session.user as any;
   if (!user || user.role !== 'admin') return new Response('Forbidden', { status: 403 });
 
   try {

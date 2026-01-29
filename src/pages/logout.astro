@@ -1,7 +1,28 @@
 ---
 export const prerender = false;
+import { auth } from "@/lib/auth";
 
 if (Astro.request.method === "POST") {
+	// Cerrar sesión con better-auth
+	const headers = new Headers();
+	
+	// Copiar cookies del request original
+	const cookieHeader = Astro.request.headers.get("cookie");
+	if (cookieHeader) {
+		headers.set("cookie", cookieHeader);
+	}
+
+	try {
+		await auth.api.signOut({ headers });
+	} catch (e) {
+		// Ignorar errores si no hay sesión
+	}
+
+	// Eliminar cookies de better-auth manualmente también
+	Astro.cookies.delete("better-auth.session_token", { path: "/" });
+	Astro.cookies.delete("better-auth.session_data", { path: "/" });
+	
+	// Eliminar cookies antiguas por si acaso
 	Astro.cookies.delete("auth_token", { path: "/" });
 	Astro.cookies.delete("cb_logged_in", { path: "/" });
 }

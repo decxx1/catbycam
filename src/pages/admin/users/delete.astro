@@ -1,18 +1,15 @@
 ---
 import { UserService } from "@/services/userService";
-import { requireAdmin } from "@/utils/adminAuth";
 
 export const prerender = false;
 
-const auth = await requireAdmin(Astro.cookies);
-if ('redirect' in auth) return Astro.redirect(auth.redirect);
-const { user: currentUser } = auth;
+const currentUser = Astro.locals.user!;
 
 if (Astro.request.method === "POST") {
 	const formData = await Astro.request.formData();
 	const id = formData.get("id")?.toString();
 
-	if (id) {
+	if (id && currentUser) {
 		// Prevent deleting yourself
 		if (id === currentUser.id.toString()) {
 			return Astro.redirect("/admin/users?error=self-delete");

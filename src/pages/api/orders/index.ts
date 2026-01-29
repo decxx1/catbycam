@@ -1,16 +1,16 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import { PaymentService } from '@/services/paymentService';
 
-export const GET: APIRoute = async ({ cookies, url }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
+export const GET: APIRoute = async ({ request, url }) => {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const { user: sessionUser } = authResult;
 
   const page = Number(url.searchParams.get('page')) || 1;
 
   try {
-    const response = await PaymentService.getOrdersByUserId(session.userId, page, 5);
+    const response = await PaymentService.getOrdersByUserId(sessionUser.id, page, 5);
     return new Response(JSON.stringify(response), { status: 200 });
   } catch (error) {
     console.error('User Orders API Error:', error);
@@ -18,14 +18,14 @@ export const GET: APIRoute = async ({ cookies, url }) => {
   }
 };
 
-export const DELETE: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
+export const DELETE: APIRoute = async ({ request }) => {
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const { user: sessionUser } = authResult;
 
   try {
     const { id } = await request.json();
-    await PaymentService.deleteOrder(Number(id), session.userId);
+    await PaymentService.deleteOrder(Number(id), sessionUser.id);
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), { status: 400 });

@@ -1,11 +1,11 @@
 import type { APIRoute } from 'astro';
-import { getSession } from '@/utils/auth';
+import { requireAuth } from '@/lib/auth-helpers';
 import { UserService } from '@/services/userService';
 
 export const PATCH: APIRoute = async ({ request, cookies }) => {
-  const token = cookies.get('auth_token')?.value;
-  const session = token ? await getSession(token) : null;
-  if (!session) return new Response('Unauthorized', { status: 401 });
+  const authResult = await requireAuth(request);
+  if (authResult instanceof Response) return authResult;
+  const { user: sessionUser } = authResult;
 
   try {
     const { name, email } = await request.json();
@@ -15,7 +15,7 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
     }
 
     // Get current user
-    const currentUser = await UserService.findById(session.userId);
+    const currentUser = await UserService.findById(sessionUser.id);
     if (!currentUser) {
       return new Response(JSON.stringify({ error: 'Usuario no encontrado' }), { status: 404 });
     }
@@ -24,14 +24,14 @@ export const PATCH: APIRoute = async ({ request, cookies }) => {
 
     // Check if email is already taken by another user
     if (emailChanged) {
-      const emailTaken = await UserService.emailExists(email, session.userId);
+      const emailTaken = await UserService.emailExists(email, sessionUser.id);
       if (emailTaken) {
         return new Response(JSON.stringify({ error: 'Este email ya está en uso' }), { status: 400 });
       }
     }
 
     // Update profile
-    await UserService.updateProfile(session.userId, { name, email });
+    await UserService.updateProfile(sessionUser.id, { name, email });
 
     // If email changed, user needs to re-login
     if (emailChanged) {
