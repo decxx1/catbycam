@@ -28,10 +28,10 @@ COPY --from=build /app/src/utils/db-standalone.ts ./src/utils/db-standalone.ts
 
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
-  CMD curl -f http://localhost:80/health || exit 1
-
 # Ejecutar migraciones y luego iniciar el servidor
 # TODO: Quitar db:reset después del primer deploy exitoso
 CMD bun run db:reset && bun run db:up && bun run db:seed && bun dist/server/entry.mjs
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
+  CMD curl -f http://localhost:80/health || exit 1
 
