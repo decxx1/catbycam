@@ -33,5 +33,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=10s \
 
 # Ejecutar migraciones y luego iniciar el servidor
 # TODO: Quitar db:reset después del primer deploy exitoso
-CMD bun run db:reset && bun run db:up && bun run db:auth && bun run db:seed && bun dist/server/entry.mjs
+CMD bun run db:reset && bun run db:auth && bun run db:up && bun run db:seed && bun dist/server/entry.mjs
 
