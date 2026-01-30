@@ -1,38 +1,47 @@
 /**
  * Script de inicio para producción
  * Ejecuta reset, migraciones, seeds y luego inicia el servidor
+ * Usa Bun.spawnSync para scripts de DB y Bun.spawn para el servidor
  */
-import 'dotenv/config';
-import { reset } from './reset';
-import { up } from './up';
-import { seedAll } from './seed';
 
-async function startServer(): Promise<void> {
-  console.log('\n=== Starting Server ===');
+function runScript(scriptPath: string, name: string): void {
+  console.log(`\n=== ${name} ===`);
   
-  // Importar y ejecutar el servidor de Astro
-  const server = await import('../../dist/server/entry.mjs');
+  const result = Bun.spawnSync(['bun', scriptPath], {
+    stdout: 'inherit',
+    stderr: 'inherit',
+    stdin: 'inherit',
+  });
+
+  if (result.exitCode !== 0) {
+    console.error(`${name} failed with exit code ${result.exitCode}`);
+    process.exit(1);
+  }
   
-  // El servidor de Astro se mantiene corriendo automáticamente
-  console.log('Server started successfully');
+  console.log(`✓ ${name} completed`);
 }
 
 async function main() {
   try {
-    // TODO: Quitar reset después del primer deploy exitoso
-    console.log('\n=== Running Database Reset ===');
-    await reset();
-    console.log('✓ Database Reset completed');
+    runScript('src/db/up.ts', 'Database Migrations');
+    runScript('src/db/seed.ts', 'Database Seeds');
     
-    console.log('\n=== Running Database Migrations ===');
-    await up();
-    console.log('✓ Database Migrations completed');
+    console.log('\n=== Starting Server ===');
     
-    console.log('\n=== Running Database Seeds ===');
-    await seedAll();
-    console.log('✓ Database Seeds completed');
+    // Ejecutar el servidor de Astro - este proceso reemplaza al actual
+    const proc = Bun.spawn(['bun', 'dist/server/entry.mjs'], {
+      stdout: 'inherit',
+      stderr: 'inherit',
+      stdin: 'inherit',
+    });
+
+    console.log('Server started on port ' + (process.env.PORT || '80'));
     
-    await startServer();
+    // Esperar a que el servidor termine (no debería terminar)
+    const exitCode = await proc.exited;
+    console.error(`Server exited with code ${exitCode}`);
+    process.exit(exitCode);
+    
   } catch (error) {
     console.error('Startup failed:', error);
     process.exit(1);
