@@ -4,7 +4,7 @@ import pool from '../utils/db-standalone';
 import { seed as categories } from './seeds/001-categories';
 import { seed as admin } from './seeds/002-admin';
 
-async function seedAll() {
+export async function seedAll() {
   console.log('=== Running All Seeds ===\n');
   
   try {
@@ -19,4 +19,7 @@ async function seedAll() {
   }
 }
 
-seedAll();
+// Solo ejecutar si es el script principal
+if (import.meta.main) {
+  seedAll();
+}

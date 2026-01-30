@@ -21,7 +21,7 @@ const migrations = [
   { name: '008-settings', module: () => import('./migrations/008-settings') },
 ];
 
-async function up() {
+export async function up() {
   console.log('=== Database Migration (db:up) ===\n');
 
   // 1. Create database if not exists
@@ -90,4 +90,7 @@ async function up() {
   }
 }
 
-up();
+// Solo ejecutar si es el script principal
+if (import.meta.main) {
+  up();
+}

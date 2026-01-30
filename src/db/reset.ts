@@ -7,7 +7,7 @@ const DB_PASSWORD = process.env.DB_PASSWORD || '';
 const DB_NAME = process.env.DB_NAME || 'catbycam';
 const DB_PORT = Number(process.env.DB_PORT) || 3306;
 
-async function reset() {
+export async function reset() {
   console.log('=== Resetting Database ===\n');
   console.log(`Connecting to ${DB_HOST}:${DB_PORT}...`);
 
@@ -49,4 +49,7 @@ async function reset() {
   }
 }
 
-reset();
+// Solo ejecutar si es el script principal
+if (import.meta.main) {
+  reset();
+}
