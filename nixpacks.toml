@@ -1,0 +1,17 @@
+[phases.setup]
+nixPkgs = ["..#bun"]
+
+[phases.install]
+cmds = ["bun install"]
+
+[phases.build]
+cmds = ["bun run build"]
+
+[start]
+# TODO: Quitar db:reset después del primer deploy exitoso
+cmd = "bun run db:reset && bun run db:up && bun run db:seed && bun dist/server/entry.mjs"
+
+[variables]
+NODE_ENV = "production"
+HOST = "0.0.0.0"
+PORT = "80"
