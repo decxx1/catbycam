@@ -5,11 +5,11 @@ nixPkgs = ["bun"]
 cmds = ["bun install"]
 
 [phases.build]
-cmds = ["bun run build"]
+cmds = ["bun run build", "chmod +x start.sh"]
 
 [start]
-# TODO: Quitar db:reset después del primer deploy exitoso
-cmd = "bun run db:reset && bun run db:up && bun run db:seed && bun dist/server/entry.mjs"
+# TODO: Quitar db:reset del start.sh después del primer deploy exitoso
+cmd = "./start.sh"
 
 [variables]
 NODE_ENV = "production"
