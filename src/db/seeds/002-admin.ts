@@ -9,7 +9,8 @@ export async function seed() {
   const rawPassword = process.env.ADMIN_PASSWORD;
   
   if (!name || !email || !rawPassword) {
-    console.error('⚠ Missing admin credentials in .env (ADMIN_NAME, ADMIN_EMAIL, ADMIN_PASSWORD)');
+    console.log('⚠ Skipping admin seed: Missing credentials in env (ADMIN_NAME, ADMIN_EMAIL, ADMIN_PASSWORD)');
+    console.log('✓ Admin seed skipped (no credentials)');
     return;
   }
 
