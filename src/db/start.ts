@@ -2,48 +2,40 @@
  * Script de inicio para producción
  * Ejecuta reset, migraciones, seeds y luego inicia el servidor
  */
-import { spawn } from 'child_process';
-import path from 'path';
 
 async function runScript(scriptPath: string, name: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    console.log(`\n=== Running ${name} ===`);
-    const proc = spawn('bun', [scriptPath], {
-      stdio: 'inherit',
-      cwd: process.cwd()
-    });
-
-    proc.on('close', (code) => {
-      if (code === 0) {
-        console.log(`✓ ${name} completed`);
-        resolve();
-      } else {
-        reject(new Error(`${name} failed with code ${code}`));
-      }
-    });
-
-    proc.on('error', (err) => {
-      reject(err);
-    });
+  console.log(`\n=== Running ${name} ===`);
+  
+  const proc = Bun.spawn(['bun', scriptPath], {
+    stdout: 'inherit',
+    stderr: 'inherit',
+    stdin: 'inherit',
   });
+
+  const exitCode = await proc.exited;
+  
+  if (exitCode === 0) {
+    console.log(`✓ ${name} completed`);
+  } else {
+    throw new Error(`${name} failed with code ${exitCode}`);
+  }
 }
 
-async function startServer(): Promise<void> {
+async function startServer(): Promise<never> {
   console.log('\n=== Starting Server ===');
-  const serverPath = path.join(process.cwd(), 'dist', 'server', 'entry.mjs');
   
-  const proc = spawn('bun', [serverPath], {
-    stdio: 'inherit',
-    cwd: process.cwd()
+  const proc = Bun.spawn(['bun', 'dist/server/entry.mjs'], {
+    stdout: 'inherit',
+    stderr: 'inherit',
+    stdin: 'inherit',
   });
 
-  proc.on('error', (err) => {
-    console.error('Server error:', err);
-    process.exit(1);
-  });
-
-  // Keep the process running
-  await new Promise(() => {});
+  // Wait for server process (this should run forever)
+  await proc.exited;
+  
+  // If we get here, server crashed
+  console.error('Server exited unexpectedly');
+  process.exit(1);
 }
 
 async function main() {
