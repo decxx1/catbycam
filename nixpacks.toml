@@ -8,8 +8,8 @@ cmds = ["bun install"]
 cmds = ["bun run build"]
 
 [start]
-# TODO: Quitar db:reset después del primer deploy exitoso
-cmd = "bun src/db/reset.ts && bun src/db/up.ts && bun src/db/seed.ts && bun dist/server/entry.mjs"
+# TODO: Quitar db:reset de src/db/start.ts después del primer deploy exitoso
+cmd = "bun src/db/start.ts"
 
 [variables]
 NODE_ENV = "production"
