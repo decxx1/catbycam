@@ -14,7 +14,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      allowedHosts: ['mp-astro.px.com.ar', 'localhost', '127.0.0.1']
+      allowedHosts: ['mp-astro.px.com.ar', 'localhost', '127.0.0.1', 'campillay.com.ar']
     }
   },
   env: {
