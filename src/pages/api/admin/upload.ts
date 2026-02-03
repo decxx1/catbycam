@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { requireAdmin } from '@/lib/auth-helpers';
+import { getUploadsPath } from '@/utils/uploads';
 import sharp from 'sharp';
 import fs from 'fs/promises';
 import path from 'path';
@@ -22,8 +23,9 @@ export const POST: APIRoute = async ({ request }) => {
     const baseFilename = uuidv4();
     
     // Si hay productId, guardar en subcarpeta del producto; si no, en carpeta temporal
+    // Usa helper que detecta entorno (dev: public/, prod: dist/client/)
     const subfolder = productId ? productId : 'temp';
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'products', subfolder);
+    const uploadDir = getUploadsPath('products', subfolder);
 
     // Ensure dir exists
     await fs.mkdir(uploadDir, { recursive: true });

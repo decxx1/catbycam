@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { requireAdmin } from '@/lib/auth-helpers';
 import { ProductService, type ProductImage } from '@/services/productService';
+import { getUploadsPath } from '@/utils/uploads';
 import fs from 'fs/promises';
 import path from 'path';
 
@@ -29,7 +30,7 @@ async function deleteFileWithRetry(filePath: string, maxRetries = 5, delayMs = 2
 
 // Limpiar archivos viejos en temp (más de 1 hora)
 async function cleanupTempFolder() {
-  const tempDir = path.join(process.cwd(), 'public', 'uploads', 'products', 'temp');
+  const tempDir = getUploadsPath('products', 'temp');
   const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
   
   try {
@@ -69,8 +70,8 @@ async function moveUrlToProductFolder(productId: number, url: string, tempDir: s
 
 // Helper para mover imágenes de temp a carpeta del producto
 async function moveImagesToProductFolder(productId: number, mainImage: ImageData, extraImages: ImageData[]): Promise<{ mainImage: ImageData; extraImages: ProductImage[] }> {
-  const tempDir = path.join(process.cwd(), 'public', 'uploads', 'products', 'temp');
-  const productDir = path.join(process.cwd(), 'public', 'uploads', 'products', String(productId));
+  const tempDir = getUploadsPath('products', 'temp');
+  const productDir = getUploadsPath('products', String(productId));
   
   await fs.mkdir(productDir, { recursive: true });
   
