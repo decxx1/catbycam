@@ -6,25 +6,20 @@ const currentYear = new Date().getFullYear();
 	<div class="container-custom grid grid-cols-1 md:grid-cols-4 gap-12">
 		<!-- Brand & Description -->
 		<div class="md:col-span-2">
-			<a href="/" class="flex items-center gap-2 mb-6">
-				<div
-					class="w-8 h-8 bg-primary rounded flex items-center justify-center"
-				>
-					<span class="text-white font-black text-sm italic">CB</span>
-				</div>
-				<span class="font-black text-2xl tracking-tighter uppercase"
-					>CatByCam</span
-				>
-			</a>
-			<p class="text-white/60 max-w-sm mb-6 leading-relaxed">
-				Especialistas en la venta de repuestos y máquinas viales con más
-				de 40 años de experiencia en el sector. Calidad y confianza en
-				cada pieza.
-			</p>
+			<div class="flex flex-row gap-4">
+				<a href="/" class="flex items-center gap-2 mb-6">
+					<img class="size-20" src="/images/logos/catbycam-logo-circulo-rojo.svg" alt="CatByCam Logo" />
+				</a>
+				<p class="text-white/60 max-w-sm mb-6 leading-relaxed">
+					Especialistas en la venta de repuestos y máquinas viales con más
+					de 40 años de experiencia en el sector. Calidad y confianza en
+					cada pieza.
+				</p>
+			</div>
 			<div class="flex gap-4">
 				<!-- Social Icons Placeholder -->
 				<a
-					href="#"
+					href="https://www.facebook.com/CampillayRepuestos"
 					class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"
 				>
 					<span class="sr-only">Facebook</span>
@@ -42,7 +37,7 @@ const currentYear = new Date().getFullYear();
 					>
 				</a>
 				<a
-					href="#"
+					href="https://www.instagram.com/campillay.repuestos/"
 					class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-primary transition-colors"
 				>
 					<span class="sr-only">Instagram</span>
@@ -115,7 +110,7 @@ const currentYear = new Date().getFullYear();
 							d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"
 						></path><circle cx="12" cy="10" r="3"></circle></svg
 					>
-					Mendoza, Argentina
+					Santa Fe 687 - Mendoza, Argentina
 				</li>
 				<li class="flex items-center gap-3">
 					<svg
@@ -131,15 +126,15 @@ const currentYear = new Date().getFullYear();
 							d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 18.92z"
 						></path></svg
 					>
-					+54 261 000 000
+					+54 261 346-4334
 				</li>
 			</ul>
 		</div>
 	</div>
 
 	<div
-		class="container-custom mt-16 pt-8 border-t border-white/5 text-center text-white/30 text-sm"
+		class="container-custom mt-16 pt-8 border-t border-white/20 text-center text-white/60 text-sm"
 	>
-		<p>&copy; {currentYear} CatByCam. Todos los derechos reservados.</p>
+		<p>&copy; {currentYear} Diseñado por - <a class="hover:text-primary transition-colors" href="https://manejoweb.com.ar/">ManejoWeb</a></p>
 	</div>
 </footer>
