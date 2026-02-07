@@ -80,6 +80,46 @@ export const SettingsService = {
     return result.affectedRows > 0;
   },
 
+  // Specific helpers for Contact Info
+  async getContactInfo(): Promise<{
+    whatsapp: string | null;
+    email: string | null;
+    address: string | null;
+    mapsUrl: string | null;
+    mapsIframe: string | null;
+  }> {
+    const config = await this.getMultiple([
+      'contact_whatsapp',
+      'contact_email',
+      'contact_address',
+      'contact_maps_url',
+      'contact_maps_iframe',
+    ]);
+    return {
+      whatsapp: config['contact_whatsapp'],
+      email: config['contact_email'],
+      address: config['contact_address'],
+      mapsUrl: config['contact_maps_url'],
+      mapsIframe: config['contact_maps_iframe'],
+    };
+  },
+
+  async setContactInfo(data: {
+    whatsapp: string;
+    email: string;
+    address: string;
+    mapsUrl: string;
+    mapsIframe: string;
+  }): Promise<void> {
+    await this.setMultiple([
+      { key: 'contact_whatsapp', value: data.whatsapp, description: 'Número de WhatsApp' },
+      { key: 'contact_email', value: data.email, description: 'Correo electrónico de contacto' },
+      { key: 'contact_address', value: data.address, description: 'Dirección física' },
+      { key: 'contact_maps_url', value: data.mapsUrl, description: 'URL de Google Maps' },
+      { key: 'contact_maps_iframe', value: data.mapsIframe, description: 'Iframe de Google Maps (base64)' },
+    ]);
+  },
+
   // Specific helpers for MercadoPago
   async getMercadoPagoConfig(): Promise<{ publicKey: string | null; accessToken: string | null }> {
     const config = await this.getMultiple(['mp_public_key', 'mp_access_token']);

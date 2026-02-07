@@ -19,6 +19,7 @@ const migrations = [
   { name: '006-admin-notifications', module: () => import('./migrations/006-admin-notifications') },
   { name: '007-shipping-addresses', module: () => import('./migrations/007-shipping-addresses') },
   { name: '008-settings', module: () => import('./migrations/008-settings') },
+  { name: '009-contact-settings', module: () => import('./migrations/009-contact-settings') },
 ];
 
 export async function up() {

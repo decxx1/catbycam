@@ -1,9 +1,11 @@
 ---
-export const prerender = true;
 import Layout from "@/layouts/Layout.astro";
 import ContactForm from "@/components/web/ContactForm.vue";
 import PageHeader from "@/components/web/common/PageHeader.astro";
 import ContactInfo from "@/components/web/contact/ContactInfo.astro";
+import { SettingsService } from "@/services/settingsService";
+
+const contactInfo = await SettingsService.getContactInfo();
 ---
 
 <Layout title="Contacto">
@@ -15,7 +17,7 @@ import ContactInfo from "@/components/web/contact/ContactInfo.astro";
 	<section class="section-padding bg-accent/20">
 		<div class="container-custom">
 			<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
-				<ContactInfo />
+				<ContactInfo {...contactInfo} />
 
 				<!-- Form -->
 				<div class="lg:sticky lg:top-32">

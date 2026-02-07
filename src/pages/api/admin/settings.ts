@@ -7,11 +7,19 @@ export const GET: APIRoute = async ({ request }) => {
   if (authResult instanceof Response) return authResult;
 
   try {
-    const mpConfig = await SettingsService.getMercadoPagoConfig();
+    const [mpConfig, contactInfo] = await Promise.all([
+      SettingsService.getMercadoPagoConfig(),
+      SettingsService.getContactInfo(),
+    ]);
     
     return new Response(JSON.stringify({
       mp_public_key: mpConfig.publicKey || '',
-      mp_access_token: mpConfig.accessToken || ''
+      mp_access_token: mpConfig.accessToken || '',
+      contact_whatsapp: contactInfo.whatsapp || '',
+      contact_email: contactInfo.email || '',
+      contact_address: contactInfo.address || '',
+      contact_maps_url: contactInfo.mapsUrl || '',
+      contact_maps_iframe: contactInfo.mapsIframe || '',
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -28,7 +36,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { mp_public_key, mp_access_token } = body;
+    const { mp_public_key, mp_access_token, contact_whatsapp, contact_email, contact_address, contact_maps_url, contact_maps_iframe } = body;
 
     // Ensure table exists
     await SettingsService.createTable();
@@ -36,6 +44,17 @@ export const POST: APIRoute = async ({ request }) => {
     // Save MercadoPago settings
     if (mp_public_key !== undefined && mp_access_token !== undefined) {
       await SettingsService.setMercadoPagoConfig(mp_public_key, mp_access_token);
+    }
+
+    // Save Contact settings
+    if (contact_whatsapp !== undefined) {
+      await SettingsService.setContactInfo({
+        whatsapp: contact_whatsapp,
+        email: contact_email,
+        address: contact_address,
+        mapsUrl: contact_maps_url,
+        mapsIframe: contact_maps_iframe,
+      });
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Configuración guardada correctamente' }), {
