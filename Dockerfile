@@ -59,7 +59,11 @@ COPY --from=build /app/src/utils/db-standalone.ts src/utils/db-standalone.ts
 COPY --from=build /app/package.json .
 
 # Uploads directory (mount as volume in Coolify for persistence)
-RUN mkdir -p dist/client/uploads/products && chown -R bun:bun dist/client/uploads
+RUN mkdir -p dist/client/uploads/products
+
+# Entrypoint script: fixes volume permissions then drops to 'bun' user
+COPY --from=build /app/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
@@ -67,6 +71,4 @@ ENV PORT=80
 
 EXPOSE 80
 
-USER bun
-
-CMD ["bun", "src/db/start.ts"]
+ENTRYPOINT ["/app/entrypoint.sh"]
