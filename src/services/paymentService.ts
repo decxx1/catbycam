@@ -202,8 +202,8 @@ export const PaymentService = {
   async getOrdersByUserId(userId: number, page: number = 1, limit: number = 5) {
     const offset = (page - 1) * limit;
     const [rows]: any = await pool.execute(
-      'SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?',
-      [userId, limit, Number(offset)]
+      `SELECT * FROM orders WHERE user_id = ? ORDER BY created_at DESC LIMIT ${Number(limit)} OFFSET ${Number(offset)}`,
+      [userId]
     );
     
     // Add items to each order
@@ -236,8 +236,8 @@ export const PaymentService = {
       FROM orders o 
       JOIN user u ON o.user_id = u.id 
       ORDER BY o.created_at DESC
-      LIMIT ? OFFSET ?
-    `, [limit, Number(offset)]);
+      LIMIT ${Number(limit)} OFFSET ${Number(offset)}
+    `);
     
     for (const order of rows) {
       const [items]: any = await pool.execute(

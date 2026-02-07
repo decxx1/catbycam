@@ -59,7 +59,7 @@ COPY --from=build /app/src/utils/db-standalone.ts src/utils/db-standalone.ts
 COPY --from=build /app/package.json .
 
 # Uploads directory (mount as volume in Coolify for persistence)
-RUN mkdir -p dist/client/uploads/products
+RUN mkdir -p dist/client/uploads/products && chown -R bun:bun dist/client/uploads
 
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0

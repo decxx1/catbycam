@@ -57,8 +57,7 @@ export const ProductService = {
 
     const [totalRows]: any = await pool.execute(`SELECT COUNT(*) as count FROM (${query}) as t`, params);
     
-    query += ` ORDER BY p.created_at DESC LIMIT ? OFFSET ?`;
-    params.push(String(limit), String(offset));
+    query += ` ORDER BY p.created_at DESC LIMIT ${Number(limit)} OFFSET ${Number(offset)}`;
 
     const [rows]: any = await pool.execute(query, params);
     
@@ -234,8 +233,8 @@ export const ProductService = {
       LEFT JOIN categories c ON p.category_id = c.id
       WHERE p.status = 'active'
       ORDER BY p.created_at DESC
-      LIMIT ?
-    `, [String(limit)]);
+      LIMIT ${Number(limit)}
+    `);
 
     const products: Product[] = [];
     for (const row of rows) {
