@@ -3,28 +3,26 @@ export const prerender = false;
 import { auth } from "@/lib/auth";
 
 if (Astro.request.method === "POST") {
-	// Cerrar sesión con better-auth
-	const headers = new Headers();
-	
-	// Copiar cookies del request original
-	const cookieHeader = Astro.request.headers.get("cookie");
-	if (cookieHeader) {
-		headers.set("cookie", cookieHeader);
-	}
-
 	try {
-		await auth.api.signOut({ headers });
-	} catch (e) {
-		// Ignorar errores si no hay sesión
-	}
+		const response = await auth.api.signOut({
+			headers: Astro.request.headers,
+			asResponse: true,
+		});
 
-	// Eliminar cookies de better-auth manualmente también
-	Astro.cookies.delete("better-auth.session_token", { path: "/" });
-	Astro.cookies.delete("better-auth.session_data", { path: "/" });
-	
-	// Eliminar cookies antiguas por si acaso
-	Astro.cookies.delete("auth_token", { path: "/" });
-	Astro.cookies.delete("cb_logged_in", { path: "/" });
+		// Propagar Set-Cookie headers de better-auth (incluye __Secure- prefix en HTTPS)
+		const setCookies = response.headers.getSetCookie?.() || [];
+		const redirectResponse = Astro.redirect("/login");
+		for (const cookie of setCookies) {
+			redirectResponse.headers.append("Set-Cookie", cookie);
+		}
+		return redirectResponse;
+	} catch (e) {
+		// Si falla, borrar cookies manualmente (ambas variantes)
+		Astro.cookies.delete("better-auth.session_token", { path: "/" });
+		Astro.cookies.delete("better-auth.session_data", { path: "/" });
+		Astro.cookies.delete("__Secure-better-auth.session_token", { path: "/", secure: true });
+		Astro.cookies.delete("__Secure-better-auth.session_data", { path: "/", secure: true });
+	}
 }
 
 return Astro.redirect("/login");
