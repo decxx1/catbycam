@@ -1,19 +1,42 @@
-.DS_Store
+# Dependencies & build output
 node_modules
 dist
 .astro
-.vscode
-.env
+
+# Git
 .git
 .gitignore
+
+# IDE & OS
+.DS_Store
+.vscode
+.idea
+
+# Environment (Coolify injects env vars)
+.env
+.env.*
+
+# Lock files (only bun.lock is needed)
+package-lock.json
+
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Docs & artifacts
 README.md
 proyecto.md
 mercadopago.md
 deployment-*.txt
-# Brain dir (LLM artifacts)
+
+# LLM artifacts
 .gemini
+.agents
+.windsurf
 brain
