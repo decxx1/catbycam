@@ -1,0 +1,819 @@
+18:17:19.755873 Starting deployment of decxx1/catbycam:master to localhost.
+18:17:20.698612 Preparing container with helper image: ghcr.io/coollabsio/coolify-helper:1.0.12
+18:17:21.132934 [DEBUG] [CMD]: docker stop -t 30 sg88cgccogk8so4s048wcowc
+18:17:21.132934 [DEBUG] Error response from daemon: No such container: sg88cgccogk8so4s048wcowc
+18:17:21.703474 [DEBUG] [CMD]: docker run -d --network coolify --name sg88cgccogk8so4s048wcowc  --rm -v /var/run/docker.sock:/var/run/docker.sock ghcr.io/coollabsio/coolify-helper:1.0.12
+18:17:21.703474 [DEBUG] 76248944a3b513e56639ee48ed6de4c517c6d49e801c6d55ff3d1b96b4a1a4d6
+18:17:23.617570 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'GIT_SSH_COMMAND="ssh -o ConnectTimeout=30 -p 22 -o Port=22 -o LogLevel=ERROR -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git ls-remote https://github.com/decxx1/catbycam refs/heads/master'
+18:17:23.617570 [DEBUG] ccab0dfeeba945adc63bf8864332580eb3d883ae	refs/heads/master
+18:17:24.076755 Image not found (rkg40osg4oc8gockk400osgw:ccab0dfeeba945adc63bf8864332580eb3d883ae). Building new image.
+18:17:24.091438 ----------------------------------------
+18:17:24.099751 Importing decxx1/catbycam:master (commit sha ccab0dfeeba945adc63bf8864332580eb3d883ae) to /artifacts/sg88cgccogk8so4s048wcowc.
+18:17:24.565582 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'git clone --depth=1 --recurse-submodules --shallow-submodules -b 'master' 'https://github.com/decxx1/catbycam' '/artifacts/sg88cgccogk8so4s048wcowc' && cd '/artifacts/sg88cgccogk8so4s048wcowc' && if [ -f .gitmodules ]; then sed -i "s#git@\(.*\):#https://\1/#g" '/artifacts/sg88cgccogk8so4s048wcowc'/.gitmodules || true && git submodule sync && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git submodule update --init --recursive --depth=1; fi && cd '/artifacts/sg88cgccogk8so4s048wcowc' && GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" git lfs pull'
+18:17:24.565582 [DEBUG] Cloning into '/artifacts/sg88cgccogk8so4s048wcowc'...
+18:17:26.812683 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'cd /artifacts/sg88cgccogk8so4s048wcowc && git log -1 ccab0dfeeba945adc63bf8864332580eb3d883ae --pretty=%B'
+18:17:26.812683 [DEBUG] Update footer with actual business information and social media links
+18:17:27.325942 Generating nixpacks configuration with: nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://campillay.com.ar,https://www.campillay.com.ar --env COOLIFY_FQDN=campillay.com.ar,www.campillay.com.ar --env COOLIFY_BRANCH=master --env COOLIFY_RESOURCE_UUID=rkg40osg4oc8gockk400osgw /artifacts/sg88cgccogk8so4s048wcowc
+18:17:27.822158 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'nixpacks plan -f json --env NIXPACKS_NODE_VERSION=22 --env COOLIFY_URL=https://campillay.com.ar,https://www.campillay.com.ar --env COOLIFY_FQDN=campillay.com.ar,www.campillay.com.ar --env COOLIFY_BRANCH=master --env COOLIFY_RESOURCE_UUID=rkg40osg4oc8gockk400osgw /artifacts/sg88cgccogk8so4s048wcowc'
+18:17:27.822158 [DEBUG] {
+18:17:27.822158 [DEBUG] "providers": [],
+18:17:27.822158 [DEBUG] "buildImage": "ghcr.io/railwayapp/nixpacks:ubuntu-1745885067",
+18:17:27.822158 [DEBUG] "variables": {
+18:17:27.822158 [DEBUG] "CI": "true",
+18:17:27.822158 [DEBUG] "COOLIFY_BRANCH": "master",
+18:17:27.822158 [DEBUG] "COOLIFY_FQDN": "campillay.com.ar,www.campillay.com.ar",
+18:17:27.822158 [DEBUG] "COOLIFY_RESOURCE_UUID": "rkg40osg4oc8gockk400osgw",
+18:17:27.822158 [DEBUG] "COOLIFY_URL": "https://campillay.com.ar,https://www.campillay.com.ar",
+18:17:27.822158 [DEBUG] "HOST": "0.0.0.0",
+18:17:27.822158 [DEBUG] "NIXPACKS_METADATA": "node",
+18:17:27.822158 [DEBUG] "NIXPACKS_NODE_VERSION": "22",
+18:17:27.822158 [DEBUG] "NODE_ENV": "production",
+18:17:27.822158 [DEBUG] "NPM_CONFIG_PRODUCTION": "false",
+18:17:27.822158 [DEBUG] "PORT": "80"
+18:17:27.822158 [DEBUG] },
+18:17:27.822158 [DEBUG] "phases": {
+18:17:27.822158 [DEBUG] "build": {
+18:17:27.822158 [DEBUG] "dependsOn": [
+18:17:27.822158 [DEBUG] "install"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "cmds": [
+18:17:27.822158 [DEBUG] "bun run build"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "cacheDirectories": [
+18:17:27.822158 [DEBUG] "node_modules/.cache"
+18:17:27.822158 [DEBUG] ]
+18:17:27.822158 [DEBUG] },
+18:17:27.822158 [DEBUG] "install": {
+18:17:27.822158 [DEBUG] "dependsOn": [
+18:17:27.822158 [DEBUG] "setup"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "cmds": [
+18:17:27.822158 [DEBUG] "bun install"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "cacheDirectories": [
+18:17:27.822158 [DEBUG] "/root/.bun"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "paths": [
+18:17:27.822158 [DEBUG] "/app/node_modules/.bin"
+18:17:27.822158 [DEBUG] ]
+18:17:27.822158 [DEBUG] },
+18:17:27.822158 [DEBUG] "setup": {
+18:17:27.822158 [DEBUG] "nixPkgs": [
+18:17:27.822158 [DEBUG] "bun"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "nixLibs": [
+18:17:27.822158 [DEBUG] "gcc-unwrapped"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "nixOverlays": [
+18:17:27.822158 [DEBUG] "https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz"
+18:17:27.822158 [DEBUG] ],
+18:17:27.822158 [DEBUG] "nixpkgsArchive": "31fb21469e34b6b5c7be77b9a35bae43d0c598e9"
+18:17:27.822158 [DEBUG] }
+18:17:27.822158 [DEBUG] },
+18:17:27.822158 [DEBUG] "start": {
+18:17:27.822158 [DEBUG] "cmd": "bun src/db/start.ts"
+18:17:27.822158 [DEBUG] }
+18:17:27.822158 [DEBUG] }
+18:17:28.310895 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'nixpacks detect /artifacts/sg88cgccogk8so4s048wcowc'
+18:17:28.310895 [DEBUG] node
+18:17:28.323455 Found application type: node.
+18:17:28.333485 If you need further customization, please check the documentation of Nixpacks: https://nixpacks.com/docs/providers/node
+18:17:28.377062 [DEBUG] Final Nixpacks plan: {
+18:17:28.377062 [DEBUG] "providers": [],
+18:17:28.377062 [DEBUG] "buildImage": "ghcr.io\/railwayapp\/nixpacks:ubuntu-1745885067",
+18:17:28.377062 [DEBUG] "phases": {
+18:17:28.377062 [DEBUG] "build": {
+18:17:28.377062 [DEBUG] "dependsOn": [
+18:17:28.377062 [DEBUG] "install"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "cmds": [
+18:17:28.377062 [DEBUG] "bun run build"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "cacheDirectories": [
+18:17:28.377062 [DEBUG] "node_modules\/.cache"
+18:17:28.377062 [DEBUG] ]
+18:17:28.377062 [DEBUG] },
+18:17:28.377062 [DEBUG] "install": {
+18:17:28.377062 [DEBUG] "dependsOn": [
+18:17:28.377062 [DEBUG] "setup"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "cmds": [
+18:17:28.377062 [DEBUG] "bun install"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "cacheDirectories": [
+18:17:28.377062 [DEBUG] "\/root\/.bun"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "paths": [
+18:17:28.377062 [DEBUG] "\/app\/node_modules\/.bin"
+18:17:28.377062 [DEBUG] ]
+18:17:28.377062 [DEBUG] },
+18:17:28.377062 [DEBUG] "setup": {
+18:17:28.377062 [DEBUG] "nixPkgs": [
+18:17:28.377062 [DEBUG] "bun"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "nixLibs": [
+18:17:28.377062 [DEBUG] "gcc-unwrapped"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "nixOverlays": [
+18:17:28.377062 [DEBUG] "https:\/\/github.com\/railwayapp\/nix-npm-overlay\/archive\/main.tar.gz"
+18:17:28.377062 [DEBUG] ],
+18:17:28.377062 [DEBUG] "nixpkgsArchive": "31fb21469e34b6b5c7be77b9a35bae43d0c598e9",
+18:17:28.377062 [DEBUG] "aptPkgs": [
+18:17:28.377062 [DEBUG] "curl",
+18:17:28.377062 [DEBUG] "wget"
+18:17:28.377062 [DEBUG] ]
+18:17:28.377062 [DEBUG] }
+18:17:28.377062 [DEBUG] },
+18:17:28.377062 [DEBUG] "start": {
+18:17:28.377062 [DEBUG] "cmd": "bun src\/db\/start.ts"
+18:17:28.377062 [DEBUG] }
+18:17:28.377062 [DEBUG] }
+18:17:29.798508 [DEBUG] Creating build-time .env file in /artifacts (outside Docker context).
+18:17:30.266767 ----------------------------------------
+18:17:30.275173 Building docker image started.
+18:17:30.283693 To check the current progress, click on Show Debug Logs.
+18:17:31.305893 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'nixpacks build -c /artifacts/thegameplan.json --cache-key 'rkg40osg4oc8gockk400osgw' --no-error-without-start -n rkg40osg4oc8gockk400osgw:ccab0dfeeba945adc63bf8864332580eb3d883ae /artifacts/sg88cgccogk8so4s048wcowc -o /artifacts/sg88cgccogk8so4s048wcowc'
+18:17:31.305893 [DEBUG] 
+18:17:31.305893 [DEBUG] ╔════════ Nixpacks v1.41.0 ════════╗
+18:17:31.305893 [DEBUG] ║ setup      │ bun, curl, wget     ║
+18:17:31.305893 [DEBUG] ║──────────────────────────────────║
+18:17:31.305893 [DEBUG] ║ install    │ bun install         ║
+18:17:31.305893 [DEBUG] ║──────────────────────────────────║
+18:17:31.305893 [DEBUG] ║ build      │ bun run build       ║
+18:17:31.305893 [DEBUG] ║──────────────────────────────────║
+18:17:31.305893 [DEBUG] ║ start      │ bun src/db/start.ts ║
+18:17:31.305893 [DEBUG] ╚══════════════════════════════════╝
+18:17:31.318313 [DEBUG] Saved output to:
+18:17:31.318313 [DEBUG] /artifacts/sg88cgccogk8so4s048wcowc
+18:17:31.838070 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'cat /artifacts/sg88cgccogk8so4s048wcowc/.nixpacks/Dockerfile'
+18:17:31.838070 [DEBUG] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] ENTRYPOINT ["/bin/bash", "-l", "-c"]
+18:17:31.838070 [DEBUG] WORKDIR /app/
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] COPY .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix
+18:17:31.838070 [DEBUG] RUN nix-env -if .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix && nix-collect-garbage -d
+18:17:31.838070 [DEBUG] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] ARG ADMIN_EMAIL ADMIN_NAME ADMIN_PASSWORD BETTER_AUTH_SECRET BETTER_AUTH_URL CI COOLIFY_BRANCH COOLIFY_FQDN COOLIFY_RESOURCE_UUID COOLIFY_URL DB_HOST DB_NAME DB_PASSWORD DB_PORT DB_USER HOST IS_PROD NIXPACKS_METADATA NIXPACKS_NODE_VERSION NODE_ENV NPM_CONFIG_PRODUCTION PORT PUBLIC_MP_SANDBOX PUBLIC_SITE_URL
+18:17:31.838070 [DEBUG] ENV ADMIN_EMAIL=$ADMIN_EMAIL ADMIN_NAME=$ADMIN_NAME ADMIN_PASSWORD=$ADMIN_PASSWORD BETTER_AUTH_SECRET=$BETTER_AUTH_SECRET BETTER_AUTH_URL=$BETTER_AUTH_URL CI=$CI COOLIFY_BRANCH=$COOLIFY_BRANCH COOLIFY_FQDN=$COOLIFY_FQDN COOLIFY_RESOURCE_UUID=$COOLIFY_RESOURCE_UUID COOLIFY_URL=$COOLIFY_URL DB_HOST=$DB_HOST DB_NAME=$DB_NAME DB_PASSWORD=$DB_PASSWORD DB_PORT=$DB_PORT DB_USER=$DB_USER HOST=$HOST IS_PROD=$IS_PROD NIXPACKS_METADATA=$NIXPACKS_METADATA NIXPACKS_NODE_VERSION=$NIXPACKS_NODE_VERSION NODE_ENV=$NODE_ENV NPM_CONFIG_PRODUCTION=$NPM_CONFIG_PRODUCTION PORT=$PORT PUBLIC_MP_SANDBOX=$PUBLIC_MP_SANDBOX PUBLIC_SITE_URL=$PUBLIC_SITE_URL
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] # setup phase
+18:17:31.838070 [DEBUG] # noop
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] # install phase
+18:17:31.838070 [DEBUG] ENV NIXPACKS_PATH=/app/node_modules/.bin:$NIXPACKS_PATH
+18:17:31.838070 [DEBUG] COPY . /app/.
+18:17:31.838070 [DEBUG] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-/root/bun,target=/root/.bun bun install
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] # build phase
+18:17:31.838070 [DEBUG] COPY . /app/.
+18:17:31.838070 [DEBUG] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] RUN printf '\nPATH=/app/node_modules/.bin:$PATH' >> /root/.profile
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] # start
+18:17:31.838070 [DEBUG] COPY . /app
+18:17:31.838070 [DEBUG] 
+18:17:31.838070 [DEBUG] CMD ["bun src/db/start.ts"]
+18:17:32.857056 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'cat /artifacts/build.sh'
+18:17:32.857056 [DEBUG] cd /artifacts/sg88cgccogk8so4s048wcowc && set -a && source /artifacts/build-time.env && set +a && docker build --add-host a48o88wg8kk4k0cc804k8s0w:10.0.1.8 --add-host coolify:10.0.1.3 --add-host coolify-db:10.0.1.9 --add-host coolify-realtime:10.0.1.5 --add-host coolify-redis:10.0.1.10 --add-host k8s04kg004wccgwwkwscg4ow:10.0.1.7 --network host -f /artifacts/sg88cgccogk8so4s048wcowc/.nixpacks/Dockerfile --progress plain -t rkg40osg4oc8gockk400osgw:ccab0dfeeba945adc63bf8864332580eb3d883ae --build-arg CI --build-arg COOLIFY_BRANCH --build-arg COOLIFY_FQDN --build-arg COOLIFY_RESOURCE_UUID --build-arg COOLIFY_URL --build-arg HOST --build-arg NIXPACKS_METADATA --build-arg NIXPACKS_NODE_VERSION --build-arg NODE_ENV --build-arg NPM_CONFIG_PRODUCTION --build-arg PORT --build-arg ADMIN_NAME --build-arg IS_PROD --build-arg ADMIN_EMAIL --build-arg ADMIN_PASSWORD --build-arg PUBLIC_SITE_URL --build-arg PUBLIC_MP_SANDBOX --build-arg DB_HOST --build-arg DB_USER --build-arg DB_PORT --build-arg DB_PASSWORD --build-arg DB_NAME --build-arg BETTER_AUTH_SECRET --build-arg BETTER_AUTH_URL --build-arg COOLIFY_BUILD_SECRETS_HASH=559a136a756e222d2112d88b95ab24790d796bb71541c56868b64dca6659c69b --build-arg 'COOLIFY_URL' --build-arg 'COOLIFY_FQDN' --build-arg 'COOLIFY_BRANCH' --build-arg 'COOLIFY_RESOURCE_UUID' /artifacts/sg88cgccogk8so4s048wcowc
+18:17:34.671801 [DEBUG] [CMD]: docker exec sg88cgccogk8so4s048wcowc bash -c 'bash /artifacts/build.sh'
+18:17:34.671801 [DEBUG] #0 building with "default" instance using docker driver
+18:17:34.671801 [DEBUG] 
+18:17:34.671801 [DEBUG] #1 [internal] load build definition from Dockerfile
+18:17:34.671801 [DEBUG] #1 transferring dockerfile: 1.88kB done
+18:17:34.671801 [DEBUG] #1 DONE 0.1s
+18:17:34.671801 [DEBUG] 
+18:17:34.671801 [DEBUG] #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+18:17:35.654655 [DEBUG] #2 DONE 1.1s
+18:17:35.773766 [DEBUG] #3 [internal] load .dockerignore
+18:17:35.773766 [DEBUG] #3 transferring context: 226B done
+18:17:35.773766 [DEBUG] #3 DONE 0.0s
+18:17:35.773766 [DEBUG] 
+18:17:35.773766 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+18:17:35.773766 [DEBUG] #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.1s done
+18:17:35.773766 [DEBUG] #4 DONE 0.1s
+18:17:35.773766 [DEBUG] 
+18:17:35.773766 [DEBUG] #5 [internal] load build context
+18:17:35.906853 [DEBUG] #5 transferring context: 1.41MB 0.1s done
+18:17:35.906853 [DEBUG] #5 DONE 0.1s
+18:17:35.906853 [DEBUG] 
+18:17:35.906853 [DEBUG] #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+18:17:35.906853 [DEBUG] #4 DONE 0.2s
+18:17:36.050069 [DEBUG] #6 [stage-0  2/11] WORKDIR /app/
+18:17:36.050069 [DEBUG] #6 DONE 0.1s
+18:17:36.050069 [DEBUG] 
+18:17:36.050069 [DEBUG] #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix
+18:17:36.050069 [DEBUG] #7 DONE 0.1s
+18:17:36.205040 [DEBUG] #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix && nix-collect-garbage -d
+18:17:36.762523 [DEBUG] #8 0.710 unpacking 'https://github.com/NixOS/nixpkgs/archive/31fb21469e34b6b5c7be77b9a35bae43d0c598e9.tar.gz' into the Git cache...
+18:19:05.250441 [DEBUG] #8 89.20 unpacking 'https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz' into the Git cache...
+18:19:06.487873 [DEBUG] #8 90.44 installing '31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env'
+18:19:08.198645 [DEBUG] #8 92.15 these 3 derivations will be built:
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/l53bwr725gp7k4831cygqrihvaxv36b9-libraries.drv
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/rnx340l87dgcfkzagwjqjbgdgyg1bi1b-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/9ybw67lhmy0kdzr1x0yjnikflkaqsl06-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv
+18:19:08.198645 [DEBUG] #8 92.15 these 36 paths will be fetched (48.37 MiB download, 226.98 MiB unpacked):
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/xcl91nw8b1zihm32cwxrqdvaakdnip75-bun-1.3.0
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/xp989kyfg52803fmkzbz5py35jphcpgd-gcc-14.3.0-lib
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/8b9srwwmrwmh1yl613cwwj7gydl87br6-gcc-14.3.0-libgcc
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/qhw0sp183mqd04x5jp75981kwya64npv-glibc-2.40-66
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/wwqyxsvmg41q5ckfvvv6wa50nwvz9dv4-libidn2-2.3.8
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/7ndy5820h69n1pgd13viph1qjq6zhhkj-libunistring-1.3
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/0ja5daq2yay3svg6f48spyfby7pgy5bm-xgcc-14.3.0-libgcc
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin
+18:19:08.198645 [DEBUG] #8 92.15   /nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1
+18:19:08.330685 [DEBUG] #8 92.17 copying path '/nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.18 copying path '/nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.19 copying path '/nix/store/8b9srwwmrwmh1yl613cwwj7gydl87br6-gcc-14.3.0-libgcc' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.19 copying path '/nix/store/0ja5daq2yay3svg6f48spyfby7pgy5bm-xgcc-14.3.0-libgcc' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.19 copying path '/nix/store/7ndy5820h69n1pgd13viph1qjq6zhhkj-libunistring-1.3' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.21 copying path '/nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook' from 'https://cache.nixos.org'...
+18:19:08.330685 [DEBUG] #8 92.28 copying path '/nix/store/wwqyxsvmg41q5ckfvvv6wa50nwvz9dv4-libidn2-2.3.8' from 'https://cache.nixos.org'...
+18:19:08.515102 [DEBUG] #8 92.31 copying path '/nix/store/qhw0sp183mqd04x5jp75981kwya64npv-glibc-2.40-66' from 'https://cache.nixos.org'...
+18:19:09.215224 [DEBUG] #8 93.16 copying path '/nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2' from 'https://cache.nixos.org'...
+18:19:09.215224 [DEBUG] #8 93.16 copying path '/nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.16 copying path '/nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.16 copying path '/nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.16 copying path '/nix/store/xcl91nw8b1zihm32cwxrqdvaakdnip75-bun-1.3.0' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.16 copying path '/nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.17 copying path '/nix/store/xp989kyfg52803fmkzbz5py35jphcpgd-gcc-14.3.0-lib' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.17 copying path '/nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.17 copying path '/nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.17 copying path '/nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.17 copying path '/nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.18 copying path '/nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.18 copying path '/nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.18 copying path '/nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.24 copying path '/nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.24 copying path '/nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2' from 'https://cache.nixos.org'...
+18:19:09.349440 [DEBUG] #8 93.30 copying path '/nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45' from 'https://cache.nixos.org'...
+18:19:09.800654 [DEBUG] #8 93.75 copying path '/nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35' from 'https://cache.nixos.org'...
+18:19:10.003981 [DEBUG] #8 93.77 copying path '/nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin' from 'https://cache.nixos.org'...
+18:19:10.003981 [DEBUG] #8 93.79 copying path '/nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12' from 'https://cache.nixos.org'...
+18:19:10.107976 [DEBUG] #8 94.06 copying path '/nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14' from 'https://cache.nixos.org'...
+18:19:11.000081 [DEBUG] #8 94.95 copying path '/nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0' from 'https://cache.nixos.org'...
+18:19:11.151944 [DEBUG] #8 94.95 copying path '/nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2' from 'https://cache.nixos.org'...
+18:19:11.293605 [DEBUG] #8 95.24 copying path '/nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7' from 'https://cache.nixos.org'...
+18:19:11.411069 [DEBUG] #8 95.36 copying path '/nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12' from 'https://cache.nixos.org'...
+18:19:11.564581 [DEBUG] #8 95.36 copying path '/nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0' from 'https://cache.nixos.org'...
+18:19:11.564581 [DEBUG] #8 95.36 copying path '/nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0' from 'https://cache.nixos.org'...
+18:19:11.689911 [DEBUG] #8 95.64 copying path '/nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux' from 'https://cache.nixos.org'...
+18:19:11.854363 [DEBUG] #8 95.80 building '/nix/store/l53bwr725gp7k4831cygqrihvaxv36b9-libraries.drv'...
+18:19:12.601307 [DEBUG] #8 96.55 building '/nix/store/rnx340l87dgcfkzagwjqjbgdgyg1bi1b-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv'...
+18:19:14.831284 [DEBUG] #8 98.78 building '/nix/store/9ybw67lhmy0kdzr1x0yjnikflkaqsl06-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv'...
+18:19:14.838027 [DEBUG] 
+18:19:14.973072 [DEBUG] #8 98.92 created 3 symlinks in user environment
+18:19:14.977985 [DEBUG] 
+18:19:15.214268 [DEBUG] #8 99.16 building '/nix/store/k2c9zlqxzxpklbz7g2klygnd989853d4-user-environment.drv'...
+18:19:15.464890 [DEBUG] #8 99.41 removing old generations of profile /nix/var/nix/profiles/per-user/root/channels
+18:19:15.573649 [DEBUG] #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/profile
+18:19:15.573649 [DEBUG] #8 99.42 removing profile version 1
+18:19:15.573649 [DEBUG] #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/channels
+18:19:15.573649 [DEBUG] #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/profile
+18:19:15.573649 [DEBUG] #8 99.42 finding garbage collector roots...
+18:19:15.573649 [DEBUG] #8 99.42 removing stale link from '/nix/var/nix/gcroots/auto/lzjbmb2ry0z7lma2fvpqprb12921pnb5' to '/nix/var/nix/profiles/per-user/root/profile-1-link'
+18:19:15.573649 [DEBUG] #8 99.43 deleting garbage...
+18:19:15.573649 [DEBUG] #8 99.43 deleting '/nix/store/a9qf4wwhympzs35ncp80r185j6a21w07-user-environment'
+18:19:15.573649 [DEBUG] #8 99.44 deleting '/nix/store/253kwn1730vnay87xkjgxa2v97w3y079-user-environment.drv'
+18:19:15.573649 [DEBUG] #8 99.44 deleting '/nix/store/hn5mrh362n52x8wwab9s1v6bgn4n5c94-env-manifest.nix'
+18:19:15.573649 [DEBUG] #8 99.46 deleting '/nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0'
+18:19:15.573649 [DEBUG] #8 99.52 deleting '/nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux'
+18:19:15.774307 [DEBUG] #8 99.52 deleting '/nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2'
+18:19:15.774307 [DEBUG] #8 99.53 deleting '/nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12'
+18:19:15.774307 [DEBUG] #8 99.53 deleting '/nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46'
+18:19:15.774307 [DEBUG] #8 99.53 deleting '/nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook'
+18:19:15.774307 [DEBUG] #8 99.53 deleting '/nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01'
+18:19:15.774307 [DEBUG] #8 99.54 deleting '/nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45'
+18:19:15.774307 [DEBUG] #8 99.54 deleting '/nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0'
+18:19:15.774307 [DEBUG] #8 99.54 deleting '/nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12'
+18:19:15.774307 [DEBUG] #8 99.55 deleting '/nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7'
+18:19:15.774307 [DEBUG] #8 99.55 deleting '/nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2'
+18:19:15.774307 [DEBUG] #8 99.55 deleting '/nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8'
+18:19:15.774307 [DEBUG] #8 99.55 deleting '/nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2'
+18:19:15.774307 [DEBUG] #8 99.56 deleting '/nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35'
+18:19:15.774307 [DEBUG] #8 99.56 deleting '/nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2'
+18:19:15.774307 [DEBUG] #8 99.56 deleting '/nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14'
+18:19:15.774307 [DEBUG] #8 99.56 deleting '/nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/bk363s873cgn87wgl7ag62wi20cry89i-source'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin'
+18:19:15.774307 [DEBUG] #8 99.57 deleting '/nix/store/2w56d3yplcdfg19kddn8gd194yj4yzpp-source'
+18:19:20.101348 [DEBUG] #8 104.0 deleting '/nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl'
+18:19:20.295375 [DEBUG] #8 104.0 deleting '/nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/cvw5asqga7k27zb1jlippfrkqm084ml7-libraries'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1'
+18:19:20.295375 [DEBUG] #8 104.1 deleting '/nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38'
+18:19:20.295375 [DEBUG] #8 104.1 deleting unused links...
+18:19:24.894582 [DEBUG] #8 108.8 note: currently hard linking saves -4.29 MiB
+18:19:25.012091 [DEBUG] #8 108.9 35 store paths deleted, 249.22 MiB freed
+18:19:25.012091 [DEBUG] #8 DONE 109.0s
+18:19:25.167802 [DEBUG] #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+18:19:26.084295 [DEBUG] #9 1.068 Get:1 http://archive.ubuntu.com/ubuntu noble InRelease [256 kB]
+18:19:26.084295 [DEBUG] #9 1.068 Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+18:19:27.221403 [DEBUG] #9 2.204 Get:3 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [3061 kB]
+18:19:27.460298 [DEBUG] #9 2.293 Get:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+18:19:27.611232 [DEBUG] #9 2.595 Get:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+18:19:27.924412 [DEBUG] #9 2.908 Get:6 http://archive.ubuntu.com/ubuntu noble/restricted amd64 Packages [117 kB]
+18:19:28.150302 [DEBUG] #9 2.982 Get:7 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [331 kB]
+18:19:28.227987 [DEBUG] #9 3.211 Get:8 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages [1808 kB]
+18:19:28.591487 [DEBUG] #9 3.575 Get:9 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1199 kB]
+18:19:28.830752 [DEBUG] #9 3.643 Get:10 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [34.8 kB]
+18:19:28.830752 [DEBUG] #9 3.645 Get:11 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1802 kB]
+18:19:28.830752 [DEBUG] #9 3.662 Get:12 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [19.3 MB]
+18:19:30.845360 [DEBUG] #9 5.828 Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [2198 kB]
+18:19:31.091181 [DEBUG] #9 6.072 Get:14 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [38.1 kB]
+18:19:31.250433 [DEBUG] #9 6.078 Get:15 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [3280 kB]
+18:19:31.497456 [DEBUG] #9 6.481 Get:16 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1978 kB]
+18:19:31.729092 [DEBUG] #9 6.712 Get:17 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [49.5 kB]
+18:19:31.882070 [DEBUG] #9 6.715 Get:18 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [34.6 kB]
+18:19:31.892398 [DEBUG] 
+18:19:32.098466 [DEBUG] #9 7.081 Fetched 35.9 MB in 7s (5383 kB/s)
+18:19:32.098466 [DEBUG] #9 7.081 Reading package lists...
+18:19:33.639909 [DEBUG] 
+18:19:33.849308 [DEBUG] #9 8.682 Reading package lists...
+18:19:35.116162 [DEBUG] 
+18:19:35.293269 [DEBUG] #9 10.13 Building dependency tree...
+18:19:35.463729 [DEBUG] #9 10.44 Reading state information...
+18:19:35.614703 [DEBUG] 
+18:19:35.982127 [DEBUG] #9 10.97 curl is already the newest version (8.5.0-2ubuntu10.6).
+18:19:35.982127 [DEBUG] #9 10.97 The following NEW packages will be installed:
+18:19:35.982127 [DEBUG] #9 10.97   wget
+18:19:36.470239 [DEBUG] #9 11.45 0 upgraded, 1 newly installed, 0 to remove and 42 not upgraded.
+18:19:36.470239 [DEBUG] #9 11.45 Need to get 334 kB of archives.
+18:19:36.470239 [DEBUG] #9 11.45 After this operation, 938 kB of additional disk space will be used.
+18:19:36.470239 [DEBUG] #9 11.45 Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 wget amd64 1.21.4-1ubuntu4.1 [334 kB]
+18:19:37.855805 [DEBUG] #9 12.84 debconf: delaying package configuration, since apt-utils is not installed
+18:19:37.985051 [DEBUG] #9 12.91 Fetched 334 kB in 2s (219 kB/s)
+18:19:37.985051 [DEBUG] #9 12.97 Selecting previously unselected package wget.
+18:19:37.985051 [DEBUG] #9 12.97 (Reading database ...
+18:19:38.159503 [DEBUG] (Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 9511 files and directories currently installed.)
+18:19:38.159503 [DEBUG] #9 13.00 Preparing to unpack .../wget_1.21.4-1ubuntu4.1_amd64.deb ...
+18:19:38.159503 [DEBUG] #9 13.02 Unpacking wget (1.21.4-1ubuntu4.1) ...
+18:19:38.159503 [DEBUG] #9 13.14 Setting up wget (1.21.4-1ubuntu4.1) ...
+18:19:38.295282 [DEBUG] #9 DONE 13.3s
+18:19:38.449018 [DEBUG] #10 [stage-0  6/11] COPY . /app/.
+18:19:38.454984 [DEBUG] #10 DONE 0.2s
+18:19:38.614205 [DEBUG] #11 [stage-0  7/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-/root/bun,target=/root/.bun bun install
+18:19:38.679309 [DEBUG] #11 0.217 bun install v1.3.0 (b0a6feca)
+18:19:38.844245 [DEBUG] #11 0.232 [10.61ms] migrated lockfile from package-lock.json
+18:19:51.077109 [DEBUG] #11 12.61
+18:19:51.077109 [DEBUG] #11 12.61 + @astrojs/node@9.5.2
+18:19:51.077109 [DEBUG] #11 12.61 + @astrojs/vue@5.1.4
+18:19:51.077109 [DEBUG] #11 12.61 + @fontsource-variable/inter@5.2.8
+18:19:51.077109 [DEBUG] #11 12.61 + @nanostores/persistent@1.2.0
+18:19:51.077109 [DEBUG] #11 12.61 + @nanostores/vue@1.0.1
+18:19:51.077109 [DEBUG] #11 12.61 + @tailwindcss/vite@4.1.18
+18:19:51.077109 [DEBUG] #11 12.61 + @types/toastify-js@1.12.4
+18:19:51.077109 [DEBUG] #11 12.61 + @types/uuid@11.0.0
+18:19:51.077109 [DEBUG] #11 12.61 + astro@5.17.1
+18:19:51.077109 [DEBUG] #11 12.61 + bcryptjs@3.0.3
+18:19:51.077109 [DEBUG] #11 12.61 + better-auth@1.4.18
+18:19:51.077109 [DEBUG] #11 12.61 + dotenv@17.2.3
+18:19:51.077109 [DEBUG] #11 12.61 + jose@6.1.3
+18:19:51.077109 [DEBUG] #11 12.61 + mercadopago@2.12.0
+18:19:51.077109 [DEBUG] #11 12.61 + mysql2@3.16.1
+18:19:51.077109 [DEBUG] #11 12.61 + nanostores@1.1.0
+18:19:51.077109 [DEBUG] #11 12.61 + photoswipe@5.4.4
+18:19:51.077109 [DEBUG] #11 12.61 + sharp@0.34.5
+18:19:51.077109 [DEBUG] #11 12.61 + tailwindcss@4.1.18
+18:19:51.077109 [DEBUG] #11 12.61 + toastify-js@1.12.0
+18:19:51.077109 [DEBUG] #11 12.61 + uuid@13.0.0
+18:19:51.077109 [DEBUG] #11 12.61 + vue@3.5.27
+18:19:51.077109 [DEBUG] #11 12.61
+18:19:51.077109 [DEBUG] #11 12.61 464 packages installed [12.40s]
+18:19:51.229398 [DEBUG] #11 12.61 Saved lockfile
+18:19:51.385983 [DEBUG] #11 DONE 12.9s
+18:19:51.542393 [DEBUG] #12 [stage-0  8/11] COPY . /app/.
+18:19:52.087397 [DEBUG] #12 DONE 0.7s
+18:19:52.242499 [DEBUG] #13 [stage-0  9/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build
+18:19:52.280710 [DEBUG] #13 0.189 $ astro build
+18:19:52.839865 [DEBUG] #13 0.748 81 | 					`You can download it from ${msvcDownloadLink}`,
+18:19:52.839865 [DEBUG] #13 0.748 82 | 				{ cause: error }
+18:19:52.839865 [DEBUG] #13 0.748 83 | 			);
+18:19:52.839865 [DEBUG] #13 0.748 84 | 		}
+18:19:52.839865 [DEBUG] #13 0.748 85 |
+18:19:52.839865 [DEBUG] #13 0.748 86 | 		throw new Error(
+18:19:52.839865 [DEBUG] #13 0.748                  ^
+18:19:52.839865 [DEBUG] #13 0.748 error: Cannot find module @rollup/rollup-linux-x64-gnu. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+18:19:52.839865 [DEBUG] #13 0.748       at requireWithFriendlyError (/app/node_modules/rollup/dist/native.js:86:13)
+18:19:52.839865 [DEBUG] #13 0.748       at <anonymous> (/app/node_modules/rollup/dist/native.js:95:76)
+18:19:52.839865 [DEBUG] #13 0.748
+18:19:53.072830 [DEBUG] #13 0.761 error: script "build" exited with code 1
+18:19:53.072830 [DEBUG] #13 ERROR: process "/bin/bash -ol pipefail -c bun run build" did not complete successfully: exit code: 1
+18:19:53.102425 [DEBUG] ------
+18:19:53.102425 [DEBUG] > [stage-0  9/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build:
+18:19:53.102425 [DEBUG] 0.748 83 | 			);
+18:19:53.102425 [DEBUG] 0.748 84 | 		}
+18:19:53.102425 [DEBUG] 0.748 85 |
+18:19:53.102425 [DEBUG] 0.748 86 | 		throw new Error(
+18:19:53.102425 [DEBUG] 0.748                  ^
+18:19:53.102425 [DEBUG] 0.748 error: Cannot find module @rollup/rollup-linux-x64-gnu. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+18:19:53.102425 [DEBUG] 0.748       at requireWithFriendlyError (/app/node_modules/rollup/dist/native.js:86:13)
+18:19:53.102425 [DEBUG] 0.748       at <anonymous> (/app/node_modules/rollup/dist/native.js:95:76)
+18:19:53.102425 [DEBUG] 0.748
+18:19:53.102425 [DEBUG] 0.761 error: script "build" exited with code 1
+18:19:53.102425 [DEBUG] ------
+18:19:53.111973 [DEBUG] 9 warnings found (use docker --debug to expand):
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "BETTER_AUTH_SECRET") (line 11)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "BETTER_AUTH_SECRET") (line 12)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "DB_PASSWORD") (line 12)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "ADMIN_PASSWORD") (line 11)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "BETTER_AUTH_URL") (line 11)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "DB_PASSWORD") (line 11)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "ADMIN_PASSWORD") (line 12)
+18:19:53.111973 [DEBUG] - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "BETTER_AUTH_URL") (line 12)
+18:19:53.111973 [DEBUG] - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+18:19:53.111973 [DEBUG] Dockerfile:24
+18:19:53.111973 [DEBUG] --------------------
+18:19:53.111973 [DEBUG] 22 |     # build phase
+18:19:53.111973 [DEBUG] 23 |     COPY . /app/.
+18:19:53.111973 [DEBUG] 24 | >>> RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build
+18:19:53.111973 [DEBUG] 25 |
+18:19:53.111973 [DEBUG] 26 |
+18:19:53.111973 [DEBUG] --------------------
+18:19:53.111973 [DEBUG] ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c bun run build" did not complete successfully: exit code: 1
+18:19:53.124716 [DEBUG] exit status 1
+18:19:53.221983 ========================================
+18:19:53.232744 Deployment failed: Command execution failed (exit code 1): docker exec sg88cgccogk8so4s048wcowc bash -c 'bash /artifacts/build.sh'
+18:19:53.232744 Error: #0 building with "default" instance using docker driver
+18:19:53.232744 
+18:19:53.232744 #1 [internal] load build definition from Dockerfile
+18:19:53.232744 #1 transferring dockerfile: 1.88kB done
+18:19:53.232744 #1 DONE 0.1s
+18:19:53.232744 
+18:19:53.232744 #2 [internal] load metadata for ghcr.io/railwayapp/nixpacks:ubuntu-1745885067
+18:19:53.232744 #2 DONE 1.1s
+18:19:53.232744 
+18:19:53.232744 #3 [internal] load .dockerignore
+18:19:53.232744 #3 transferring context: 226B done
+18:19:53.232744 #3 DONE 0.0s
+18:19:53.232744 
+18:19:53.232744 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+18:19:53.232744 #4 resolve ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de 0.1s done
+18:19:53.232744 #4 DONE 0.1s
+18:19:53.232744 
+18:19:53.232744 #5 [internal] load build context
+18:19:53.232744 #5 transferring context: 1.41MB 0.1s done
+18:19:53.232744 #5 DONE 0.1s
+18:19:53.232744 
+18:19:53.232744 #4 [stage-0  1/11] FROM ghcr.io/railwayapp/nixpacks:ubuntu-1745885067@sha256:d45c89d80e13d7ad0fd555b5130f22a866d9dd10e861f589932303ef2314c7de
+18:19:53.232744 #4 DONE 0.2s
+18:19:53.232744 
+18:19:53.232744 #6 [stage-0  2/11] WORKDIR /app/
+18:19:53.232744 #6 DONE 0.1s
+18:19:53.232744 
+18:19:53.232744 #7 [stage-0  3/11] COPY .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix
+18:19:53.232744 #7 DONE 0.1s
+18:19:53.232744 
+18:19:53.232744 #8 [stage-0  4/11] RUN nix-env -if .nixpacks/nixpkgs-31fb21469e34b6b5c7be77b9a35bae43d0c598e9.nix && nix-collect-garbage -d
+18:19:53.232744 #8 0.710 unpacking 'https://github.com/NixOS/nixpkgs/archive/31fb21469e34b6b5c7be77b9a35bae43d0c598e9.tar.gz' into the Git cache...
+18:19:53.232744 #8 89.20 unpacking 'https://github.com/railwayapp/nix-npm-overlay/archive/main.tar.gz' into the Git cache...
+18:19:53.232744 #8 90.44 installing '31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env'
+18:19:53.232744 #8 92.15 these 3 derivations will be built:
+18:19:53.232744 #8 92.15   /nix/store/l53bwr725gp7k4831cygqrihvaxv36b9-libraries.drv
+18:19:53.232744 #8 92.15   /nix/store/rnx340l87dgcfkzagwjqjbgdgyg1bi1b-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv
+18:19:53.232744 #8 92.15   /nix/store/9ybw67lhmy0kdzr1x0yjnikflkaqsl06-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv
+18:19:53.232744 #8 92.15 these 36 paths will be fetched (48.37 MiB download, 226.98 MiB unpacked):
+18:19:53.232744 #8 92.15   /nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2
+18:19:53.232744 #8 92.15   /nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2
+18:19:53.232744 #8 92.15   /nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3
+18:19:53.232744 #8 92.15   /nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl
+18:19:53.232744 #8 92.15   /nix/store/xcl91nw8b1zihm32cwxrqdvaakdnip75-bun-1.3.0
+18:19:53.232744 #8 92.15   /nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8
+18:19:53.232744 #8 92.15   /nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin
+18:19:53.232744 #8 92.15   /nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7
+18:19:53.232744 #8 92.15   /nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12
+18:19:53.232744 #8 92.15   /nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2
+18:19:53.232744 #8 92.15   /nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45
+18:19:53.232744 #8 92.15   /nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0
+18:19:53.232744 #8 92.15   /nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2
+18:19:53.232744 #8 92.15   /nix/store/xp989kyfg52803fmkzbz5py35jphcpgd-gcc-14.3.0-lib
+18:19:53.232744 #8 92.15   /nix/store/8b9srwwmrwmh1yl613cwwj7gydl87br6-gcc-14.3.0-libgcc
+18:19:53.232744 #8 92.15   /nix/store/qhw0sp183mqd04x5jp75981kwya64npv-glibc-2.40-66
+18:19:53.232744 #8 92.15   /nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0
+18:19:53.232744 #8 92.15   /nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01
+18:19:53.232744 #8 92.15   /nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12
+18:19:53.232744 #8 92.15   /nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1
+18:19:53.232744 #8 92.15   /nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9
+18:19:53.232744 #8 92.15   /nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35
+18:19:53.232744 #8 92.15   /nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14
+18:19:53.232744 #8 92.15   /nix/store/wwqyxsvmg41q5ckfvvv6wa50nwvz9dv4-libidn2-2.3.8
+18:19:53.232744 #8 92.15   /nix/store/7ndy5820h69n1pgd13viph1qjq6zhhkj-libunistring-1.3
+18:19:53.232744 #8 92.15   /nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38
+18:19:53.232744 #8 92.15   /nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8
+18:19:53.232744 #8 92.15   /nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2
+18:19:53.232744 #8 92.15   /nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46
+18:19:53.232744 #8 92.15   /nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0
+18:19:53.232744 #8 92.15   /nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux
+18:19:53.232744 #8 92.15   /nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook
+18:19:53.232744 #8 92.15   /nix/store/0ja5daq2yay3svg6f48spyfby7pgy5bm-xgcc-14.3.0-libgcc
+18:19:53.232744 #8 92.15   /nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1
+18:19:53.232744 #8 92.15   /nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin
+18:19:53.232744 #8 92.15   /nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1
+18:19:53.232744 #8 92.17 copying path '/nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.18 copying path '/nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.19 copying path '/nix/store/8b9srwwmrwmh1yl613cwwj7gydl87br6-gcc-14.3.0-libgcc' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.19 copying path '/nix/store/0ja5daq2yay3svg6f48spyfby7pgy5bm-xgcc-14.3.0-libgcc' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.19 copying path '/nix/store/7ndy5820h69n1pgd13viph1qjq6zhhkj-libunistring-1.3' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.21 copying path '/nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.28 copying path '/nix/store/wwqyxsvmg41q5ckfvvv6wa50nwvz9dv4-libidn2-2.3.8' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 92.31 copying path '/nix/store/qhw0sp183mqd04x5jp75981kwya64npv-glibc-2.40-66' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/xcl91nw8b1zihm32cwxrqdvaakdnip75-bun-1.3.0' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.16 copying path '/nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.17 copying path '/nix/store/xp989kyfg52803fmkzbz5py35jphcpgd-gcc-14.3.0-lib' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.17 copying path '/nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.17 copying path '/nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.17 copying path '/nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.17 copying path '/nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.18 copying path '/nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.18 copying path '/nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.18 copying path '/nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.24 copying path '/nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.24 copying path '/nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.30 copying path '/nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.75 copying path '/nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.77 copying path '/nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 93.79 copying path '/nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 94.06 copying path '/nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 94.95 copying path '/nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 94.95 copying path '/nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.24 copying path '/nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.36 copying path '/nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.36 copying path '/nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.36 copying path '/nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.64 copying path '/nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux' from 'https://cache.nixos.org'...
+18:19:53.232744 #8 95.80 building '/nix/store/l53bwr725gp7k4831cygqrihvaxv36b9-libraries.drv'...
+18:19:53.232744 #8 96.55 building '/nix/store/rnx340l87dgcfkzagwjqjbgdgyg1bi1b-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv'...
+18:19:53.232744 #8 98.78 building '/nix/store/9ybw67lhmy0kdzr1x0yjnikflkaqsl06-31fb21469e34b6b5c7be77b9a35bae43d0c598e9-env.drv'...
+18:19:53.232744 #8 98.92 created 3 symlinks in user environment
+18:19:53.232744 #8 99.16 building '/nix/store/k2c9zlqxzxpklbz7g2klygnd989853d4-user-environment.drv'...
+18:19:53.232744 #8 99.41 removing old generations of profile /nix/var/nix/profiles/per-user/root/channels
+18:19:53.232744 #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/profile
+18:19:53.232744 #8 99.42 removing profile version 1
+18:19:53.232744 #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/channels
+18:19:53.232744 #8 99.42 removing old generations of profile /nix/var/nix/profiles/per-user/root/profile
+18:19:53.232744 #8 99.42 finding garbage collector roots...
+18:19:53.232744 #8 99.42 removing stale link from '/nix/var/nix/gcroots/auto/lzjbmb2ry0z7lma2fvpqprb12921pnb5' to '/nix/var/nix/profiles/per-user/root/profile-1-link'
+18:19:53.232744 #8 99.43 deleting garbage...
+18:19:53.232744 #8 99.43 deleting '/nix/store/a9qf4wwhympzs35ncp80r185j6a21w07-user-environment'
+18:19:53.232744 #8 99.44 deleting '/nix/store/253kwn1730vnay87xkjgxa2v97w3y079-user-environment.drv'
+18:19:53.232744 #8 99.44 deleting '/nix/store/hn5mrh362n52x8wwab9s1v6bgn4n5c94-env-manifest.nix'
+18:19:53.232744 #8 99.46 deleting '/nix/store/k2y9xpcdqxma66kag80nhbv0pq2bznzf-perl-5.40.0'
+18:19:53.232744 #8 99.52 deleting '/nix/store/x1d0ad98h92lp5g59pfryjzk4ca84i3r-stdenv-linux'
+18:19:53.232744 #8 99.52 deleting '/nix/store/swbmnc2s8g2zxzxh62hx1vbbcg6i2r5b-gawk-5.3.2'
+18:19:53.232744 #8 99.53 deleting '/nix/store/6q57mnfak3q8ss656qgp245qzqvnniyr-gnugrep-3.12'
+18:19:53.232744 #8 99.53 deleting '/nix/store/wqlkv0cjacnm7arca156p3d3vh0kdbmk-pcre2-10.46'
+18:19:53.232744 #8 99.53 deleting '/nix/store/ka03rs4a3bybjhqpvg388sdszbybvbff-update-autotools-gnu-config-scripts-hook'
+18:19:53.232744 #8 99.53 deleting '/nix/store/2j08vib6rf81vwi6mv3s544wi8rj3xn7-gnu-config-2024-01-01'
+18:19:53.232744 #8 99.54 deleting '/nix/store/5qm0vivgc7lmiyfbf5d5a55s40d996bd-file-5.45'
+18:19:53.232744 #8 99.54 deleting '/nix/store/wq1cxh4s8rz8vs4ssp2z49v96m0nhxhj-findutils-4.10.0'
+18:19:53.232744 #8 99.54 deleting '/nix/store/c7qlkpbivy2znqxd25prgh9pwjxdri6w-diffutils-3.12'
+18:19:53.232744 #8 99.55 deleting '/nix/store/00bc157nm93q5fjz551fwk60ihlbilvj-coreutils-9.7'
+18:19:53.232744 #8 99.55 deleting '/nix/store/0032synbfqd0ylgf9szgp724nmw2fq89-patchelf-0.15.2'
+18:19:53.232744 #8 99.55 deleting '/nix/store/r9lif1a0naanr8kdapwnbnr39lr7d56a-patch-2.8'
+18:19:53.232744 #8 99.55 deleting '/nix/store/wgvx9p6h00aijb9jw95am7095wjzm9mv-ed-1.22.2'
+18:19:53.232744 #8 99.56 deleting '/nix/store/n09s57l86zxyjydkxagawxpkhh3d3dlh-gnutar-1.35'
+18:19:53.232744 #8 99.56 deleting '/nix/store/jj3knbpiiwbwmplin208h775gzm86rc3-acl-2.3.2'
+18:19:53.232744 #8 99.56 deleting '/nix/store/wd4i398mh329vhw93mvmamw3hrnhl257-gzip-1.14'
+18:19:53.232744 #8 99.56 deleting '/nix/store/cl2gkgnh26mmpka81pc2g5bzjfrili92-bash-5.3p3'
+18:19:53.232744 #8 99.57 deleting '/nix/store/bk363s873cgn87wgl7ag62wi20cry89i-source'
+18:19:53.232744 #8 99.57 deleting '/nix/store/xnd0ld68fzj1g1qr19gg0va486snwj22-bzip2-1.0.8-bin'
+18:19:53.232744 #8 99.57 deleting '/nix/store/j59qq0cqb364kzzrx2r32swfljwklxlq-bzip2-1.0.8'
+18:19:53.232744 #8 99.57 deleting '/nix/store/6qi8skh85ci2k9gvl27nnh3kiy32qnsz-zlib-1.3.1'
+18:19:53.232744 #8 99.57 deleting '/nix/store/77jyjqy2b9l2a0139im9ds28zkdv0ybc-xz-5.8.1-bin'
+18:19:53.232744 #8 99.57 deleting '/nix/store/2w56d3yplcdfg19kddn8gd194yj4yzpp-source'
+18:19:53.232744 #8 104.0 deleting '/nix/store/1dw13nzqf9v8w7jcy205hkp7s7ggi0cc-builder.pl'
+18:19:53.232744 #8 104.0 deleting '/nix/store/7zy6jnnpqh16b18j6ar289vhwp17msh0-gnused-4.9'
+18:19:53.232744 #8 104.1 deleting '/nix/store/78xkc7z5m21chq7p6awrzgznz83xyml0-gmp-with-cxx-6.3.0'
+18:19:53.232744 #8 104.1 deleting '/nix/store/swqs30pymm3ymv2qnkzs353xmpgr80jr-xz-5.8.1'
+18:19:53.232744 #8 104.1 deleting '/nix/store/2mwbf3viqfqd3lr946slqby9y4k7d9lw-attr-2.5.2'
+18:19:53.232744 #8 104.1 deleting '/nix/store/cvw5asqga7k27zb1jlippfrkqm084ml7-libraries'
+18:19:53.232744 #8 104.1 deleting '/nix/store/lmn1m0giq5bkgdqvdpiryb9a2ly28w6g-gnumake-4.4.1'
+18:19:53.232744 #8 104.1 deleting '/nix/store/nkn950vf2i29k4v3z6w9717pjrg483ng-libxcrypt-4.4.38'
+18:19:53.232744 #8 104.1 deleting unused links...
+18:19:53.232744 #8 108.8 note: currently hard linking saves -4.29 MiB
+18:19:53.232744 #8 108.9 35 store paths deleted, 249.22 MiB freed
+18:19:53.232744 #8 DONE 109.0s
+18:19:53.232744 
+18:19:53.232744 #9 [stage-0  5/11] RUN sudo apt-get update && sudo apt-get install -y --no-install-recommends curl wget
+18:19:53.232744 #9 1.068 Get:1 http://archive.ubuntu.com/ubuntu noble InRelease [256 kB]
+18:19:53.232744 #9 1.068 Get:2 http://security.ubuntu.com/ubuntu noble-security InRelease [126 kB]
+18:19:53.232744 #9 2.204 Get:3 http://security.ubuntu.com/ubuntu noble-security/restricted amd64 Packages [3061 kB]
+18:19:53.232744 #9 2.293 Get:4 http://archive.ubuntu.com/ubuntu noble-updates InRelease [126 kB]
+18:19:53.232744 #9 2.595 Get:5 http://archive.ubuntu.com/ubuntu noble-backports InRelease [126 kB]
+18:19:53.232744 #9 2.908 Get:6 http://archive.ubuntu.com/ubuntu noble/restricted amd64 Packages [117 kB]
+18:19:53.232744 #9 2.982 Get:7 http://archive.ubuntu.com/ubuntu noble/multiverse amd64 Packages [331 kB]
+18:19:53.232744 #9 3.211 Get:8 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages [1808 kB]
+18:19:53.232744 #9 3.575 Get:9 http://security.ubuntu.com/ubuntu noble-security/universe amd64 Packages [1199 kB]
+18:19:53.232744 #9 3.643 Get:10 http://security.ubuntu.com/ubuntu noble-security/multiverse amd64 Packages [34.8 kB]
+18:19:53.232744 #9 3.645 Get:11 http://security.ubuntu.com/ubuntu noble-security/main amd64 Packages [1802 kB]
+18:19:53.232744 #9 3.662 Get:12 http://archive.ubuntu.com/ubuntu noble/universe amd64 Packages [19.3 MB]
+18:19:53.232744 #9 5.828 Get:13 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 Packages [2198 kB]
+18:19:53.232744 #9 6.072 Get:14 http://archive.ubuntu.com/ubuntu noble-updates/multiverse amd64 Packages [38.1 kB]
+18:19:53.232744 #9 6.078 Get:15 http://archive.ubuntu.com/ubuntu noble-updates/restricted amd64 Packages [3280 kB]
+18:19:53.232744 #9 6.481 Get:16 http://archive.ubuntu.com/ubuntu noble-updates/universe amd64 Packages [1978 kB]
+18:19:53.232744 #9 6.712 Get:17 http://archive.ubuntu.com/ubuntu noble-backports/main amd64 Packages [49.5 kB]
+18:19:53.232744 #9 6.715 Get:18 http://archive.ubuntu.com/ubuntu noble-backports/universe amd64 Packages [34.6 kB]
+18:19:53.232744 #9 7.081 Fetched 35.9 MB in 7s (5383 kB/s)
+18:19:53.232744 #9 7.081 Reading package lists...
+18:19:53.232744 #9 8.682 Reading package lists...
+18:19:53.232744 #9 10.13 Building dependency tree...
+18:19:53.232744 #9 10.44 Reading state information...
+18:19:53.232744 #9 10.97 curl is already the newest version (8.5.0-2ubuntu10.6).
+18:19:53.232744 #9 10.97 The following NEW packages will be installed:
+18:19:53.232744 #9 10.97   wget
+18:19:53.232744 #9 11.45 0 upgraded, 1 newly installed, 0 to remove and 42 not upgraded.
+18:19:53.232744 #9 11.45 Need to get 334 kB of archives.
+18:19:53.232744 #9 11.45 After this operation, 938 kB of additional disk space will be used.
+18:19:53.232744 #9 11.45 Get:1 http://archive.ubuntu.com/ubuntu noble-updates/main amd64 wget amd64 1.21.4-1ubuntu4.1 [334 kB]
+18:19:53.232744 #9 12.84 debconf: delaying package configuration, since apt-utils is not installed
+18:19:53.232744 #9 12.91 Fetched 334 kB in 2s (219 kB/s)
+18:19:53.232744 #9 12.97 Selecting previously unselected package wget.
+18:19:53.232744 #9 12.97 (Reading database ... 
+(Reading database ... 5%
+(Reading database ... 10%
+(Reading database ... 15%
+(Reading database ... 20%
+(Reading database ... 25%
+(Reading database ... 30%
+(Reading database ... 35%
+(Reading database ... 40%
+(Reading database ... 45%
+(Reading database ... 50%
+(Reading database ... 55%
+(Reading database ... 60%
+(Reading database ... 65%
+(Reading database ... 70%
+(Reading database ... 75%
+(Reading database ... 80%
+(Reading database ... 85%
+(Reading database ... 90%
+(Reading database ... 95%
+(Reading database ... 100%
+(Reading database ... 9511 files and directories currently installed.)
+18:19:53.232744 #9 13.00 Preparing to unpack .../wget_1.21.4-1ubuntu4.1_amd64.deb ...
+18:19:53.232744 #9 13.02 Unpacking wget (1.21.4-1ubuntu4.1) ...
+18:19:53.232744 #9 13.14 Setting up wget (1.21.4-1ubuntu4.1) ...
+18:19:53.232744 #9 DONE 13.3s
+18:19:53.232744 
+18:19:53.232744 #10 [stage-0  6/11] COPY . /app/.
+18:19:53.232744 #10 DONE 0.2s
+18:19:53.232744 
+18:19:53.232744 #11 [stage-0  7/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-/root/bun,target=/root/.bun bun install
+18:19:53.232744 #11 0.217 bun install v1.3.0 (b0a6feca)
+18:19:53.232744 #11 0.232 [10.61ms] migrated lockfile from package-lock.json
+18:19:53.232744 #11 12.61
+18:19:53.232744 #11 12.61 + @astrojs/node@9.5.2
+18:19:53.232744 #11 12.61 + @astrojs/vue@5.1.4
+18:19:53.232744 #11 12.61 + @fontsource-variable/inter@5.2.8
+18:19:53.232744 #11 12.61 + @nanostores/persistent@1.2.0
+18:19:53.232744 #11 12.61 + @nanostores/vue@1.0.1
+18:19:53.232744 #11 12.61 + @tailwindcss/vite@4.1.18
+18:19:53.232744 #11 12.61 + @types/toastify-js@1.12.4
+18:19:53.232744 #11 12.61 + @types/uuid@11.0.0
+18:19:53.232744 #11 12.61 + astro@5.17.1
+18:19:53.232744 #11 12.61 + bcryptjs@3.0.3
+18:19:53.232744 #11 12.61 + better-auth@1.4.18
+18:19:53.232744 #11 12.61 + dotenv@17.2.3
+18:19:53.232744 #11 12.61 + jose@6.1.3
+18:19:53.232744 #11 12.61 + mercadopago@2.12.0
+18:19:53.232744 #11 12.61 + mysql2@3.16.1
+18:19:53.232744 #11 12.61 + nanostores@1.1.0
+18:19:53.232744 #11 12.61 + photoswipe@5.4.4
+18:19:53.232744 #11 12.61 + sharp@0.34.5
+18:19:53.232744 #11 12.61 + tailwindcss@4.1.18
+18:19:53.232744 #11 12.61 + toastify-js@1.12.0
+18:19:53.232744 #11 12.61 + uuid@13.0.0
+18:19:53.232744 #11 12.61 + vue@3.5.27
+18:19:53.232744 #11 12.61
+18:19:53.232744 #11 12.61 464 packages installed [12.40s]
+18:19:53.232744 #11 12.61 Saved lockfile
+18:19:53.232744 #11 DONE 12.9s
+18:19:53.232744 
+18:19:53.232744 #12 [stage-0  8/11] COPY . /app/.
+18:19:53.232744 #12 DONE 0.7s
+18:19:53.232744 
+18:19:53.232744 #13 [stage-0  9/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build
+18:19:53.232744 #13 0.189 $ astro build
+18:19:53.232744 #13 0.748 81 | 					`You can download it from ${msvcDownloadLink}`,
+18:19:53.232744 #13 0.748 82 | 				{ cause: error }
+18:19:53.232744 #13 0.748 83 | 			);
+18:19:53.232744 #13 0.748 84 | 		}
+18:19:53.232744 #13 0.748 85 |
+18:19:53.232744 #13 0.748 86 | 		throw new Error(
+18:19:53.232744 #13 0.748                  ^
+18:19:53.232744 #13 0.748 error: Cannot find module @rollup/rollup-linux-x64-gnu. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+18:19:53.232744 #13 0.748       at requireWithFriendlyError (/app/node_modules/rollup/dist/native.js:86:13)
+18:19:53.232744 #13 0.748       at <anonymous> (/app/node_modules/rollup/dist/native.js:95:76)
+18:19:53.232744 #13 0.748
+18:19:53.232744 #13 0.761 error: script "build" exited with code 1
+18:19:53.232744 #13 ERROR: process "/bin/bash -ol pipefail -c bun run build" did not complete successfully: exit code: 1
+18:19:53.232744 ------
+18:19:53.232744 > [stage-0  9/11] RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build:
+18:19:53.232744 0.748 83 | 			);
+18:19:53.232744 0.748 84 | 		}
+18:19:53.232744 0.748 85 |
+18:19:53.232744 0.748 86 | 		throw new Error(
+18:19:53.232744 0.748                  ^
+18:19:53.232744 0.748 error: Cannot find module @rollup/rollup-linux-x64-gnu. npm has a bug related to optional dependencies (https://github.com/npm/cli/issues/4828). Please try `npm i` again after removing both package-lock.json and node_modules directory.
+18:19:53.232744 0.748       at requireWithFriendlyError (/app/node_modules/rollup/dist/native.js:86:13)
+18:19:53.232744 0.748       at <anonymous> (/app/node_modules/rollup/dist/native.js:95:76)
+18:19:53.232744 0.748
+18:19:53.232744 0.761 error: script "build" exited with code 1
+18:19:53.232744 ------
+18:19:53.232744 
+18:19:53.232744 9 warnings found (use docker --debug to expand):
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "BETTER_AUTH_SECRET") (line 11)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "BETTER_AUTH_SECRET") (line 12)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "DB_PASSWORD") (line 12)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "ADMIN_PASSWORD") (line 11)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "BETTER_AUTH_URL") (line 11)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ARG "DB_PASSWORD") (line 11)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "ADMIN_PASSWORD") (line 12)
+18:19:53.232744 - SecretsUsedInArgOrEnv: Do not use ARG or ENV instructions for sensitive data (ENV "BETTER_AUTH_URL") (line 12)
+18:19:53.232744 - UndefinedVar: Usage of undefined variable '$NIXPACKS_PATH' (line 18)
+18:19:53.232744 Dockerfile:24
+18:19:53.232744 --------------------
+18:19:53.232744 22 |     # build phase
+18:19:53.232744 23 |     COPY . /app/.
+18:19:53.232744 24 | >>> RUN --mount=type=cache,id=rkg40osg4oc8gockk400osgw-node_modules/cache,target=/app/node_modules/.cache bun run build
+18:19:53.232744 25 |
+18:19:53.232744 26 |
+18:19:53.232744 --------------------
+18:19:53.232744 ERROR: failed to build: failed to solve: process "/bin/bash -ol pipefail -c bun run build" did not complete successfully: exit code: 1
+18:19:53.232744 exit status 1
+18:19:53.243170 [DEBUG] Error type: RuntimeException
+18:19:53.253359 [DEBUG] Error code: 0
+18:19:53.266518 [DEBUG] Location: /var/www/html/app/Traits/ExecuteRemoteCommand.php:243
+18:19:53.279307 [DEBUG] Stack trace (first 5 lines):
+18:19:53.296203 [DEBUG] #0 /var/www/html/app/Traits/ExecuteRemoteCommand.php(104): App\Jobs\ApplicationDeploymentJob->executeCommandWithProcess()
+18:19:53.308923 [DEBUG] #1 /var/www/html/vendor/laravel/framework/src/Illuminate/Collections/Traits/EnumeratesValues.php(271): App\Jobs\ApplicationDeploymentJob->{closure:App\Traits\ExecuteRemoteCommand::execute_remote_command():71}()
+18:19:53.325873 [DEBUG] #2 /var/www/html/app/Traits/ExecuteRemoteCommand.php(71): Illuminate\Support\Collection->each()
+18:19:53.343301 [DEBUG] #3 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(3118): App\Jobs\ApplicationDeploymentJob->execute_remote_command()
+18:19:53.358042 [DEBUG] #4 /var/www/html/app/Jobs/ApplicationDeploymentJob.php(888): App\Jobs\ApplicationDeploymentJob->build_image()
+18:19:53.379259 ========================================
+18:19:53.401360 Deployment failed. Removing the new version of your application.
+18:19:55.413849 Gracefully shutting down build container: sg88cgccogk8so4s048wcowc
+18:19:56.144343 [DEBUG] [CMD]: docker stop -t 30 sg88cgccogk8so4s048wcowc
+18:19:56.144343 [DEBUG] sg88cgccogk8so4s048wcowc

@@ -9,9 +9,11 @@ dist
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-bun.lock
+package-lock.json
 README.md
 proyecto.md
+mercadopago.md
+deployment-*.txt
 # Brain dir (LLM artifacts)
 .gemini
 brain

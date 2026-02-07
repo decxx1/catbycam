@@ -1,7 +1,22 @@
 import { auth } from "@/lib/auth";
 import { defineMiddleware } from "astro:middleware";
 
+const prerenderedRoutes = ["/", "/contact"];
+
+function isPrerenderedRoute(pathname: string): boolean {
+  const normalized = pathname.endsWith("/") && pathname !== "/" ? pathname.slice(0, -1) : pathname;
+  return prerenderedRoutes.includes(normalized);
+}
+
 export const onRequest = defineMiddleware(async (context, next) => {
+  const { pathname } = context.url;
+
+  if (isPrerenderedRoute(pathname)) {
+    context.locals.user = null;
+    context.locals.session = null;
+    return next();
+  }
+
   const isAuthed = await auth.api.getSession({
     headers: context.request.headers,
   });
@@ -15,7 +30,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
   }
 
   // Proteger rutas admin
-  const { pathname } = context.url;
   const isAdminRoute = pathname.startsWith("/admin") && pathname !== "/admin/login";
   const isAdminApiRoute = pathname.startsWith("/api/admin");
 

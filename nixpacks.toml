@@ -2,7 +2,7 @@
 nixPkgs = ["bun"]
 
 [phases.install]
-cmds = ["bun install"]
+cmds = ["bun install --no-save"]
 
 [phases.build]
 cmds = ["bun run build"]

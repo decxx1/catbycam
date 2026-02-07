@@ -1,8 +1,11 @@
 ---
 import { auth } from "@/lib/auth";
 
-const session = await auth.api.getSession({ headers: Astro.request.headers });
-const isLoggedIn = !!session;
+let isLoggedIn = false;
+try {
+	const session = await auth.api.getSession({ headers: Astro.request.headers });
+	isLoggedIn = !!session;
+} catch {}
 ---
 <!-- Desktop Auth -->
 {
