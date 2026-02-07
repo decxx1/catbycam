@@ -9,7 +9,7 @@ const sessionData = await auth.api.getSession({
 const session = sessionData ? { userId: sessionData.user.id } : null;
 ---
 
-<Layout title="Finalizar Compra">
+<Layout title="Finalizar Compra" robots="noindex, nofollow">
 	<main class="pt-20">
 		<CheckoutView client:load initialSession={session} />
 	</main>

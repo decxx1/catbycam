@@ -4,7 +4,6 @@ import Layout from "@/layouts/Layout.astro";
 import { ProductService } from "@/services/productService";
 import ProductGallery from "@/components/catalog/ProductGallery.vue";
 import ProductCard from "@/components/catalog/ProductCard.astro";
-import PageHeader from "@/components/web/common/PageHeader.astro";
 
 const { id } = Astro.params;
 const product = await ProductService.findById(id!);
@@ -37,9 +36,19 @@ const formattedPrice =
 	new Intl.NumberFormat("es-AR", {
 		maximumFractionDigits: 0,
 	}).format(product.price);
+
+const seoDescription = product.description
+	? product.description.substring(0, 155).replace(/\n/g, " ").trim() + (product.description.length > 155 ? "..." : "")
+	: `${product.title} - Réplica oficial CAT a escala. ${product.category_name || "Modelo coleccionable"}. Comprá online en Cat By Cam con envío a todo el país.`;
+
+const seoImage = product.main_image || undefined;
 ---
 
-<Layout title={`${product.title} | Cat By Cam`}>
+<Layout
+	title={product.title}
+	description={seoDescription}
+	image={seoImage}
+>
 	<div class="bg-accent/10 pt-32 pb-24">
 		<div class="container-custom">
 			<!-- Breadcrumbs -->

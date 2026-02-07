@@ -5,15 +5,36 @@ import Footer from "@/components/common/Footer.astro";
 // Supports weights 100-900
 import "@fontsource-variable/inter/opsz-italic.css";
 
+interface PreloadLink {
+	href: string;
+	as: string;
+	type?: string;
+}
+
 interface Props {
 	title: string;
 	description?: string;
+	image?: string;
+	robots?: string;
+	preLoad?: PreloadLink[];
 }
+
+const SITE_URL = import.meta.env.PUBLIC_SITE_URL || "https://catbycam.com.ar";
+const defaultDescription =
+	"Cat By Cam - Réplicas Oficiales CAT a Escala. Distribuidor autorizado Caterpillar. Modelos coleccionables en escalas 1:16, 1:24, 1:25, 1:50 y 1:87. Envíos a todo el país.";
+const defaultImage = `${SITE_URL}/images/logos/favicon/catbycam-logo-circulo-rojox64.png`;
 
 const {
 	title,
-	description = "Cat By Cam - Réplicas Oficiales CAT a Escala | Distribuidor Autorizado Caterpillar",
+	description = defaultDescription,
+	image = defaultImage,
+	robots = "index, follow",
+	preLoad,
 } = Astro.props;
+
+const fullTitle = `${title} | Cat By Cam`;
+const canonical = new URL(Astro.url.pathname, SITE_URL).href;
+const metaImg = image.startsWith("http") ? image : `${SITE_URL}${image}`;
 ---
 
 <!doctype html>
@@ -21,10 +42,48 @@ const {
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<!-- Favicons -->
+		<link href="/images/logos/catbycam-logo-circulo-rojo.svg" type="image/svg+xml" rel="icon" />
+		<!-- Favicon compatibilidad -->
+		<link href="/images/logos/favicon/catbycam-logo-circulo-rojox32.png" type="image/png" sizes="32x32" rel="icon" />
+		<link href="/images/logos/favicon/catbycam-logo-circulo-rojox56.png" type="image/png" sizes="56x56" rel="icon" />
+		<link href="/images/logos/favicon/catbycam-logo-circulo-rojox64.png" type="image/png" sizes="64x64" rel="icon" />
+		<link href="/images/logos/favicon/catbycam-logo-circulo-rojox180.png" rel="apple-touch-icon" sizes="180x180" />
+
 		<meta name="generator" content={Astro.generator} />
+		<title>{fullTitle}</title>
+
+		<!-- SEO -->
+		<link rel="canonical" href={canonical} />
 		<meta name="description" content={description} />
-		<title>{title} | Cat By Cam</title>
+		<meta http-equiv="Cache-Control" content="no-cache" />
+		<meta http-equiv="Expires" content="Mon, 01 Jul 1970 00:00:00 GMT" />
+		<meta name="robots" content={robots} />
+		<meta name="googlebot" content={robots} />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:title" content={fullTitle} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={metaImg} />
+		<meta property="og:site_name" content="Cat By Cam" />
+		<meta property="og:locale" content="es_AR" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={fullTitle} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:url" content={canonical} />
+		<meta name="twitter:image" content={metaImg} />
+
+		<!-- Preload -->
+		{
+			preLoad?.map(({ href, as, type }) => (
+				<link rel="preload" {as} {href} {type} />
+			))
+		}
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<script is:inline src="https://sdk.mercadopago.com/js/v2"></script>
