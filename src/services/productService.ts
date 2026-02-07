@@ -227,6 +227,33 @@ export const ProductService = {
     return rows.map(normalizeProduct);
   },
 
+  async getFeatured(limit = 4): Promise<Product[]> {
+    const [rows]: any = await pool.execute(`
+      SELECT p.*, c.name as category_name 
+      FROM products p 
+      LEFT JOIN categories c ON p.category_id = c.id
+      WHERE p.status = 'active'
+      ORDER BY p.created_at DESC
+      LIMIT ?
+    `, [String(limit)]);
+
+    const products: Product[] = [];
+    for (const row of rows) {
+      const [imgs]: any = await pool.execute('SELECT url, url_full, width, height FROM product_images WHERE product_id = ? ORDER BY position ASC', [row.id]);
+      products.push({
+        ...normalizeProduct(row),
+        images: imgs.map((i: any) => ({
+          url: i.url,
+          urlFull: i.url_full,
+          width: i.width,
+          height: i.height
+        }))
+      });
+    }
+
+    return products;
+  },
+
   async decreaseStock(productId: number, quantity: number): Promise<void> {
     // Descontar stock y cambiar estado a out_of_stock si llega a 0
     await pool.execute(

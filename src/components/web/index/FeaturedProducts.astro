@@ -1,32 +1,8 @@
 ---
 import ProductCard from "@/components/catalog/ProductCard.astro";
+import { ProductService } from "@/services/productService";
 
-const featuredProducts = [
-	{
-		id: 0,
-		title: "CAT 390F Excavadora Hidráulica 1:50",
-		category: "Escala 1:50",
-		image: "/hero-bg.png",
-	},
-	{
-		id: 0,
-		title: "CAT D6 XE Topadora 1:50",
-		category: "Escala 1:50",
-		image: "/hero-bg.png",
-	},
-	{
-		id: 0,
-		title: "CAT 745 Camión Articulado 1:25",
-		category: "Escala 1:25",
-		image: "/hero-bg.png",
-	},
-	{
-		id: 0,
-		title: "CAT 320 Next Gen Excavadora 1:16",
-		category: "Escala 1:16",
-		image: "/hero-bg.png",
-	},
-];
+const products = await ProductService.getFeatured(4);
 ---
 
 <section class="section-padding bg-accent/30">
@@ -51,8 +27,31 @@ const featuredProducts = [
 			</a>
 		</div>
 
-		<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-			{featuredProducts.map((product) => <ProductCard {...product} />)}
-		</div>
+		{products.length > 0 ? (
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+				{products.map((product) => (
+					<ProductCard
+						id={product.id!}
+						title={product.title}
+						category={product.category_name || ""}
+						image={product.main_image}
+						price={product.price}
+						status={product.status}
+					/>
+				))}
+			</div>
+		) : (
+			<div class="text-center py-16">
+				<p class="text-secondary/40 text-lg font-medium">
+					Próximamente nuevos productos destacados.
+				</p>
+				<a
+					href="/catalog"
+					class="inline-block mt-4 text-primary font-bold uppercase tracking-widest text-sm hover:underline"
+				>
+					Explorar catálogo
+				</a>
+			</div>
+		)}
 	</div>
 </section>
