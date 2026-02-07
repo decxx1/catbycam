@@ -42,6 +42,9 @@ RUN IS_PROD=${IS_PROD} \
 # ---- Release ----
 FROM base AS release
 
+# curl is required for Coolify's healthcheck
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
 # Production node_modules (native deps: sharp, mysql2, etc.)
 COPY --from=install /temp/prod/node_modules node_modules
 
