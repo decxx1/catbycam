@@ -2,6 +2,7 @@
 export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
 import { ProductService } from "@/services/productService";
+import { SettingsService } from "@/services/settingsService";
 import ProductGallery from "@/components/catalog/ProductGallery.vue";
 import ProductCard from "@/components/catalog/ProductCard.astro";
 
@@ -42,6 +43,9 @@ const seoDescription = product.description
 	: `${product.title} - Réplica oficial CAT a escala. ${product.category_name || "Modelo coleccionable"}. Comprá online en Cat By Cam con envío a todo el país.`;
 
 const seoImage = product.main_image || undefined;
+
+const contactInfo = await SettingsService.getContactInfo();
+const whatsappNumber = contactInfo.whatsapp?.replace(/[^0-9+]/g, '') || '';
 ---
 
 <Layout
@@ -131,7 +135,7 @@ const seoImage = product.main_image || undefined;
 
 						<div class="space-y-4 mb-10">
 							<a
-								href={`https://wa.me/5491100000000?text=Hola! Estoy interesado en el producto: ${product.title} (Ref: ${product.id})`}
+								href={`https://wa.me/${whatsappNumber}?text=Hola! Estoy interesado en el producto: ${product.title} (Ref: ${product.id})`}
 								target="_blank"
 								class="w-full bg-primary hover:bg-secondary text-white font-black py-6 rounded-2xl flex items-center justify-center gap-3 transition-all shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0"
 							>
@@ -153,6 +157,7 @@ const seoImage = product.main_image || undefined;
 							</a>
 							{canPurchase ? (
 								<button
+									type="button"
 									id="buy-now-btn"
 									class="w-full bg-accent/50 hover:bg-accent text-secondary font-black py-6 rounded-2xl transition-all cursor-pointer"
 									data-product={JSON.stringify({
@@ -250,6 +255,7 @@ const seoImage = product.main_image || undefined;
 			<div class="mt-24">
 				<div class="flex border-b border-secondary/5 mb-12">
 					<button
+						type="button"
 						class="px-8 py-4 border-b-4 border-primary text-secondary font-black italic uppercase tracking-widest text-xs"
 						>Descripción Detallada</button
 					>
