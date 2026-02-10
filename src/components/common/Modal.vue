@@ -34,7 +34,7 @@ const sizes = {
     >
       <div v-if="show" class="fixed inset-0 z-100 flex items-center justify-center p-4">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-secondary/60 backdrop-blur-sm""></div>
+        <div class="absolute inset-0 bg-secondary/60 backdrop-blur-sm"></div>
         
         <!-- Modal Content -->
         <div 
