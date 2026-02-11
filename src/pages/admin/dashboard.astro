@@ -11,6 +11,8 @@ import OrdersTable from "@/components/admin/dashboard/OrdersTable.astro";
 import AdminsTable from "@/components/admin/dashboard/AdminsTable.astro";
 import MercadoPagoAlert from "@/components/admin/dashboard/MercadoPagoAlert.astro";
 import { SettingsService } from "@/services/settingsService";
+import { DollarRateService } from "@/services/dollarRateService";
+import DollarRateCards from "@/components/admin/dashboard/DollarRateCards.astro";
 
 // Inicializar variables
 let totalUsers = 0;
@@ -24,6 +26,8 @@ let ordersToDispatch: any[] = [];
 let dispatchedOrders: any[] = [];
 let admins: any[] = [];
 let hasMpCredentials = false;
+let dolarOficial: any = null;
+let dolarBlue: any = null;
 
 try {
 	// Usuarios
@@ -100,6 +104,10 @@ try {
 	);
 	admins = adminsResult;
 
+	// Cotizaciones del dólar
+	dolarOficial = await DollarRateService.getByCasa('oficial');
+	dolarBlue = await DollarRateService.getByCasa('blue');
+
 	// Credenciales de MercadoPago
 	const mpConfig = await SettingsService.getMercadoPagoConfig();
 	hasMpCredentials = !!(mpConfig.publicKey && mpConfig.accessToken);
@@ -121,6 +129,11 @@ const pendingIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="
 	<!-- Alerta de MercadoPago -->
 	<div class="mb-8">
 		<MercadoPagoAlert hasCredentials={hasMpCredentials} />
+	</div>
+
+	<!-- Cotizaciones del Dólar -->
+	<div class="mb-10">
+		<DollarRateCards oficial={dolarOficial} blue={dolarBlue} />
 	</div>
 
 	<!-- Métricas principales -->
