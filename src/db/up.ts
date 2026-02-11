@@ -20,6 +20,7 @@ const migrations = [
   { name: '007-shipping-addresses', module: () => import('./migrations/007-shipping-addresses') },
   { name: '008-settings', module: () => import('./migrations/008-settings') },
   { name: '009-contact-settings', module: () => import('./migrations/009-contact-settings') },
+  { name: '010-dollar-rates', module: () => import('./migrations/010-dollar-rates') },
 ];
 
 export async function up() {

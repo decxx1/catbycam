@@ -26,6 +26,10 @@ async function main() {
     runScript('src/db/up.ts', 'Database Migrations');
     runScript('src/db/seed.ts', 'Database Seeds');
     
+    // Start dollar rate cron (runs in background)
+    const { startCron } = await import('./cron');
+    await startCron();
+
     console.log('\n=== Starting Server ===');
     
     // Ejecutar el servidor de Astro - este proceso reemplaza al actual
