@@ -134,5 +134,15 @@ export const SettingsService = {
       { key: 'mp_public_key', value: publicKey, description: 'MercadoPago Public Key' },
       { key: 'mp_access_token', value: accessToken, description: 'MercadoPago Access Token' }
     ]);
+  },
+
+  // Store purchases toggle (panic button)
+  async isPurchasesEnabled(): Promise<boolean> {
+    const value = await this.get('store_purchases_enabled');
+    return value !== 'false';
+  },
+
+  async setPurchasesEnabled(enabled: boolean): Promise<void> {
+    await this.set('store_purchases_enabled', enabled ? 'true' : 'false', 'Habilitar/deshabilitar compras en la tienda');
   }
 };

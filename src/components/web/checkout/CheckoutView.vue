@@ -32,6 +32,19 @@ const isPreferenceLoading = ref(false);
 const preferenceId = ref<string | null>(null);
 const isSandbox = ref(import.meta.env.PUBLIC_MP_SANDBOX === 'true');
 const mpPublicKey = ref<string>('');
+const purchasesEnabled = ref(true);
+
+const checkStoreStatus = async () => {
+  try {
+    const res = await fetch('/api/config/store-status');
+    if (res.ok) {
+      const data = await res.json();
+      purchasesEnabled.value = data.purchases_enabled !== false;
+    }
+  } catch (e) {
+    console.error('Error checking store status', e);
+  }
+};
 
 const getMPPublicKey = async () => {
   try {
@@ -72,7 +85,7 @@ const fetchAddresses = async () => {
 
 onMounted(async () => {
   isMounted.value = true;
-  await getMPPublicKey();
+  await Promise.all([getMPPublicKey(), checkStoreStatus()]);
   if (session.value) {
     step.value = 2;
     await fetchAddresses();
@@ -210,6 +223,16 @@ watch([items, total], () => {
   <div v-if="isMounted" class="container-custom py-20">
     <div v-if="count === 0" class="text-center py-20 flex flex-col items-center gap-6">
       <h1 class="text-4xl font-black text-secondary uppercase italic">Tu carrito está vacío</h1>
+      <a href="/catalog" class="btn-primary py-4 px-12 rounded-2xl">Volver al catálogo</a>
+    </div>
+
+    <!-- Purchases disabled banner -->
+    <div v-else-if="!purchasesEnabled" class="text-center py-20 flex flex-col items-center gap-6">
+      <div class="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-500"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>
+      </div>
+      <h1 class="text-4xl font-black text-secondary uppercase italic">Compras no disponibles</h1>
+      <p class="text-secondary/60 font-bold max-w-md">En este momento no es posible realizar compras. Por favor, intentá más tarde o contactanos por WhatsApp.</p>
       <a href="/catalog" class="btn-primary py-4 px-12 rounded-2xl">Volver al catálogo</a>
     </div>
 

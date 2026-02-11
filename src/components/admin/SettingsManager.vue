@@ -14,7 +14,10 @@ const form = ref({
   contact_address: '',
   contact_maps_url: '',
   contact_maps_iframe: '',
+  store_purchases_enabled: true,
 });
+
+const isTogglingPurchases = ref(false);
 
 const fetchSettings = async () => {
   isLoading.value = true;
@@ -29,6 +32,7 @@ const fetchSettings = async () => {
       form.value.contact_address = data.contact_address || '';
       form.value.contact_maps_url = data.contact_maps_url || '';
       form.value.contact_maps_iframe = data.contact_maps_iframe || '';
+      form.value.store_purchases_enabled = data.store_purchases_enabled !== false;
     }
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -61,6 +65,29 @@ const saveSettings = async () => {
   }
 };
 
+const togglePurchases = async () => {
+  isTogglingPurchases.value = true;
+  const newValue = !form.value.store_purchases_enabled;
+  try {
+    const res = await fetch('/api/admin/settings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ store_purchases_enabled: newValue })
+    });
+    if (res.ok) {
+      form.value.store_purchases_enabled = newValue;
+      toast.success(newValue ? 'Compras habilitadas' : 'Compras deshabilitadas');
+    } else {
+      toast.error('Error al cambiar el estado');
+    }
+  } catch (error) {
+    console.error('Error toggling purchases:', error);
+    toast.error('Error al cambiar el estado');
+  } finally {
+    isTogglingPurchases.value = false;
+  }
+};
+
 onMounted(fetchSettings);
 </script>
 
@@ -78,6 +105,44 @@ onMounted(fetchSettings);
 
     <!-- Settings Form -->
     <form v-else @submit.prevent="saveSettings" class="space-y-6">
+      <!-- Panic Button Section -->
+      <div :class="['rounded-2xl p-6 shadow-sm border transition-all', form.store_purchases_enabled ? 'bg-white border-gray-100' : 'bg-red-50 border-red-200']">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div :class="['w-10 h-10 rounded-xl flex items-center justify-center transition-colors', form.store_purchases_enabled ? 'bg-green-100' : 'bg-red-100']">
+              <svg v-if="form.store_purchases_enabled" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+              <svg v-else xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-red-600"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>
+            </div>
+            <div>
+              <h2 class="text-lg font-bold text-gray-900">Estado de la Tienda</h2>
+              <p class="text-sm" :class="form.store_purchases_enabled ? 'text-green-600' : 'text-red-600'">
+                {{ form.store_purchases_enabled ? 'Las compras están habilitadas' : 'Las compras están deshabilitadas' }}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            @click="togglePurchases"
+            :disabled="isTogglingPurchases"
+            :class="[
+              'px-5 py-3 font-bold rounded-xl transition-all text-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed',
+              form.store_purchases_enabled
+                ? 'bg-red-500 hover:bg-red-600 text-white'
+                : 'bg-green-500 hover:bg-green-600 text-white'
+            ]"
+          >
+            <svg v-if="isTogglingPurchases" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ form.store_purchases_enabled ? 'Detener Compras' : 'Habilitar Compras' }}
+          </button>
+        </div>
+        <p v-if="!form.store_purchases_enabled" class="mt-4 text-xs text-red-500 font-medium bg-red-100 rounded-lg px-4 py-2">
+          Los usuarios no pueden realizar compras en este momento. El botón "Comprar Ahora" y el checkout están bloqueados.
+        </p>
+      </div>
+
       <!-- Contact Info Section -->
       <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div class="flex items-center gap-3 mb-6">

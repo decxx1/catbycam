@@ -46,6 +46,7 @@ const seoImage = product.main_image || undefined;
 
 const contactInfo = await SettingsService.getContactInfo();
 const whatsappNumber = contactInfo.whatsapp?.replace(/[^0-9+]/g, '') || '';
+const purchasesEnabled = await SettingsService.isPurchasesEnabled();
 ---
 
 <Layout
@@ -155,7 +156,7 @@ const whatsappNumber = contactInfo.whatsapp?.replace(/[^0-9+]/g, '') || '';
 								>
 								Consultar por WhatsApp
 							</a>
-							{canPurchase ? (
+							{canPurchase && purchasesEnabled ? (
 								<button
 									type="button"
 									id="buy-now-btn"
@@ -170,6 +171,10 @@ const whatsappNumber = contactInfo.whatsapp?.replace(/[^0-9+]/g, '') || '';
 								>
 									Comprar Ahora
 								</button>
+							) : !purchasesEnabled ? (
+								<div class="w-full bg-red-50 text-red-400 font-black py-6 rounded-2xl text-center cursor-not-allowed border border-red-100">
+									Compras no disponibles
+								</div>
 							) : (
 								<div class="w-full bg-secondary/10 text-secondary/50 font-black py-6 rounded-2xl text-center cursor-not-allowed">
 									{product.status === 'out_of_stock' ? 'Producto Agotado' : 'No Disponible'}

@@ -7,9 +7,10 @@ export const GET: APIRoute = async ({ request }) => {
   if (authResult instanceof Response) return authResult;
 
   try {
-    const [mpConfig, contactInfo] = await Promise.all([
+    const [mpConfig, contactInfo, purchasesEnabled] = await Promise.all([
       SettingsService.getMercadoPagoConfig(),
       SettingsService.getContactInfo(),
+      SettingsService.isPurchasesEnabled(),
     ]);
     
     return new Response(JSON.stringify({
@@ -20,6 +21,7 @@ export const GET: APIRoute = async ({ request }) => {
       contact_address: contactInfo.address || '',
       contact_maps_url: contactInfo.mapsUrl || '',
       contact_maps_iframe: contactInfo.mapsIframe || '',
+      store_purchases_enabled: purchasesEnabled,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -36,7 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { mp_public_key, mp_access_token, contact_whatsapp, contact_email, contact_address, contact_maps_url, contact_maps_iframe } = body;
+    const { mp_public_key, mp_access_token, contact_whatsapp, contact_email, contact_address, contact_maps_url, contact_maps_iframe, store_purchases_enabled } = body;
 
     // Ensure table exists
     await SettingsService.createTable();
@@ -55,6 +57,11 @@ export const POST: APIRoute = async ({ request }) => {
         mapsUrl: contact_maps_url,
         mapsIframe: contact_maps_iframe,
       });
+    }
+
+    // Save store purchases toggle
+    if (store_purchases_enabled !== undefined) {
+      await SettingsService.setPurchasesEnabled(store_purchases_enabled);
     }
 
     return new Response(JSON.stringify({ success: true, message: 'Configuración guardada correctamente' }), {
