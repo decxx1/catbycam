@@ -27,8 +27,8 @@ async function main() {
     runScript('src/db/seed.ts', 'Database Seeds');
     
     // Start dollar rate cron (runs in background)
-    const { startCron } = await import('./cron');
-    await startCron();
+    //const { startCron } = await import('./cron');
+    //await startCron();
 
     console.log('\n=== Starting Server ===');
     
