@@ -42,7 +42,7 @@ const sizes = {
           class="animate-in fade-in zoom-in duration-300"
         >
           <!-- Header -->
-          <div class="px-8 py-6 border-b border-secondary/5 flex items-center justify-between shrink-0">
+          <div class="px-6 py-4 border-b border-secondary/5 flex items-center justify-between shrink-0">
             <h3 class="text-2xl font-black">{{ title }}</h3>
             <button 
               @click="emit('close')"
@@ -58,7 +58,7 @@ const sizes = {
           </div>
           
           <!-- Footer (Optional) -->
-          <div v-if="$slots.footer" class="px-8 py-6 border-t border-secondary/5 bg-accent/5 shrink-0">
+          <div v-if="$slots.footer" class="px-6 py-4 border-t border-secondary/5 bg-accent/5 shrink-0">
             <slot name="footer" />
           </div>
         </div>
