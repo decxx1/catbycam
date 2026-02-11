@@ -7,9 +7,10 @@ export const GET: APIRoute = async ({ request }) => {
   if (authResult instanceof Response) return authResult;
 
   try {
-    const [mpConfig, contactInfo] = await Promise.all([
+    const [mpConfig, contactInfo, dollarType] = await Promise.all([
       SettingsService.getMercadoPagoConfig(),
       SettingsService.getContactInfo(),
+      SettingsService.getDollarType(),
     ]);
     
     return new Response(JSON.stringify({
@@ -20,6 +21,7 @@ export const GET: APIRoute = async ({ request }) => {
       contact_address: contactInfo.address || '',
       contact_maps_url: contactInfo.mapsUrl || '',
       contact_maps_iframe: contactInfo.mapsIframe || '',
+      dollar_type: dollarType,
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }
@@ -36,7 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { mp_public_key, mp_access_token, contact_whatsapp, contact_email, contact_address, contact_maps_url, contact_maps_iframe } = body;
+    const { mp_public_key, mp_access_token, contact_whatsapp, contact_email, contact_address, contact_maps_url, contact_maps_iframe, dollar_type } = body;
 
     // Ensure table exists
     await SettingsService.createTable();
@@ -44,6 +46,11 @@ export const POST: APIRoute = async ({ request }) => {
     // Save MercadoPago settings
     if (mp_public_key !== undefined && mp_access_token !== undefined) {
       await SettingsService.setMercadoPagoConfig(mp_public_key, mp_access_token);
+    }
+
+    // Save Dollar type
+    if (dollar_type !== undefined) {
+      await SettingsService.setDollarType(dollar_type);
     }
 
     // Save Contact settings

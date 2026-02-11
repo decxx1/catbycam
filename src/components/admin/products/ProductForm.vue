@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, onMounted, computed } from 'vue';
 import type { Product, ProductImage } from '@/services/productService';
 import type { Category } from '@/services/categoryService';
 import { toast } from '@/utils/toast';
@@ -14,10 +14,15 @@ const emit = defineEmits(['save', 'cancel']);
 const formRef = ref<HTMLFormElement | null>(null);
 const isUploading = ref(false);
 
+const dollarVenta = ref<number | null>(null);
+const dollarType = ref('oficial');
+
 const product = ref<Product>(props.initialData ? { ...props.initialData } : {
   title: '',
   description: '',
   price: 0,
+  dollar_enabled: false,
+  dollar_price: null,
   stock: 1,
   status: 'active',
   item_condition: 'new',
@@ -28,6 +33,34 @@ const product = ref<Product>(props.initialData ? { ...props.initialData } : {
   main_image_height: 0,
   images: []
 });
+
+const convertedPrice = computed(() => {
+  if (product.value.dollar_enabled && product.value.dollar_price && dollarVenta.value) {
+    return Math.round(product.value.dollar_price * dollarVenta.value * 100) / 100;
+  }
+  return null;
+});
+
+watch(convertedPrice, (val) => {
+  if (val !== null) {
+    product.value.price = val;
+  }
+});
+
+const fetchDollarRate = async () => {
+  try {
+    const res = await fetch('/api/admin/dollar-rates');
+    if (res.ok) {
+      const data = await res.json();
+      dollarType.value = data.dollar_type;
+      if (data.selected_rate) {
+        dollarVenta.value = data.selected_rate.venta;
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching dollar rate:', e);
+  }
+};
 
 // Extraer solo las URLs de thumbnail para mostrar en el formulario
 const extraImages = ref<ProductImage[]>(props.initialData?.images || []);
@@ -96,6 +129,8 @@ const removeExtraImage = (index: number) => {
   extraImages.value.splice(index, 1);
 };
 
+onMounted(fetchDollarRate);
+
 const handleSubmit = () => {
   if (formRef.value?.reportValidity()) {
     if (!product.value.main_image) {
@@ -127,8 +162,52 @@ const handleSubmit = () => {
           />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <!-- Dollar Toggle -->
+        <div class="flex items-center gap-3 p-4 rounded-xl border-2 transition-all" :class="product.dollar_enabled ? 'border-green-500/30 bg-green-50/50' : 'border-secondary/10 bg-accent/30'">
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" v-model="product.dollar_enabled" class="sr-only peer" />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+          </label>
+          <div>
+            <span class="text-sm font-bold" :class="product.dollar_enabled ? 'text-green-700' : 'text-secondary/50'">Precio en dólares</span>
+            <p v-if="dollarVenta" class="text-[10px] text-secondary/40">Dólar {{ dollarType }} venta: ${{ dollarVenta.toLocaleString('es-AR') }}</p>
+          </div>
+        </div>
+
+        <!-- Dollar Price Fields -->
+        <div v-if="product.dollar_enabled" class="grid grid-cols-2 gap-4">
           <div class="flex flex-col gap-2">
+            <label class="text-[10px] uppercase font-bold tracking-widest text-green-600 ml-1">Precio (USD)</label>
+            <div class="relative">
+                <span class="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-green-500">U$D</span>
+                <input 
+                    v-model.number="product.dollar_price"
+                    type="number" 
+                    required 
+                    min="0"
+                    step="0.01"
+                    class="w-full bg-green-50 border border-green-200 rounded-xl pl-14 pr-5 py-4 focus:outline-none focus:border-green-400 focus:bg-white transition-all font-bold"
+                />
+            </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Precio (ARS) - Calculado</label>
+            <div class="relative">
+                <span class="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-secondary/40">$</span>
+                <input 
+                    :value="convertedPrice ?? product.price"
+                    type="number" 
+                    disabled
+                    class="w-full bg-gray-100 border border-secondary/10 rounded-xl pl-10 pr-5 py-4 font-bold text-secondary/60 cursor-not-allowed"
+                />
+            </div>
+            <p v-if="!dollarVenta" class="text-[10px] text-red-500 font-medium">No hay cotización disponible. El precio no se calculará.</p>
+          </div>
+        </div>
+
+        <!-- Regular Price + Stock -->
+        <div class="grid grid-cols-2 gap-4">
+          <div v-if="!product.dollar_enabled" class="flex flex-col gap-2">
             <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Precio (ARS)</label>
             <div class="relative">
                 <span class="absolute left-5 top-1/2 -translate-y-1/2 font-bold text-secondary/40">$</span>

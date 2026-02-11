@@ -10,6 +10,7 @@ import { up as adminNotifications } from './migrations/006-admin-notifications';
 import { up as shippingAddresses } from './migrations/007-shipping-addresses';
 import { up as settings } from './migrations/008-settings';
 import { up as dollarRates } from './migrations/010-dollar-rates';
+import { up as productsDollar } from './migrations/011-products-dollar';
 
 async function migrate() {
   console.log('=== Running All Migrations ===\n');
@@ -25,6 +26,7 @@ async function migrate() {
     await shippingAddresses();
     await settings();
     await dollarRates();
+    await productsDollar();
     
     console.log('\n=== All Migrations Completed ===');
   } catch (error) {

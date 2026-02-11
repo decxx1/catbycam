@@ -4,7 +4,9 @@ import { toast } from '@/utils/toast';
 
 const isLoading = ref(true);
 const isSaving = ref(false);
+const isConverting = ref(false);
 const showAccessToken = ref(false);
+const convertResult = ref<string | null>(null);
 
 const form = ref({
   mp_public_key: '',
@@ -14,6 +16,7 @@ const form = ref({
   contact_address: '',
   contact_maps_url: '',
   contact_maps_iframe: '',
+  dollar_type: 'oficial',
 });
 
 const fetchSettings = async () => {
@@ -29,6 +32,7 @@ const fetchSettings = async () => {
       form.value.contact_address = data.contact_address || '';
       form.value.contact_maps_url = data.contact_maps_url || '';
       form.value.contact_maps_iframe = data.contact_maps_iframe || '';
+      form.value.dollar_type = data.dollar_type || 'oficial';
     }
   } catch (error) {
     console.error('Error fetching settings:', error);
@@ -58,6 +62,26 @@ const saveSettings = async () => {
     toast.error('Error al guardar la configuración');
   } finally {
     isSaving.value = false;
+  }
+};
+
+const convertDollarPrices = async () => {
+  isConverting.value = true;
+  convertResult.value = null;
+  try {
+    const res = await fetch('/api/admin/products/convert-dollar', { method: 'POST' });
+    const data = await res.json();
+    if (res.ok) {
+      toast.success(data.message);
+      convertResult.value = data.message;
+    } else {
+      toast.error(data.error || 'Error al convertir precios');
+    }
+  } catch (error) {
+    console.error('Error converting prices:', error);
+    toast.error('Error al convertir precios');
+  } finally {
+    isConverting.value = false;
   }
 };
 
@@ -165,6 +189,78 @@ onMounted(fetchSettings);
             <p class="mt-1 text-xs text-gray-400">
               Código iframe de Google Maps codificado en Base64. Se decodifica automáticamente en la web.
             </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dollar Section -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-green-600">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">Cotización del Dólar</h2>
+            <p class="text-sm text-gray-500">Configura qué tipo de dólar usar para la conversión de precios</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label for="dollar_type" class="block text-sm font-medium text-gray-700 mb-1">
+              Tipo de dólar para conversión
+            </label>
+            <select
+              id="dollar_type"
+              v-model="form.dollar_type"
+              class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium"
+            >
+              <option value="oficial">Dólar Oficial</option>
+              <option value="blue">Dólar Blue</option>
+            </select>
+            <p class="mt-1 text-xs text-gray-400">
+              Los productos con precio en dólares se convertirán usando el valor de <strong>venta</strong> de este tipo de dólar.
+            </p>
+          </div>
+
+          <div class="pt-2 border-t border-gray-100">
+            <p class="text-sm font-medium text-gray-700 mb-3">Actualizar precios en pesos</p>
+            <p class="text-xs text-gray-400 mb-4">
+              Recalcula el precio en pesos de todos los productos que tienen precio en dólares, usando la cotización vigente.
+            </p>
+            <button
+              type="button"
+              :disabled="isConverting"
+              @click="convertDollarPrices"
+              class="px-5 py-2.5 bg-green-600 text-white font-bold text-sm rounded-xl hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg v-if="isConverting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>{{ isConverting ? 'Actualizando...' : 'Actualizar precios ahora' }}</span>
+            </button>
+            <p v-if="convertResult" class="mt-3 text-xs font-medium text-green-600">
+              ✓ {{ convertResult }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <div class="flex gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-600 shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M12 16v-4"/>
+              <path d="M12 8h.01"/>
+            </svg>
+            <div class="text-sm text-blue-800">
+              <p class="font-medium mb-1">¿Cómo funciona?</p>
+              <p>Los precios en dólares <strong>no se actualizan automáticamente</strong>. Usá el botón de arriba para recalcular los precios en pesos cuando lo consideres necesario.</p>
+            </div>
           </div>
         </div>
       </div>

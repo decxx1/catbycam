@@ -134,5 +134,14 @@ export const SettingsService = {
       { key: 'mp_public_key', value: publicKey, description: 'MercadoPago Public Key' },
       { key: 'mp_access_token', value: accessToken, description: 'MercadoPago Access Token' }
     ]);
+  },
+
+  async getDollarType(): Promise<string> {
+    const value = await this.get('dollar_type');
+    return value || 'oficial';
+  },
+
+  async setDollarType(type: string): Promise<void> {
+    await this.set('dollar_type', type, 'Tipo de dólar para conversión de precios (oficial/blue)');
   }
 };

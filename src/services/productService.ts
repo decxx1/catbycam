@@ -12,6 +12,8 @@ export interface Product {
   title: string;
   description: string;
   price: number;
+  dollar_enabled?: boolean;
+  dollar_price?: number | null;
   stock: number;
   status: 'active' | 'inactive' | 'out_of_stock' | 'paused';
   item_condition: 'new' | 'used' | 'not_specified';
@@ -30,6 +32,8 @@ export interface Product {
 const normalizeProduct = (row: any): Product => ({
   ...row,
   price: Number(row.price),
+  dollar_enabled: !!row.dollar_enabled,
+  dollar_price: row.dollar_price != null ? Number(row.dollar_price) : null,
   stock: Number(row.stock),
   category_id: row.category_id ? Number(row.category_id) : null
 });
@@ -84,9 +88,9 @@ export const ProductService = {
     const status = data.stock <= 0 ? 'out_of_stock' : data.status;
     
     const [result]: any = await pool.execute(
-      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
+      `INSERT INTO products (title, description, price, dollar_enabled, dollar_price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.title, data.description, data.price, data.dollar_enabled ? 1 : 0, data.dollar_price || null, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
     );
 
     const productId = result.insertId;
@@ -110,9 +114,9 @@ export const ProductService = {
     
     await pool.execute(
       `UPDATE products 
-       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?
+       SET title = ?, description = ?, price = ?, dollar_enabled = ?, dollar_price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?
        WHERE id = ?`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
+      [data.title, data.description, data.price, data.dollar_enabled ? 1 : 0, data.dollar_price || null, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
     );
 
     // Update images: simplest way is delete and re-insert
@@ -251,6 +255,14 @@ export const ProductService = {
     }
 
     return products;
+  },
+
+  async convertDollarPrices(dollarVenta: number): Promise<number> {
+    const [result]: any = await pool.execute(
+      `UPDATE products SET price = ROUND(dollar_price * ?, 2) WHERE dollar_enabled = 1 AND dollar_price IS NOT NULL`,
+      [dollarVenta]
+    );
+    return result.affectedRows;
   },
 
   async decreaseStock(productId: number, quantity: number): Promise<void> {
