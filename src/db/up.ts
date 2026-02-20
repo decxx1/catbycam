@@ -27,17 +27,34 @@ const migrations = [
   { name: '014-orders-shipping-type', module: () => import('./migrations/014-orders-shipping-type') },
 ];
 
+async function waitForDatabase(maxRetries = 10, delayMs = 3000): Promise<mysql.Connection> {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      const conn = await mysql.createConnection({
+        host: DB_HOST,
+        user: DB_USER,
+        password: DB_PASSWORD,
+        port: DB_PORT,
+      });
+      return conn;
+    } catch (error: any) {
+      if (error.code === 'ECONNREFUSED' && i < maxRetries - 1) {
+        console.log(`Database not ready, retrying in ${delayMs / 1000}s... (${i + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      } else {
+        throw error;
+      }
+    }
+  }
+  throw new Error('Could not connect to database after max retries');
+}
+
 export async function up() {
   console.log('=== Database Migration (db:up) ===\n');
 
   // 1. Create database if not exists
   console.log(`Connecting to ${DB_HOST}:${DB_PORT}...`);
-  const initConnection = await mysql.createConnection({
-    host: DB_HOST,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    port: DB_PORT,
-  });
+  const initConnection = await waitForDatabase();
 
   console.log(`Creating database '${DB_NAME}' if not exists...`);
   await initConnection.query(`CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\``);
