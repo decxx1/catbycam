@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({ request }) => {
   const { user: sessionUser } = authResult;
 
   try {
-    const { items, total, shippingAddress, phone, comments } = await request.json();
+    const { items, total, shippingAddress, phone, comments, shippingType, shippingCost } = await request.json();
 
     // 0. Get user info for payer details
     const user = await UserService.findById(sessionUser.id);
@@ -21,15 +21,18 @@ export const POST: APIRoute = async ({ request }) => {
       shippingAddress,
       items,
       phone,
-      comments
+      comments,
+      shippingType || 'delivery',
+      shippingCost || 0
     );
 
-    // 2. Generate preference
+    // 2. Generate preference (include shipping cost as separate item if > 0)
     const preferenceId = await PaymentService.generatePreference(
       orderId, 
       sessionUser.id, 
       items, 
-      user?.email
+      user?.email,
+      shippingCost || 0
     );
 
     return new Response(JSON.stringify({ preferenceId }), { status: 201 });

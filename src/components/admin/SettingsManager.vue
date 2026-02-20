@@ -19,6 +19,11 @@ const form = ref({
 
 const isTogglingPurchases = ref(false);
 
+const provinces = ref<{ id: number; name: string }[]>([]);
+const shippingCosts = ref<{ province_id: number; cost: number }[]>([]);
+const isLoadingShipping = ref(true);
+const isSavingShipping = ref(false);
+
 const fetchSettings = async () => {
   isLoading.value = true;
   try {
@@ -88,7 +93,71 @@ const togglePurchases = async () => {
   }
 };
 
-onMounted(fetchSettings);
+const fetchProvinces = async () => {
+  try {
+    const res = await fetch('/api/provinces');
+    if (res.ok) {
+      provinces.value = await res.json();
+      // Inicializar costos con 0 para todas las provincias
+      shippingCosts.value = provinces.value.map(p => ({ province_id: p.id, cost: 0 }));
+    }
+  } catch (e) {
+    console.error('Error fetching provinces', e);
+  }
+};
+
+const fetchShippingCosts = async () => {
+  isLoadingShipping.value = true;
+  try {
+    const res = await fetch('/api/admin/shipping-costs');
+    if (res.ok) {
+      const data = await res.json();
+      // Actualizar los costos existentes
+      for (const item of data) {
+        const idx = shippingCosts.value.findIndex(sc => sc.province_id === item.province_id);
+        if (idx !== -1) {
+          shippingCosts.value[idx].cost = parseFloat(item.cost);
+        }
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching shipping costs', e);
+  } finally {
+    isLoadingShipping.value = false;
+  }
+};
+
+const saveShippingCosts = async () => {
+  isSavingShipping.value = true;
+  try {
+    const res = await fetch('/api/admin/shipping-costs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ costs: shippingCosts.value })
+    });
+    if (res.ok) {
+      toast.success('Costos de envío guardados');
+    } else {
+      toast.error('Error al guardar costos');
+    }
+  } catch (e) {
+    console.error('Error saving shipping costs', e);
+    toast.error('Error al guardar costos');
+  } finally {
+    isSavingShipping.value = false;
+  }
+};
+
+const getProvinceName = (provinceId: number) => {
+  const province = provinces.value.find(p => p.id === provinceId);
+  return province ? province.name : '';
+};
+
+onMounted(async () => {
+  await fetchSettings();
+  await fetchProvinces();
+  await fetchShippingCosts();
+});
 </script>
 
 <template>
@@ -332,5 +401,63 @@ onMounted(fetchSettings);
         </button>
       </div>
     </form>
+
+    <!-- Shipping Costs Section -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-6">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-600">
+            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
+            <path d="M15 18H9"/>
+            <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
+            <circle cx="17" cy="18" r="2"/>
+            <circle cx="7" cy="18" r="2"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-gray-900">Costos de Envío por Provincia</h2>
+          <p class="text-sm text-gray-500">Configura el costo de envío para cada provincia</p>
+        </div>
+      </div>
+
+      <div v-if="isLoadingShipping" class="animate-pulse space-y-3">
+        <div v-for="i in 6" :key="i" class="h-12 bg-gray-100 rounded-xl"></div>
+      </div>
+
+      <div v-else class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+        <div 
+          v-for="sc in shippingCosts" 
+          :key="sc.province_id"
+          class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+        >
+          <span class="flex-1 font-medium text-gray-700 text-sm">{{ getProvinceName(sc.province_id) }}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-gray-400 text-sm">$</span>
+            <input
+              v-model.number="sc.cost"
+              type="number"
+              min="0"
+              step="100"
+              class="w-28 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-right font-mono"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end">
+        <button
+          type="button"
+          @click="saveShippingCosts"
+          :disabled="isSavingShipping"
+          class="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        >
+          <svg v-if="isSavingShipping" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <span>{{ isSavingShipping ? 'Guardando...' : 'Guardar costos de envío' }}</span>
+        </button>
+      </div>
+    </div>
   </div>
 </template>

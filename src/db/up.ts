@@ -21,6 +21,10 @@ const migrations = [
   { name: '008-settings', module: () => import('./migrations/008-settings') },
   { name: '009-contact-settings', module: () => import('./migrations/009-contact-settings') },
   { name: '010-dollar-rates', module: () => import('./migrations/010-dollar-rates') },
+  { name: '011-provinces', module: () => import('./migrations/011-provinces') },
+  { name: '012-shipping-addresses-province', module: () => import('./migrations/012-shipping-addresses-province') },
+  { name: '013-shipping-costs', module: () => import('./migrations/013-shipping-costs') },
+  { name: '014-orders-shipping-type', module: () => import('./migrations/014-orders-shipping-type') },
 ];
 
 export async function up() {

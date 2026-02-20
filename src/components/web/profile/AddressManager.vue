@@ -9,11 +9,30 @@ const isEditing = ref(false);
 const currentAddress = ref({
   address: '',
   city: '',
-  state: '',
+  province_id: null as number | null,
   zip: '',
   phone: '',
   is_default: false
 });
+
+const provinces = ref<{ id: number; name: string }[]>([]);
+
+const fetchProvinces = async () => {
+  try {
+    const res = await fetch('/api/provinces');
+    if (res.ok) {
+      provinces.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Error fetching provinces', e);
+  }
+};
+
+const getProvinceName = (provinceId: number | null) => {
+  if (!provinceId) return '';
+  const province = provinces.value.find(p => p.id === provinceId);
+  return province ? province.name : '';
+};
 
 const showDeleteModal = ref(false);
 const addressToDelete = ref<number | null>(null);
@@ -31,11 +50,14 @@ const fetchAddresses = async () => {
   }
 };
 
-onMounted(fetchAddresses);
+onMounted(async () => {
+  await fetchProvinces();
+  await fetchAddresses();
+});
 
 const saveAddress = async () => {
     // Basic validation
-    if (!currentAddress.value.address || !currentAddress.value.city || !currentAddress.value.state || !currentAddress.value.phone) {
+    if (!currentAddress.value.address || !currentAddress.value.city || !currentAddress.value.province_id || !currentAddress.value.phone) {
         toast.error('Completá los campos obligatorios');
         return;
     }
@@ -92,7 +114,7 @@ const addNew = () => {
     currentAddress.value = {
         address: '',
         city: '',
-        state: '',
+        province_id: null,
         zip: '',
         phone: '',
         is_default: addresses.value.length === 0
@@ -122,7 +144,10 @@ const addNew = () => {
             </div>
             <div class="flex flex-col gap-2">
                 <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40">Provincia *</label>
-                <input v-model="currentAddress.state" class="bg-accent/50 border border-secondary/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold" placeholder="Provincia" />
+                <select v-model="currentAddress.province_id" class="bg-accent/50 border border-secondary/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold">
+                  <option :value="null" disabled>Seleccionar provincia</option>
+                  <option v-for="province in provinces" :key="province.id" :value="province.id">{{ province.name }}</option>
+                </select>
             </div>
              <div class="flex flex-col gap-2">
                 <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40">Código Postal</label>
@@ -159,7 +184,7 @@ const addNew = () => {
                     <p class="font-black text-secondary">{{ addr.address }}</p>
                     <span v-if="addr.is_default" class="bg-primary text-white text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full shadow-lg shadow-primary/20">Predeterminada</span>
                 </div>
-                <p class="text-xs font-bold text-secondary/60">{{ addr.city }}, {{ addr.state }} {{ addr.zip ? `(${addr.zip})` : '' }}</p>
+                <p class="text-xs font-bold text-secondary/60">{{ addr.city }}, {{ getProvinceName(addr.province_id) }} {{ addr.zip ? `(${addr.zip})` : '' }}</p>
                 <p class="text-xs font-bold text-secondary/40">Tel: {{ addr.phone }}</p>
             </div>
             <div class="flex gap-4 sm:opacity-0 group-hover:opacity-100 transition-opacity w-full sm:w-auto justify-end border-t sm:border-none pt-4 sm:pt-0">

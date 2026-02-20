@@ -9,6 +9,8 @@ export interface Order {
   shipping_address: string;
   phone?: string;
   comments?: string;
+  shipping_type?: 'pickup' | 'delivery';
+  shipping_cost?: number;
   shipping_status?: 'processing' | 'shipped' | 'delivered';
   tracking_number?: string;
   payment_id?: string;
@@ -40,7 +42,7 @@ export const PaymentService = {
     return rows[0];
   },
 
-  async createOrUpdateOrder(userId: number, total: number, shippingAddress: string, items: OrderItem[], phone?: string, comments?: string) {
+  async createOrUpdateOrder(userId: number, total: number, shippingAddress: string, items: OrderItem[], phone?: string, comments?: string, shippingType: 'pickup' | 'delivery' = 'delivery', shippingCost: number = 0) {
     const existingOrder = await this.getLatestPendingOrder(userId);
     
     // Check if we can reuse the existing pending order
@@ -53,8 +55,8 @@ export const PaymentService = {
        try {
          await conn.beginTransaction();
          await conn.execute(
-           'UPDATE orders SET total_amount = ?, shipping_address = ?, phone = ?, comments = ?, preference_id = NULL, external_reference = ? WHERE id = ?',
-           [total, shippingAddress, phone || null, comments || null, `ORDER_${userId}_${Date.now()}`, existingOrder.id]
+           'UPDATE orders SET total_amount = ?, shipping_address = ?, phone = ?, comments = ?, shipping_type = ?, shipping_cost = ?, preference_id = NULL, external_reference = ? WHERE id = ?',
+           [total, shippingAddress, phone || null, comments || null, shippingType, shippingCost, `ORDER_${userId}_${Date.now()}`, existingOrder.id]
          );
          await conn.execute('DELETE FROM order_items WHERE order_id = ?', [existingOrder.id]);
          for (const item of items) {
@@ -79,8 +81,8 @@ export const PaymentService = {
 
       // 1. Create order
       const [orderResult]: any = await conn.execute(
-        'INSERT INTO orders (user_id, total_amount, status, shipping_address, phone, comments, external_reference) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [userId, total, 'pending', shippingAddress, phone || null, comments || null, `ORDER_${userId}_${Date.now()}`]
+        'INSERT INTO orders (user_id, total_amount, status, shipping_address, phone, comments, shipping_type, shipping_cost, external_reference) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [userId, total, 'pending', shippingAddress, phone || null, comments || null, shippingType, shippingCost, `ORDER_${userId}_${Date.now()}`]
       );
       const orderId = orderResult.insertId;
 
@@ -127,7 +129,7 @@ export const PaymentService = {
     return true;
   },
 
-  async generatePreference(orderId: number, userId: number, items: OrderItem[], userEmail?: string) {
+  async generatePreference(orderId: number, userId: number, items: OrderItem[], userEmail?: string, shippingCost: number = 0) {
     const externalReference = `ORDER_${orderId}`;
 
     const webhookUrl = import.meta.env.WEBHOOK_DOMAIN || import.meta.env.PUBLIC_SITE_URL;
@@ -135,15 +137,29 @@ export const PaymentService = {
         ? `${webhookUrl}/api/webhooks` 
         : undefined;
 
+    // Build items array with products
+    const preferenceItems = items.map(item => ({
+        id: String(item.product_id),
+        title: item.title,
+        unit_price: Number(item.price),
+        quantity: Number(item.quantity),
+        currency_id: 'ARS'
+    }));
+
+    // Add shipping cost as a separate item if > 0
+    if (shippingCost > 0) {
+      preferenceItems.push({
+        id: 'shipping',
+        title: 'Costo de envío',
+        unit_price: Number(shippingCost),
+        quantity: 1,
+        currency_id: 'ARS'
+      });
+    }
+
     const preferenceBody = {
         body: {
-            items: items.map(item => ({
-                id: String(item.product_id),
-                title: item.title,
-                unit_price: Number(item.price),
-                quantity: Number(item.quantity),
-                currency_id: 'ARS'
-            })),
+            items: preferenceItems,
             payer: userEmail ? { email: userEmail } : undefined,
             external_reference: externalReference,
             back_urls: {

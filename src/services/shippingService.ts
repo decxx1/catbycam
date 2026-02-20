@@ -5,7 +5,7 @@ export interface ShippingAddress {
   user_id: number;
   address: string;
   city: string;
-  state: string;
+  province_id?: number | null;
   zip?: string;
   phone: string;
   is_default?: boolean;
@@ -37,8 +37,8 @@ export const ShippingService = {
     }
 
     const [result] = await pool.execute(
-      'INSERT INTO shipping_addresses (user_id, address, city, state, zip, phone, is_default) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [address.user_id, address.address, address.city, address.state, address.zip || '', address.phone, address.is_default ? 1 : 0]
+      'INSERT INTO shipping_addresses (user_id, address, city, province_id, zip, phone, is_default) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [address.user_id, address.address, address.city, address.province_id || null, address.zip || '', address.phone, address.is_default ? 1 : 0]
     );
     return result;
   },
@@ -53,7 +53,7 @@ export const ShippingService = {
     
     if (address.address !== undefined) { fields.push('address = ?'); values.push(address.address); }
     if (address.city !== undefined) { fields.push('city = ?'); values.push(address.city); }
-    if (address.state !== undefined) { fields.push('state = ?'); values.push(address.state); }
+    if (address.province_id !== undefined) { fields.push('province_id = ?'); values.push(address.province_id); }
     if (address.zip !== undefined) { fields.push('zip = ?'); values.push(address.zip); }
     if (address.phone !== undefined) { fields.push('phone = ?'); values.push(address.phone); }
     if (address.is_default !== undefined) { fields.push('is_default = ?'); values.push(address.is_default ? 1 : 0); }

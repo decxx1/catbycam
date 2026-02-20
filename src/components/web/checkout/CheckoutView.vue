@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { useStore } from '@nanostores/vue';
 import { cartList, cartTotal, cartCount } from '@/stores/cartStore';
 import { formatMoney } from '@/utils/formatters';
@@ -22,10 +22,46 @@ const selectedAddressId = ref<number | null>(null);
 const shippingData = ref({
   address: '',
   city: '',
-  state: '',
+  province_id: null as number | null,
   zip: '',
   phone: '',
   comments: ''
+});
+
+const provinces = ref<{ id: number; name: string }[]>([]);
+const shippingCosts = ref<{ province_id: number; cost: number }[]>([]);
+const shippingType = ref<'pickup' | 'delivery'>('pickup');
+
+const fetchProvinces = async () => {
+  try {
+    const res = await fetch('/api/provinces');
+    if (res.ok) {
+      provinces.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Error fetching provinces', e);
+  }
+};
+
+const fetchShippingCosts = async () => {
+  try {
+    const res = await fetch('/api/shipping-costs');
+    if (res.ok) {
+      shippingCosts.value = await res.json();
+    }
+  } catch (e) {
+    console.error('Error fetching shipping costs', e);
+  }
+};
+
+const getShippingCost = computed(() => {
+  if (shippingType.value === 'pickup' || !shippingData.value.province_id) return 0;
+  const cost = shippingCosts.value.find(sc => sc.province_id === shippingData.value.province_id);
+  return cost ? parseFloat(String(cost.cost)) : 0;
+});
+
+const finalTotal = computed(() => {
+  return total.value + getShippingCost.value;
 });
 
 const isPreferenceLoading = ref(false);
@@ -67,12 +103,11 @@ const fetchAddresses = async () => {
             const defaultAddr = addresses.value.find(a => a.is_default);
             if (defaultAddr) {
                 selectedAddressId.value = defaultAddr.id;
-                // Merge default address into shippingData
                 shippingData.value = { 
                     ...shippingData.value,
                     address: defaultAddr.address,
                     city: defaultAddr.city,
-                    state: defaultAddr.state,
+                    province_id: defaultAddr.province_id,
                     zip: defaultAddr.zip,
                     phone: defaultAddr.phone
                 };
@@ -85,7 +120,7 @@ const fetchAddresses = async () => {
 
 onMounted(async () => {
   isMounted.value = true;
-  await Promise.all([getMPPublicKey(), checkStoreStatus()]);
+  await Promise.all([getMPPublicKey(), checkStoreStatus(), fetchProvinces(), fetchShippingCosts()]);
   if (session.value) {
     step.value = 2;
     await fetchAddresses();
@@ -98,10 +133,16 @@ const selectSavedAddress = (addr: any) => {
         ...shippingData.value,
         address: addr.address,
         city: addr.city,
-        state: addr.state,
+        province_id: addr.province_id,
         zip: addr.zip,
         phone: addr.phone
     };
+};
+
+const getProvinceName = (provinceId: number | null) => {
+  if (!provinceId) return '';
+  const province = provinces.value.find(p => p.id === provinceId);
+  return province ? province.name : '';
 };
 
 const useNewAddress = () => {
@@ -109,7 +150,7 @@ const useNewAddress = () => {
     shippingData.value = {
         address: '',
         city: '',
-        state: '',
+        province_id: null,
         zip: '',
         phone: '',
         comments: shippingData.value.comments
@@ -129,8 +170,12 @@ const createPreference = async () => {
                     price: i.price,
                     quantity: i.quantity
                 })),
-                total: total.value,
-                shippingAddress: `${shippingData.value.address}, ${shippingData.value.city}, ${shippingData.value.state} (CP: ${shippingData.value.zip})`,
+                total: finalTotal.value,
+                shippingType: shippingType.value,
+                shippingCost: getShippingCost.value,
+                shippingAddress: shippingType.value === 'pickup' 
+                  ? 'Retiro en sucursal' 
+                  : `${shippingData.value.address}, ${shippingData.value.city}, ${getProvinceName(shippingData.value.province_id)} (CP: ${shippingData.value.zip})`,
                 phone: shippingData.value.phone,
                 comments: shippingData.value.comments
             })
@@ -178,13 +223,20 @@ const initMPButton = (prefId: string) => {
 };
 
 const handleShippingSubmit = async () => {
-  if (!shippingData.value.address || !shippingData.value.city || !shippingData.value.phone) {
-    alert('Por favor completa los campos obligatorios');
-    return;
+  if (shippingType.value === 'delivery') {
+    if (!shippingData.value.address || !shippingData.value.city || !shippingData.value.province_id || !shippingData.value.phone) {
+      alert('Por favor completa los campos obligatorios');
+      return;
+    }
+  } else {
+    if (!shippingData.value.phone) {
+      alert('Por favor ingresa un teléfono de contacto');
+      return;
+    }
   }
 
-  // If logged in, save/update this address if it's new
-  if (session.value && !selectedAddressId.value) {
+  // If logged in and using delivery, save/update this address if it's new
+  if (session.value && !selectedAddressId.value && shippingType.value === 'delivery') {
     try {
         await fetch('/api/shipping', {
             method: 'POST',
@@ -293,13 +345,59 @@ watch([items, total], () => {
                     class="bg-white p-6 rounded-2xl border border-secondary/5 hover:border-primary/40 transition-all text-left group shadow-sm"
                 >
                     <p class="font-black text-secondary group-hover:text-primary transition-colors">{{ addr.address }}</p>
-                    <p class="text-xs font-bold text-secondary/40 uppercase">{{ addr.city }}, {{ addr.state }} {{ addr.zip ? `(CP: ${addr.zip})` : '' }}</p>
+                    <p class="text-xs font-bold text-secondary/40 uppercase">{{ addr.city }}, {{ getProvinceName(addr.province_id) }} {{ addr.zip ? `(CP: ${addr.zip})` : '' }}</p>
                     <span class="mt-2 inline-block text-[8px] font-black uppercase tracking-widest text-primary">Usar esta dirección</span>
                 </button>
             </div>
 
             <form @submit.prevent="handleShippingSubmit" class="bg-white rounded-3xl p-10 border border-secondary/5 shadow-xl grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-              <div v-if="selectedAddressId" class="md:col-span-2 bg-primary/5 p-4 rounded-xl flex items-center justify-between mb-2">
+              <!-- Shipping Type Selection -->
+              <div class="md:col-span-2">
+                <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-3 block">Tipo de Envío *</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <button type="button" @click="shippingType = 'pickup'" :class="['p-5 rounded-2xl border-2 transition-all text-left', shippingType === 'pickup' ? 'border-primary bg-primary/5' : 'border-secondary/10 hover:border-secondary/20']">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div :class="['w-8 h-8 rounded-full flex items-center justify-center', shippingType === 'pickup' ? 'bg-primary text-white' : 'bg-secondary/10 text-secondary/40']">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><path d="M12 3v6"/></svg>
+                      </div>
+                      <span :class="['font-black', shippingType === 'pickup' ? 'text-primary' : 'text-secondary']">Retiro en Sucursal</span>
+                    </div>
+                    <p class="text-xs text-secondary/50 font-medium">Sin costo adicional</p>
+                  </button>
+                  <button type="button" @click="shippingType = 'delivery'" :class="['p-5 rounded-2xl border-2 transition-all text-left', shippingType === 'delivery' ? 'border-primary bg-primary/5' : 'border-secondary/10 hover:border-secondary/20']">
+                    <div class="flex items-center gap-3 mb-2">
+                      <div :class="['w-8 h-8 rounded-full flex items-center justify-center', shippingType === 'delivery' ? 'bg-primary text-white' : 'bg-secondary/10 text-secondary/40']">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
+                      </div>
+                      <span :class="['font-black', shippingType === 'delivery' ? 'text-primary' : 'text-secondary']">Envío a Domicilio</span>
+                    </div>
+                    <p class="text-xs text-secondary/50 font-medium">Costo según provincia</p>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Pickup Info -->
+              <div v-if="shippingType === 'pickup'" class="md:col-span-2 bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+                <div class="flex items-start gap-4">
+                  <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-600"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                  </div>
+                  <div>
+                    <p class="font-black text-emerald-800 mb-1">Retirá tu pedido en nuestra sucursal</p>
+                    <p class="text-sm text-emerald-700">Te notificaremos cuando tu pedido esté listo para retirar.</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Pickup: Only phone required -->
+              <div v-if="shippingType === 'pickup'" class="flex flex-col gap-2 md:col-span-2">
+                <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Teléfono de contacto *</label>
+                <input v-model="shippingData.phone" type="tel" required class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold" placeholder="3816556677" />
+              </div>
+
+              <!-- Delivery: Full address form -->
+              <template v-if="shippingType === 'delivery'">
+                <div v-if="selectedAddressId" class="md:col-span-2 bg-primary/5 p-4 rounded-xl flex items-center justify-between mb-2">
                  <div class="flex items-center gap-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     <p class="text-xs font-bold text-primary uppercase">Usando dirección guardada</p>
@@ -317,7 +415,10 @@ watch([items, total], () => {
               </div>
               <div class="flex flex-col gap-2">
                 <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Provincia *</label>
-                <input v-model="shippingData.state" type="text" required class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold" placeholder="Tucumán" />
+                <select v-model="shippingData.province_id" required class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold">
+                  <option :value="null" disabled>Seleccionar provincia</option>
+                  <option v-for="province in provinces" :key="province.id" :value="province.id">{{ province.name }}</option>
+                </select>
               </div>
               <div class="flex flex-col gap-2">
                 <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Código Postal *</label>
@@ -331,10 +432,11 @@ watch([items, total], () => {
                 <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Comentarios Adicionales</label>
                 <textarea v-model="shippingData.comments" class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold h-32" placeholder="Indicaciones para el repartidor..."></textarea>
               </div>
-              <div class="md:col-span-2 pt-4">
-                <button type="submit" class="btn-primary w-full py-5 rounded-2xl font-black uppercase tracking-widest">Continuar al Pago</button>
-              </div>
-            </form>
+            </template>
+            <div class="md:col-span-2 pt-4">
+              <button type="submit" class="btn-primary w-full py-5 rounded-2xl font-black uppercase tracking-widest">Continuar al Pago</button>
+            </div>
+          </form>
           </div>
 
           <!-- Step 3: Payment -->
@@ -393,13 +495,15 @@ watch([items, total], () => {
               <span>Subtotal</span>
               <span class="text-secondary text-sm tabular-nums">{{ formatMoney(total, 0, '$') }}</span>
             </div>
-            <div v-if="step > 1" class="flex justify-between items-center text-secondary/20 font-bold uppercase tracking-widest text-[10px]">
+            <div v-if="step > 1" class="flex justify-between items-center text-secondary/40 font-bold uppercase tracking-widest text-[10px]">
               <span>Envío</span>
-              <span class="text-secondary text-xs italic">A convenir</span>
+              <span class="text-secondary text-sm tabular-nums">
+                {{ shippingType === 'pickup' ? 'Gratis' : (getShippingCost > 0 ? formatMoney(getShippingCost, 0, '$') : 'Seleccionar provincia') }}
+              </span>
             </div>
             <div class="flex justify-between items-center pt-4">
               <span class="font-black text-xl text-secondary tracking-tighter uppercase italic">Total</span>
-              <span class="text-3xl font-black text-primary tracking-tighter tabular-nums">{{ formatMoney(total, 0, '$') }}</span>
+              <span class="text-3xl font-black text-primary tracking-tighter tabular-nums">{{ formatMoney(finalTotal, 0, '$') }}</span>
             </div>
           </div>
         </div>

@@ -104,6 +104,16 @@ const getShippingStatusLabel = (status: string) => {
     }
 };
 
+const getShippingTypeColor = (type: string) => {
+    return type === 'pickup' 
+        ? 'bg-violet-100 text-violet-700 border-violet-200' 
+        : 'bg-sky-100 text-sky-700 border-sky-200';
+};
+
+const getShippingTypeLabel = (type: string) => {
+    return type === 'pickup' ? 'Retiro' : 'Envío';
+};
+
 const expandedOrder = ref<number | null>(null);
 const editingShipping = ref<number | null>(null);
 const shippingForm = ref({
@@ -200,9 +210,16 @@ const saveShippingStatus = async (orderId: number) => {
                                     {{ getStatusLabel(order.status) }}
                                 </span>
                             </div>
-                            <div v-if="order.status === 'paid'" class="flex items-center gap-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary/40"><path d="M3 9h18v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9Z"/><path d="m3 9 2.45-4.9A2 2 0 0 1 7.24 3h9.52a2 2 0 0 1 1.8 1.1L21 9"/><path d="M12 3v6"/></svg>
+                                <span class="text-[9px] font-bold text-secondary/40 uppercase">Tipo:</span>
+                                <span :class="[getShippingTypeColor(order.shipping_type || 'delivery'), 'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border shadow-sm']">
+                                    {{ getShippingTypeLabel(order.shipping_type || 'delivery') }}
+                                </span>
+                            </div>
+                            <div v-if="order.status === 'paid' && order.shipping_type !== 'pickup'" class="flex items-center gap-1.5">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-secondary/40"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg>
-                                <span class="text-[9px] font-bold text-secondary/40 uppercase">Envío:</span>
+                                <span class="text-[9px] font-bold text-secondary/40 uppercase">Estado:</span>
                                 <span :class="[getShippingStatusColor(order.shipping_status || 'processing'), 'text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full border shadow-sm']">
                                     {{ getShippingStatusLabel(order.shipping_status || 'processing') }}
                                 </span>
@@ -252,7 +269,12 @@ const saveShippingStatus = async (orderId: number) => {
                         <div class="space-y-3">
                             <h4 class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Datos de Envío</h4>
                             <div class="bg-white p-4 rounded-xl space-y-3">
-                                <div>
+                                <div class="flex items-center gap-2">
+                                    <span :class="[getShippingTypeColor(order.shipping_type || 'delivery'), 'text-xs font-black uppercase px-3 py-1 rounded-full border']">
+                                        {{ order.shipping_type === 'pickup' ? '📦 Retiro en Sucursal' : '🚚 Envío a Domicilio' }}
+                                    </span>
+                                </div>
+                                <div v-if="order.shipping_type !== 'pickup'">
                                     <p class="text-[9px] font-bold text-secondary/40 uppercase">Dirección</p>
                                     <p class="text-sm font-medium text-secondary">{{ order.shipping_address }}</p>
                                 </div>
@@ -260,19 +282,23 @@ const saveShippingStatus = async (orderId: number) => {
                                     <p class="text-[9px] font-bold text-secondary/40 uppercase">Teléfono</p>
                                     <p class="text-sm font-medium text-secondary">{{ order.phone }}</p>
                                 </div>
+                                <div v-if="order.shipping_cost > 0">
+                                    <p class="text-[9px] font-bold text-secondary/40 uppercase">Costo de Envío</p>
+                                    <p class="text-sm font-black text-primary">{{ formatMoney(order.shipping_cost, 0, '$') }}</p>
+                                </div>
                                 <div v-if="order.comments">
                                     <p class="text-[9px] font-bold text-secondary/40 uppercase">Comentarios</p>
                                     <p class="text-sm font-medium text-secondary/70 italic">{{ order.comments }}</p>
                                 </div>
-                                <div v-if="order.tracking_number">
+                                <div v-if="order.tracking_number && order.shipping_type !== 'pickup'">
                                     <p class="text-[9px] font-bold text-secondary/40 uppercase">Nº Seguimiento</p>
                                     <p class="text-sm font-black text-primary">{{ order.tracking_number }}</p>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Shipping Status Management -->
-                        <div class="space-y-3">
+                        <!-- Shipping Status Management (only for delivery) -->
+                        <div v-if="order.shipping_type !== 'pickup'" class="space-y-3">
                             <h4 class="text-[10px] font-black uppercase text-secondary/40 tracking-widest">Gestión de Envío</h4>
                             <div class="bg-white p-4 rounded-xl space-y-4">
                                 <div v-if="order.status !== 'paid'" class="text-center py-4">
