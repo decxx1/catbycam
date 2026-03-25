@@ -4,9 +4,9 @@ import pool from '../../utils/db-standalone';
 export async function up() {
   console.log('Adding shipping_type and shipping_cost to orders table...');
   await pool.execute(`
-    ALTER TABLE orders 
-    ADD COLUMN shipping_type ENUM('pickup', 'delivery') DEFAULT 'delivery' AFTER comments,
-    ADD COLUMN shipping_cost DECIMAL(15, 2) DEFAULT 0 AFTER shipping_type
+    ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS shipping_type ENUM('pickup', 'delivery') DEFAULT 'delivery' AFTER comments,
+    ADD COLUMN IF NOT EXISTS shipping_cost DECIMAL(15, 2) DEFAULT 0 AFTER shipping_type
   `);
   console.log('✓ shipping_type and shipping_cost columns added to orders');
 }

@@ -6,6 +6,7 @@ import { formatMoney } from '@/utils/formatters';
 
 const props = defineProps<{
   initialSession: any;
+  isProd?: boolean;
 }>();
 
 const items = useStore(cartList);
@@ -29,8 +30,53 @@ const shippingData = ref({
 });
 
 const provinces = ref<{ id: number; name: string }[]>([]);
-const shippingCosts = ref<{ province_id: number; cost: number }[]>([]);
 const shippingType = ref<'pickup' | 'delivery'>('pickup');
+
+// MiCorreo rate quoting
+const mcRates = ref<{ deliveredType: string; productType: string; productName: string; price: number; deliveryTimeMin: string; deliveryTimeMax: string }[]>([]);
+const selectedRate = ref<{ deliveredType: string; productType: string; productName: string; price: number; deliveryTimeMin: string; deliveryTimeMax: string } | null>(null);
+const isLoadingRates = ref(false);
+const ratesError = ref('');
+
+const aggregateDimensions = () => {
+  const DEFAULT_WEIGHT = 2000;
+  const DEFAULT_DIM = 30;
+  let totalWeight = 0, maxHeight = 0, maxWidth = 0, maxLength = 0;
+  for (const item of items.value) {
+    totalWeight += (item.weight ?? DEFAULT_WEIGHT) * item.quantity;
+    maxHeight = Math.max(maxHeight, item.pkg_height ?? DEFAULT_DIM);
+    maxWidth = Math.max(maxWidth, item.pkg_width ?? DEFAULT_DIM);
+    maxLength = Math.max(maxLength, item.pkg_length ?? DEFAULT_DIM);
+  }
+  return { weight: totalWeight, height: maxHeight, width: maxWidth, length: maxLength };
+};
+
+const fetchMiCorreoRates = async () => {
+  const zip = shippingData.value.zip;
+  if (!zip || zip.length < 4) return;
+  isLoadingRates.value = true;
+  ratesError.value = '';
+  mcRates.value = [];
+  selectedRate.value = null;
+  try {
+    const res = await fetch('/api/shipping/rates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postalCodeDestination: zip, dimensions: aggregateDimensions() }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      mcRates.value = data.rates ?? [];
+      if (mcRates.value.length === 1) selectedRate.value = mcRates.value[0];
+    } else {
+      ratesError.value = 'No se pudo cotizar el envío. Ingresá otro código postal o contactanos.';
+    }
+  } catch {
+    ratesError.value = 'Error al cotizar el envío.';
+  } finally {
+    isLoadingRates.value = false;
+  }
+};
 
 const fetchProvinces = async () => {
   try {
@@ -43,30 +89,16 @@ const fetchProvinces = async () => {
   }
 };
 
-const fetchShippingCosts = async () => {
-  try {
-    const res = await fetch('/api/shipping-costs');
-    if (res.ok) {
-      shippingCosts.value = await res.json();
-    }
-  } catch (e) {
-    console.error('Error fetching shipping costs', e);
-  }
-};
-
-const getShippingCost = computed(() => {
-  if (shippingType.value === 'pickup' || !shippingData.value.province_id) return 0;
-  const cost = shippingCosts.value.find(sc => sc.province_id === shippingData.value.province_id);
-  return cost ? parseFloat(String(cost.cost)) : 0;
-});
-
 const finalTotal = computed(() => {
-  return total.value + getShippingCost.value;
+  return total.value + (shippingType.value === 'delivery' ? (selectedRate.value?.price ?? 0) : 0);
 });
 
 const isPreferenceLoading = ref(false);
 const preferenceId = ref<string | null>(null);
+const orderId = ref<number | null>(null);
 const isSandbox = ref(import.meta.env.PUBLIC_MP_SANDBOX === 'true');
+const isTestMode = ref(!props.isProd);
+const isTestPaymentLoading = ref(false);
 const mpPublicKey = ref<string>('');
 const purchasesEnabled = ref(true);
 
@@ -120,7 +152,7 @@ const fetchAddresses = async () => {
 
 onMounted(async () => {
   isMounted.value = true;
-  await Promise.all([getMPPublicKey(), checkStoreStatus(), fetchProvinces(), fetchShippingCosts()]);
+  await Promise.all([getMPPublicKey(), checkStoreStatus(), fetchProvinces()]);
   if (session.value) {
     step.value = 2;
     await fetchAddresses();
@@ -172,7 +204,7 @@ const createPreference = async () => {
                 })),
                 total: finalTotal.value,
                 shippingType: shippingType.value,
-                shippingCost: getShippingCost.value,
+                shippingCost: shippingType.value === 'delivery' ? (selectedRate.value?.price ?? 0) : 0,
                 shippingAddress: shippingType.value === 'pickup' 
                   ? 'Retiro en sucursal' 
                   : `${shippingData.value.address}, ${shippingData.value.city}, ${getProvinceName(shippingData.value.province_id)} (CP: ${shippingData.value.zip})`,
@@ -184,6 +216,7 @@ const createPreference = async () => {
         if (res.ok) {
             const data = await res.json();
             preferenceId.value = data.preferenceId;
+            orderId.value = data.orderId ?? null;
             initMPButton(data.preferenceId);
         }
     } catch (e) {
@@ -228,6 +261,10 @@ const handleShippingSubmit = async () => {
       alert('Por favor completa los campos obligatorios');
       return;
     }
+    if (!selectedRate.value) {
+      alert('Por favor seleccioná una opción de envío');
+      return;
+    }
   } else {
     if (!shippingData.value.phone) {
       alert('Por favor ingresa un teléfono de contacto');
@@ -255,6 +292,28 @@ const handleShippingSubmit = async () => {
   createPreference();
 };
 
+const simulateTestPayment = async () => {
+  if (!orderId.value) return;
+  isTestPaymentLoading.value = true;
+  try {
+    const res = await fetch('/api/checkout/test-payment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: orderId.value }),
+    });
+    if (res.ok) {
+      window.location.href = '/profile?tab=orders';
+    } else {
+      const data = await res.json();
+      alert(data.error ?? 'Error al simular el pago');
+    }
+  } catch {
+    alert('Error de conexión');
+  } finally {
+    isTestPaymentLoading.value = false;
+  }
+};
+
 const goToLogin = () => {
   window.location.href = `/login?redirect=/checkout`;
 };
@@ -262,6 +321,26 @@ const goToLogin = () => {
 const goToRegister = () => {
   window.location.href = `/register?redirect=/checkout`;
 };
+
+// Fetch MiCorreo rates when postal code changes (debounced)
+let ratesDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+watch(() => shippingData.value.zip, (zip: string) => {
+  if (shippingType.value !== 'delivery') return;
+  if (ratesDebounceTimer) clearTimeout(ratesDebounceTimer);
+  ratesDebounceTimer = setTimeout(() => {
+    if (zip && zip.length >= 4) fetchMiCorreoRates();
+  }, 500);
+});
+
+watch(shippingType, (type: string) => {
+  if (type === 'delivery' && shippingData.value.zip && shippingData.value.zip.length >= 4) {
+    fetchMiCorreoRates();
+  } else if (type === 'pickup') {
+    mcRates.value = [];
+    selectedRate.value = null;
+    ratesError.value = '';
+  }
+});
 
 // Re-generate preference if cart changes while on the last step
 watch([items, total], () => {
@@ -371,7 +450,7 @@ watch([items, total], () => {
                       </div>
                       <span :class="['font-black', shippingType === 'delivery' ? 'text-primary' : 'text-secondary']">Envío a Domicilio</span>
                     </div>
-                    <p class="text-xs text-secondary/50 font-medium">Costo según provincia</p>
+                    <p class="text-xs text-secondary/50 font-medium">Costo según código postal</p>
                   </button>
                 </div>
               </div>
@@ -424,6 +503,32 @@ watch([items, total], () => {
                 <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Código Postal *</label>
                 <input v-model="shippingData.zip" type="text" required class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold" placeholder="4000" />
               </div>
+              <!-- MiCorreo rate options -->
+              <div class="md:col-span-2">
+                <div v-if="isLoadingRates" class="animate-pulse bg-accent rounded-xl h-16 flex items-center justify-center">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-secondary/30">Cotizando envío...</span>
+                </div>
+                <div v-else-if="mcRates.length > 0">
+                  <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40 mb-3 block">Opción de Envío *</label>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <button
+                      v-for="rate in mcRates"
+                      :key="rate.deliveredType + rate.productType"
+                      type="button"
+                      @click="selectedRate = rate"
+                      :class="['p-4 rounded-2xl border-2 transition-all text-left', selectedRate?.deliveredType === rate.deliveredType && selectedRate?.productType === rate.productType ? 'border-primary bg-primary/5' : 'border-secondary/10 hover:border-secondary/20']"
+                    >
+                      <p class="font-black text-secondary text-sm">{{ rate.productName }}</p>
+                      <p class="text-xs text-secondary/50">{{ rate.deliveryTimeMin }}-{{ rate.deliveryTimeMax }} días hábiles</p>
+                      <p class="font-black text-primary mt-1">{{ formatMoney(rate.price, 0, '$') }}</p>
+                    </button>
+                  </div>
+                </div>
+                <div v-else-if="ratesError" class="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <p class="text-xs font-bold text-red-600">{{ ratesError }}</p>
+                </div>
+              </div>
+
               <div class="flex flex-col gap-2">
                 <label class="text-[10px] font-black uppercase tracking-widest text-secondary/40">Teléfono de contacto *</label>
                 <input v-model="shippingData.phone" type="tel" required class="w-full bg-accent/30 border-none rounded-xl py-4 px-6 focus:ring-2 focus:ring-primary outline-none font-bold" placeholder="3816556677" />
@@ -465,6 +570,23 @@ watch([items, total], () => {
                 </div>
               </div>
 
+              <!-- Test payment button — only visible in dev/test mode -->
+              <div v-if="isTestMode && orderId" class="w-full border-t border-dashed border-amber-300 pt-4 mt-2">
+                <p class="text-[9px] font-black uppercase tracking-widest text-amber-500 mb-3">Modo test — simulación de pago</p>
+                <button
+                  type="button"
+                  @click="simulateTestPayment"
+                  :disabled="isTestPaymentLoading"
+                  class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-black uppercase tracking-widest text-xs rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <svg v-if="isTestPaymentLoading" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  {{ isTestPaymentLoading ? 'Procesando...' : 'Simular Pago (Test)' }}
+                </button>
+              </div>
+
               <button @click="step = 2" class="text-xs font-bold uppercase text-secondary/40 hover:text-primary transition-colors underline mt-4">Volver a datos de envío</button>
             </div>
           </div>
@@ -498,7 +620,7 @@ watch([items, total], () => {
             <div v-if="step > 1" class="flex justify-between items-center text-secondary/40 font-bold uppercase tracking-widest text-[10px]">
               <span>Envío</span>
               <span class="text-secondary text-sm tabular-nums">
-                {{ shippingType === 'pickup' ? 'Gratis' : (getShippingCost > 0 ? formatMoney(getShippingCost, 0, '$') : 'Seleccionar provincia') }}
+                {{ shippingType === 'pickup' ? 'Gratis' : (selectedRate ? formatMoney(selectedRate.price, 0, '$') : 'Cotizando...') }}
               </span>
             </div>
             <div class="flex justify-between items-center pt-4">

@@ -38,6 +38,15 @@ export default defineConfig({
       DB_PASSWORD: envField.string({ context: "server", access: "secret", default: "" }),
       DB_NAME: envField.string({ context: "server", access: "secret", default: "catbycam" }),
       DB_PORT: envField.number({ context: "server", access: "secret", default: 3306 }),
+      MC_USER: envField.string({ context: "server", access: "secret" }),
+      MC_PASSWORD: envField.string({ context: "server", access: "secret" }),
+      MC_BASE_URL: envField.string({ context: "server", access: "secret", default: "https://api.correoargentino.com.ar/micorreo/v1" }),
+      MC_TEST_BASE_URL: envField.string({ context: "server", access: "secret", optional: true }),
+      MC_CUSTOMER_ID: envField.string({ context: "server", access: "secret" }),
+      MC_TEST_CUSTOMER_ID: envField.string({ context: "server", access: "secret", optional: true }),
+      TRUSTED_ORIGINS: envField.string({ context: "server", access: "secret", optional: true }),
+      CA_EMAIL: envField.string({ context: "server", access: "secret", optional: true }),
+      CA_PASSWORD: envField.string({ context: "server", access: "secret", optional: true }),
     }
   }
 });

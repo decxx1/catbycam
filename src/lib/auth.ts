@@ -15,6 +15,9 @@ const pool = createPool({
 export const auth = betterAuth({
   database: pool,
   baseURL: import.meta.env.BETTER_AUTH_URL || "http://localhost:4321",
+  trustedOrigins: import.meta.env.TRUSTED_ORIGINS
+    ? import.meta.env.TRUSTED_ORIGINS.split(',')
+    : [],
   secret: import.meta.env.BETTER_AUTH_SECRET,
   
   emailAndPassword: {

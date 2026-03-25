@@ -37,6 +37,10 @@ const products = await ProductService.getFeatured(4);
 						image={product.main_image}
 						price={product.price}
 						status={product.status}
+						weight={product.weight}
+						pkg_height={product.pkg_height}
+						pkg_width={product.pkg_width}
+						pkg_length={product.pkg_length}
 					/>
 				))}
 			</div>

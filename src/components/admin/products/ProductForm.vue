@@ -26,7 +26,11 @@ const product = ref<Product>(props.initialData ? { ...props.initialData } : {
   main_image_full: '',
   main_image_width: 0,
   main_image_height: 0,
-  images: []
+  images: [],
+  weight: null,
+  pkg_height: null,
+  pkg_width: null,
+  pkg_length: null,
 });
 
 // Extraer solo las URLs de thumbnail para mostrar en el formulario
@@ -254,6 +258,58 @@ const handleSubmit = () => {
             </template>
         </div>
         <p class="text-[10px] text-center text-secondary/30 font-bold uppercase tracking-widest mt-4">Hasta 6 fotos adicionales</p>
+      </div>
+    </div>
+
+    <!-- Shipping Dimensions Section -->
+    <div class="space-y-4 pt-4 border-t border-secondary/5">
+      <h4 class="text-lg font-bold">Dimensiones de Envío</h4>
+      <p class="text-xs text-secondary/40">Necesario para calcular el costo de envío con Correo Argentino. Dejar vacío si no aplica.</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="flex flex-col gap-2">
+          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Peso (g)</label>
+          <input
+            v-model.number="product.weight"
+            type="number"
+            min="1"
+            max="25000"
+            placeholder="ej: 1500"
+            class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Alto (cm)</label>
+          <input
+            v-model.number="product.pkg_height"
+            type="number"
+            min="1"
+            max="150"
+            placeholder="ej: 20"
+            class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Ancho (cm)</label>
+          <input
+            v-model.number="product.pkg_width"
+            type="number"
+            min="1"
+            max="150"
+            placeholder="ej: 30"
+            class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+          />
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Largo (cm)</label>
+          <input
+            v-model.number="product.pkg_length"
+            type="number"
+            min="1"
+            max="150"
+            placeholder="ej: 40"
+            class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+          />
+        </div>
       </div>
     </div>
 

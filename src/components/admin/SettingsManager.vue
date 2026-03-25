@@ -19,11 +19,6 @@ const form = ref({
 
 const isTogglingPurchases = ref(false);
 
-const provinces = ref<{ id: number; name: string }[]>([]);
-const shippingCosts = ref<{ province_id: number; cost: number }[]>([]);
-const isLoadingShipping = ref(true);
-const isSavingShipping = ref(false);
-
 const fetchSettings = async () => {
   isLoading.value = true;
   try {
@@ -93,71 +88,87 @@ const togglePurchases = async () => {
   }
 };
 
-const fetchProvinces = async () => {
-  try {
-    const res = await fetch('/api/provinces');
-    if (res.ok) {
-      provinces.value = await res.json();
-      // Inicializar costos con 0 para todas las provincias
-      shippingCosts.value = provinces.value.map(p => ({ province_id: p.id, cost: 0 }));
-    }
-  } catch (e) {
-    console.error('Error fetching provinces', e);
-  }
-};
-
-const fetchShippingCosts = async () => {
-  isLoadingShipping.value = true;
-  try {
-    const res = await fetch('/api/admin/shipping-costs');
-    if (res.ok) {
-      const data = await res.json();
-      // Actualizar los costos existentes
-      for (const item of data) {
-        const idx = shippingCosts.value.findIndex(sc => sc.province_id === item.province_id);
-        if (idx !== -1) {
-          shippingCosts.value[idx].cost = parseFloat(item.cost);
-        }
-      }
-    }
-  } catch (e) {
-    console.error('Error fetching shipping costs', e);
-  } finally {
-    isLoadingShipping.value = false;
-  }
-};
-
-const saveShippingCosts = async () => {
-  isSavingShipping.value = true;
-  try {
-    const res = await fetch('/api/admin/shipping-costs', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ costs: shippingCosts.value })
-    });
-    if (res.ok) {
-      toast.success('Costos de envío guardados');
-    } else {
-      toast.error('Error al guardar costos');
-    }
-  } catch (e) {
-    console.error('Error saving shipping costs', e);
-    toast.error('Error al guardar costos');
-  } finally {
-    isSavingShipping.value = false;
-  }
-};
-
-const getProvinceName = (provinceId: number) => {
-  const province = provinces.value.find(p => p.id === provinceId);
-  return province ? province.name : '';
-};
-
 onMounted(async () => {
   await fetchSettings();
-  await fetchProvinces();
-  await fetchShippingCosts();
 });
+
+// ---- MiCorreo ----
+const mcValidateResult = ref<{ customerId?: string; createdAt?: string; error?: string } | null>(null);
+const isMcValidating = ref(false);
+const showRegisterForm = ref(false);
+const isMcRegistering = ref(false);
+const mcRegisterResult = ref<{ customerId?: string; createdAt?: string; error?: string } | null>(null);
+const mcRegisterForm = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  password: '',
+  documentType: 'DNI' as 'DNI' | 'CUIT',
+  documentId: '',
+  phone: '',
+  address: {
+    streetName: '',
+    streetNumber: '',
+    city: '',
+    locality: '',
+    provinceCode: 'X',
+    postalCode: '',
+  },
+});
+const mcTestZip = ref('');
+const isMcTesting = ref(false);
+const mcTestResult = ref<any>(null);
+
+const validateMcCredentials = async () => {
+  isMcValidating.value = true;
+  mcValidateResult.value = null;
+  try {
+    const res = await fetch('/api/admin/shipping/validate');
+    const data = await res.json();
+    mcValidateResult.value = res.ok ? data : { error: data.error ?? 'Error desconocido' };
+  } catch {
+    mcValidateResult.value = { error: 'Error de conexión' };
+  } finally {
+    isMcValidating.value = false;
+  }
+};
+
+const registerMcUser = async () => {
+  isMcRegistering.value = true;
+  mcRegisterResult.value = null;
+  try {
+    const res = await fetch('/api/admin/shipping/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mcRegisterForm.value),
+    });
+    const data = await res.json();
+    mcRegisterResult.value = res.ok ? data : { error: data.error ?? 'Error al registrar' };
+    if (res.ok) toast.success('Usuario registrado. Copiá el customerId y actualizá MC_CUSTOMER_ID en .env');
+  } catch {
+    mcRegisterResult.value = { error: 'Error de conexión' };
+  } finally {
+    isMcRegistering.value = false;
+  }
+};
+
+const testMcRates = async () => {
+  if (!mcTestZip.value) return;
+  isMcTesting.value = true;
+  mcTestResult.value = null;
+  try {
+    const res = await fetch('/api/shipping/rates', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postalCodeDestination: mcTestZip.value, dimensions: { weight: 1500, height: 20, width: 30, length: 40 } }),
+    });
+    mcTestResult.value = await res.json();
+  } catch {
+    mcTestResult.value = { error: 'Error de conexión' };
+  } finally {
+    isMcTesting.value = false;
+  }
+};
 </script>
 
 <template>
@@ -386,6 +397,189 @@ onMounted(async () => {
         </div>
       </div>
 
+      <!-- MiCorreo Section -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-amber-600">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-gray-900">MiCorreo (Correo Argentino)</h2>
+            <p class="text-sm text-gray-500">Verificar credenciales, registrar usuario de test y probar cotización de envíos</p>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <!-- Validate credentials -->
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Validar credenciales</p>
+            <button
+              type="button"
+              @click="validateMcCredentials"
+              :disabled="isMcValidating"
+              class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <svg v-if="isMcValidating" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              {{ isMcValidating ? 'Validando...' : 'Validar credenciales' }}
+            </button>
+            <div v-if="mcValidateResult" class="mt-3 p-3 rounded-xl text-sm font-mono" :class="mcValidateResult.error ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-800 border border-green-200'">
+              <span v-if="mcValidateResult.error">{{ mcValidateResult.error }}</span>
+              <span v-else>customerId: <strong>{{ mcValidateResult.customerId }}</strong> · createdAt: {{ mcValidateResult.createdAt }}</span>
+            </div>
+          </div>
+
+          <!-- Register user -->
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold uppercase tracking-widest text-gray-500">Registrar usuario en MiCorreo</p>
+              <button type="button" @click="showRegisterForm = !showRegisterForm" class="text-xs text-gray-400 hover:text-gray-600 underline">
+                {{ showRegisterForm ? 'Ocultar' : 'Mostrar formulario' }}
+              </button>
+            </div>
+            <div v-if="showRegisterForm" class="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Nombre *</label>
+                  <input v-model="mcRegisterForm.firstName" type="text" placeholder="Juan" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Apellido *</label>
+                  <input v-model="mcRegisterForm.lastName" type="text" placeholder="Gonzalez" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Email *</label>
+                <input v-model="mcRegisterForm.email" type="email" placeholder="test@correo.com" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Contraseña *</label>
+                <input v-model="mcRegisterForm.password" type="password" placeholder="Mínimo 6 caracteres" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Tipo de documento *</label>
+                  <select v-model="mcRegisterForm.documentType" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400">
+                    <option value="DNI">DNI</option>
+                    <option value="CUIT">CUIT</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Número de documento *</label>
+                  <input v-model="mcRegisterForm.documentId" type="text" placeholder="32471960" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+              </div>
+              <p class="text-[10px] font-bold uppercase tracking-widest text-gray-400 pt-1">Dirección (requerida para DNI)</p>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Calle *</label>
+                  <input v-model="mcRegisterForm.address.streetName" type="text" placeholder="Mitre" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Número *</label>
+                  <input v-model="mcRegisterForm.address.streetNumber" type="text" placeholder="123" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Ciudad *</label>
+                  <input v-model="mcRegisterForm.address.city" type="text" placeholder="Cordoba" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Localidad *</label>
+                  <input v-model="mcRegisterForm.address.locality" type="text" placeholder="Cordoba" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Provincia *</label>
+                  <select v-model="mcRegisterForm.address.provinceCode" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400">
+                    <option value="A">Salta</option>
+                    <option value="B">Buenos Aires</option>
+                    <option value="C">CABA</option>
+                    <option value="D">San Luis</option>
+                    <option value="E">Entre Ríos</option>
+                    <option value="F">La Rioja</option>
+                    <option value="G">Santiago del Estero</option>
+                    <option value="H">Chaco</option>
+                    <option value="J">San Juan</option>
+                    <option value="K">Catamarca</option>
+                    <option value="L">La Pampa</option>
+                    <option value="M">Mendoza</option>
+                    <option value="N">Misiones</option>
+                    <option value="P">Formosa</option>
+                    <option value="Q">Neuquén</option>
+                    <option value="R">Río Negro</option>
+                    <option value="S">Santa Fe</option>
+                    <option value="T">Tucumán</option>
+                    <option value="U">Chubut</option>
+                    <option value="V">Tierra del Fuego</option>
+                    <option value="W">Corrientes</option>
+                    <option value="X">Córdoba</option>
+                    <option value="Y">Jujuy</option>
+                    <option value="Z">Santa Cruz</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">Código Postal *</label>
+                  <input v-model="mcRegisterForm.address.postalCode" type="text" placeholder="5000" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400" />
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="registerMcUser"
+                :disabled="isMcRegistering || !mcRegisterForm.firstName || !mcRegisterForm.email || !mcRegisterForm.password || !mcRegisterForm.documentId"
+                class="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {{ isMcRegistering ? 'Registrando...' : 'Registrar usuario' }}
+              </button>
+              <div v-if="mcRegisterResult" class="p-3 rounded-xl text-sm font-mono" :class="mcRegisterResult.error ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-green-50 text-green-800 border border-green-200'">
+                <span v-if="mcRegisterResult.error">{{ mcRegisterResult.error }}</span>
+                <span v-else>customerId: <strong>{{ mcRegisterResult.customerId }}</strong> — Actualizá MC_CUSTOMER_ID en .env</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Test rates -->
+          <div>
+            <p class="text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Test de cotización</p>
+            <div class="flex gap-2">
+              <input v-model="mcTestZip" type="text" placeholder="CP destino (ej: 5500)" maxlength="8" class="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-300 focus:border-amber-400 w-40" />
+              <button
+                type="button"
+                @click="testMcRates"
+                :disabled="isMcTesting || !mcTestZip"
+                class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                <svg v-if="isMcTesting" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isMcTesting ? 'Cotizando...' : 'Cotizar' }}
+              </button>
+            </div>
+            <div v-if="mcTestResult" class="mt-3">
+              <div v-if="mcTestResult.error" class="p-3 rounded-xl text-sm bg-red-50 text-red-700 border border-red-200 font-mono">
+                {{ mcTestResult.error }}
+              </div>
+              <div v-else-if="mcTestResult.rates" class="space-y-2">
+                <div v-for="rate in mcTestResult.rates" :key="rate.deliveredType + rate.productType" class="p-3 rounded-xl bg-green-50 border border-green-200 flex justify-between items-center text-sm">
+                  <div>
+                    <p class="font-bold text-green-800">{{ rate.productName }}</p>
+                    <p class="text-xs text-green-600">{{ rate.deliveredType === 'D' ? 'A domicilio' : 'A sucursal' }} · {{ rate.deliveryTimeMin }}-{{ rate.deliveryTimeMax }} días</p>
+                  </div>
+                  <p class="font-black text-green-800">${{ rate.price.toLocaleString('es-AR', { maximumFractionDigits: 0 }) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Submit Button -->
       <div class="flex justify-end">
         <button
@@ -401,63 +595,5 @@ onMounted(async () => {
         </button>
       </div>
     </form>
-
-    <!-- Shipping Costs Section -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mt-6">
-      <div class="flex items-center gap-3 mb-6">
-        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-orange-600">
-            <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/>
-            <path d="M15 18H9"/>
-            <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
-            <circle cx="17" cy="18" r="2"/>
-            <circle cx="7" cy="18" r="2"/>
-          </svg>
-        </div>
-        <div>
-          <h2 class="text-lg font-bold text-gray-900">Costos de Envío por Provincia</h2>
-          <p class="text-sm text-gray-500">Configura el costo de envío para cada provincia</p>
-        </div>
-      </div>
-
-      <div v-if="isLoadingShipping" class="animate-pulse space-y-3">
-        <div v-for="i in 6" :key="i" class="h-12 bg-gray-100 rounded-xl"></div>
-      </div>
-
-      <div v-else class="space-y-3 max-h-[500px] overflow-y-auto pr-2">
-        <div 
-          v-for="sc in shippingCosts" 
-          :key="sc.province_id"
-          class="flex items-center gap-4 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
-        >
-          <span class="flex-1 font-medium text-gray-700 text-sm">{{ getProvinceName(sc.province_id) }}</span>
-          <div class="flex items-center gap-2">
-            <span class="text-gray-400 text-sm">$</span>
-            <input
-              v-model.number="sc.cost"
-              type="number"
-              min="0"
-              step="100"
-              class="w-28 px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm text-right font-mono"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-6 flex justify-end">
-        <button
-          type="button"
-          @click="saveShippingCosts"
-          :disabled="isSavingShipping"
-          class="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-        >
-          <svg v-if="isSavingShipping" class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-          <span>{{ isSavingShipping ? 'Guardando...' : 'Guardar costos de envío' }}</span>
-        </button>
-      </div>
-    </div>
   </div>
 </template>

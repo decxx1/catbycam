@@ -25,6 +25,9 @@ const migrations = [
   { name: '012-shipping-addresses-province', module: () => import('./migrations/012-shipping-addresses-province') },
   { name: '013-shipping-costs', module: () => import('./migrations/013-shipping-costs') },
   { name: '014-orders-shipping-type', module: () => import('./migrations/014-orders-shipping-type') },
+  { name: '015-provinces-code', module: () => import('./migrations/015-provinces-code') },
+  { name: '016-orders-micorreo', module: () => import('./migrations/016-orders-micorreo') },
+  { name: '017-products-dimensions', module: () => import('./migrations/017-products-dimensions') },
 ];
 
 async function waitForDatabase(maxRetries = 10, delayMs = 3000): Promise<mysql.Connection> {

@@ -35,7 +35,7 @@ export const POST: APIRoute = async ({ request }) => {
       shippingCost || 0
     );
 
-    return new Response(JSON.stringify({ preferenceId }), { status: 201 });
+    return new Response(JSON.stringify({ preferenceId, orderId }), { status: 201 });
   } catch (error: any) {
     console.error('Preference API Error:', error);
     return new Response(JSON.stringify({ 

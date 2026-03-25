@@ -1,43 +1,45 @@
 import 'dotenv/config';
 import pool from '../../utils/db-standalone';
 
-const provinces = [
-  'BUENOS AIRES',
-  'CATAMARCA',
-  'CHACO',
-  'CHUBUT',
-  'CIUDAD DE BUENOS AIRES',
-  'CÓRDOBA',
-  'CORRIENTES',
-  'ENTRE RÍOS',
-  'FORMOSA',
-  'JUJUY',
-  'LA PAMPA',
-  'LA RIOJA',
-  'MENDOZA',
-  'MISIONES',
-  'NEUQUÉN',
-  'RÍO NEGRO',
-  'SALTA',
-  'SAN JUAN',
-  'SAN LUIS',
-  'SANTA CRUZ',
-  'SANTA FE',
-  'SANTIAGO DEL ESTERO',
-  'TIERRA DEL FUEGO',
-  'TUCUMÁN',
+// Province codes match Correo Argentino MiCorreo API letter codes
+const provinces: { name: string; code: string }[] = [
+  { name: 'BUENOS AIRES',          code: 'B' },
+  { name: 'CATAMARCA',             code: 'K' },
+  { name: 'CHACO',                 code: 'H' },
+  { name: 'CHUBUT',                code: 'U' },
+  { name: 'CIUDAD DE BUENOS AIRES', code: 'C' },
+  { name: 'CÓRDOBA',               code: 'X' },
+  { name: 'CORRIENTES',            code: 'W' },
+  { name: 'ENTRE RÍOS',            code: 'E' },
+  { name: 'FORMOSA',               code: 'P' },
+  { name: 'JUJUY',                 code: 'Y' },
+  { name: 'LA PAMPA',              code: 'L' },
+  { name: 'LA RIOJA',              code: 'F' },
+  { name: 'MENDOZA',               code: 'M' },
+  { name: 'MISIONES',              code: 'N' },
+  { name: 'NEUQUÉN',               code: 'Q' },
+  { name: 'RÍO NEGRO',             code: 'R' },
+  { name: 'SALTA',                 code: 'A' },
+  { name: 'SAN JUAN',              code: 'J' },
+  { name: 'SAN LUIS',              code: 'D' },
+  { name: 'SANTA CRUZ',            code: 'Z' },
+  { name: 'SANTA FE',              code: 'S' },
+  { name: 'SANTIAGO DEL ESTERO',   code: 'G' },
+  { name: 'TIERRA DEL FUEGO',      code: 'V' },
+  { name: 'TUCUMÁN',               code: 'T' },
 ];
 
 export async function seed() {
   console.log('Seeding provinces...');
-  
-  for (const name of provinces) {
+
+  for (const { name, code } of provinces) {
     await pool.execute(
-      `INSERT INTO provinces (name) VALUES (?) ON DUPLICATE KEY UPDATE name = name`,
-      [name]
+      `INSERT INTO provinces (name, code) VALUES (?, ?)
+       ON DUPLICATE KEY UPDATE code = VALUES(code)`,
+      [name, code]
     );
   }
-  
+
   console.log(`✓ ${provinces.length} provinces seeded`);
 }
 

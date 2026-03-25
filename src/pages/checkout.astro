@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import CheckoutView from "@/components/web/checkout/CheckoutView.vue";
 import { auth } from "@/lib/auth";
+import { IS_PROD } from "astro:env/client";
 
 const sessionData = await auth.api.getSession({
 	headers: Astro.request.headers,
@@ -11,6 +12,6 @@ const session = sessionData ? { userId: sessionData.user.id } : null;
 
 <Layout title="Finalizar Compra" robots="noindex, nofollow">
 	<main class="pt-20">
-		<CheckoutView client:load initialSession={session} />
+		<CheckoutView client:load initialSession={session} :isProd="IS_PROD ?? false" />
 	</main>
 </Layout>

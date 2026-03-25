@@ -21,6 +21,10 @@ export interface Product {
   main_image_width?: number;
   main_image_height?: number;
   images?: ProductImage[]; // Extra images con thumbnail, full y dimensiones
+  weight?: number | null;      // Peso del paquete en gramos
+  pkg_height?: number | null;  // Alto del paquete en cm
+  pkg_width?: number | null;   // Ancho del paquete en cm
+  pkg_length?: number | null;  // Largo del paquete en cm
   created_at?: string;
   updated_at?: string;
   category_name?: string;
@@ -84,9 +88,9 @@ export const ProductService = {
     const status = data.stock <= 0 ? 'out_of_stock' : data.status;
     
     const [result]: any = await pool.execute(
-      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0]
+      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height, weight, pkg_height, pkg_width, pkg_length)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null]
     );
 
     const productId = result.insertId;
@@ -109,10 +113,10 @@ export const ProductService = {
     const status = data.stock <= 0 ? 'out_of_stock' : data.status;
     
     await pool.execute(
-      `UPDATE products 
-       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?
+      `UPDATE products
+       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?, weight = ?, pkg_height = ?, pkg_width = ?, pkg_length = ?
        WHERE id = ?`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, id]
+      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null, id]
     );
 
     // Update images: simplest way is delete and re-insert

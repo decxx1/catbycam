@@ -160,6 +160,81 @@ const saveShippingStatus = async (orderId: number) => {
         toast.error('Error de red');
     }
 };
+
+// MiCorreo import
+const isImporting = ref<number | null>(null);
+const importDimensions = ref({ weight: 2000, height: 30, width: 30, length: 30 });
+const showImportForm = ref<number | null>(null);
+
+const getDefaultDimensions = (order: any) => {
+    if (!order.items || order.items.length === 0) return { weight: 2000, height: 30, width: 30, length: 30 };
+    let totalWeight = 0, maxH = 0, maxW = 0, maxL = 0;
+    for (const item of order.items) {
+        totalWeight += (item.weight ?? 2000) * item.quantity;
+        maxH = Math.max(maxH, item.pkg_height ?? 30);
+        maxW = Math.max(maxW, item.pkg_width ?? 30);
+        maxL = Math.max(maxL, item.pkg_length ?? 30);
+    }
+    return { weight: totalWeight, height: maxH, width: maxW, length: maxL };
+};
+
+const openImportForm = (order: any) => {
+    importDimensions.value = getDefaultDimensions(order);
+    showImportForm.value = order.id;
+};
+
+const importToMiCorreo = async (orderId: number) => {
+    isImporting.value = orderId;
+    try {
+        const res = await fetch('/api/admin/shipping/import', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ orderId, dimensions: importDimensions.value })
+        });
+        const data = await res.json();
+        if (res.ok) {
+            toast.success('Envío importado a MiCorreo');
+            showImportForm.value = null;
+            fetchOrders(pagination.value.page);
+        } else {
+            toast.error(data.error || 'Error al importar');
+        }
+    } catch (e) {
+        toast.error('Error de red');
+    } finally {
+        isImporting.value = null;
+    }
+};
+
+// MiCorreo tracking
+const trackingData = ref<Record<number, any[]>>({});
+const isLoadingTracking = ref<number | null>(null);
+
+const fetchAdminTracking = async (orderId: number) => {
+    if (trackingData.value[orderId]) {
+        delete trackingData.value[orderId];
+        return;
+    }
+    isLoadingTracking.value = orderId;
+    try {
+        const res = await fetch(`/api/admin/shipping/tracking?orderId=${orderId}`);
+        if (res.ok) {
+            const data = await res.json();
+            trackingData.value[orderId] = data.events ?? [];
+            // Update tracking number in order list if it was fetched
+            if (data.trackingNumber) {
+                const order = orders.value.find((o: any) => o.id === orderId);
+                if (order) order.mc_tracking_number = data.trackingNumber;
+            }
+        } else {
+            toast.error('No se pudo obtener el tracking');
+        }
+    } catch (e) {
+        toast.error('Error de red');
+    } finally {
+        isLoadingTracking.value = null;
+    }
+};
 </script>
 
 <template>
@@ -305,6 +380,58 @@ const saveShippingStatus = async (orderId: number) => {
                                     <p class="text-xs font-bold text-secondary/40">El pedido debe estar pagado para gestionar el envío</p>
                                 </div>
                                 <template v-else>
+                                    <!-- MiCorreo Import Section -->
+                                    <div v-if="!order.mc_imported_at" class="pb-3 border-b border-secondary/10">
+                                        <p class="text-[9px] font-bold text-secondary/40 uppercase mb-2">MiCorreo (Correo Argentino)</p>
+                                        <div v-if="showImportForm !== order.id">
+                                            <button @click.stop="openImportForm(order)" class="w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border-2 border-primary text-primary hover:bg-primary hover:text-white transition-all">
+                                                Importar Envío a MiCorreo
+                                            </button>
+                                        </div>
+                                        <div v-else class="space-y-3" @click.stop>
+                                            <div class="grid grid-cols-2 gap-2">
+                                                <div>
+                                                    <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-1">Peso (g)</label>
+                                                    <input v-model.number="importDimensions.weight" type="number" min="1" class="w-full bg-accent/50 border-none rounded-lg py-2 px-3 font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                                </div>
+                                                <div>
+                                                    <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-1">Alto (cm)</label>
+                                                    <input v-model.number="importDimensions.height" type="number" min="1" class="w-full bg-accent/50 border-none rounded-lg py-2 px-3 font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                                </div>
+                                                <div>
+                                                    <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-1">Ancho (cm)</label>
+                                                    <input v-model.number="importDimensions.width" type="number" min="1" class="w-full bg-accent/50 border-none rounded-lg py-2 px-3 font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                                </div>
+                                                <div>
+                                                    <label class="text-[9px] font-bold text-secondary/40 uppercase block mb-1">Largo (cm)</label>
+                                                    <input v-model.number="importDimensions.length" type="number" min="1" class="w-full bg-accent/50 border-none rounded-lg py-2 px-3 font-bold text-sm focus:ring-2 focus:ring-primary outline-none" />
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2">
+                                                <button @click.stop="showImportForm = null" class="flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-widest border border-secondary/20 hover:bg-accent transition-all">Cancelar</button>
+                                                <button @click.stop="importToMiCorreo(order.id)" :disabled="isImporting === order.id" class="flex-1 btn-primary py-2 rounded-xl text-xs font-black uppercase tracking-widest disabled:opacity-50">
+                                                    {{ isImporting === order.id ? 'Importando...' : 'Confirmar' }}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="pb-3 border-b border-secondary/10">
+                                        <p class="text-[9px] font-bold text-secondary/40 uppercase mb-1">MiCorreo</p>
+                                        <p class="text-xs font-bold text-emerald-600">✓ Importado el {{ new Date(order.mc_imported_at).toLocaleDateString('es-AR') }}</p>
+                                        <p v-if="order.mc_tracking_number" class="text-xs font-bold text-secondary mt-1">N° {{ order.mc_tracking_number }}</p>
+                                        <button @click.stop="fetchAdminTracking(order.id)" :disabled="isLoadingTracking === order.id" class="mt-2 text-[9px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50">
+                                            {{ isLoadingTracking === order.id ? 'Cargando...' : (trackingData[order.id] ? 'Ocultar tracking' : 'Ver tracking') }}
+                                        </button>
+                                        <div v-if="trackingData[order.id]" class="mt-2 space-y-1 max-h-32 overflow-y-auto">
+                                            <div v-if="trackingData[order.id].length === 0" class="text-xs text-secondary/40">Sin eventos aún</div>
+                                            <div v-for="(ev, i) in trackingData[order.id]" :key="i" class="text-xs bg-accent/50 rounded-lg p-2">
+                                                <span class="font-black text-secondary">{{ ev.event }}</span>
+                                                <span class="text-secondary/50 ml-2">{{ ev.date }}</span>
+                                                <span v-if="ev.branch" class="text-secondary/40 block text-[10px]">{{ ev.branch }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div v-if="editingShipping !== order.id">
                                         <div class="flex items-center justify-between mb-4">
                                             <div>

@@ -7,9 +7,13 @@ interface Props {
 	image: string;
 	price?: number;
 	status?: 'active' | 'inactive' | 'out_of_stock' | 'paused';
+	weight?: number | null;
+	pkg_height?: number | null;
+	pkg_width?: number | null;
+	pkg_length?: number | null;
 }
 
-const { id, title, category, image, price, status = 'active' } = Astro.props;
+const { id, title, category, image, price, status = 'active', weight, pkg_height, pkg_width, pkg_length } = Astro.props;
 
 const statusConfig: Record<string, { label: string; color: string }> = {
 	out_of_stock: { label: 'Agotado', color: 'bg-red-500' },
@@ -80,6 +84,10 @@ const canAddToCart = status === 'active';
 									category,
 									image,
 									price,
+									weight,
+									pkg_height,
+									pkg_width,
+									pkg_length,
 								})}
 							>
 								<svg

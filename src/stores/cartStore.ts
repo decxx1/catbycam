@@ -5,6 +5,10 @@ export interface CartItem {
 	image: string;
 	quantity: number;
 	category: string;
+	weight?: number | null;
+	pkg_height?: number | null;
+	pkg_width?: number | null;
+	pkg_length?: number | null;
 }
 
 import { persistentMap } from '@nanostores/persistent';

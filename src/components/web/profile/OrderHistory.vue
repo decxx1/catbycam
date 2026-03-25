@@ -112,6 +112,31 @@ const getShippingIcon = (status: string) => {
         default: return 'clock';
     }
 };
+
+// MiCorreo tracking
+const trackingData = ref<Record<number, any[]>>({});
+const isLoadingTracking = ref<number | null>(null);
+
+const fetchTracking = async (orderId: number) => {
+    if (trackingData.value[orderId]) {
+        delete trackingData.value[orderId];
+        return;
+    }
+    isLoadingTracking.value = orderId;
+    try {
+        const res = await fetch(`/api/shipping/tracking?orderId=${orderId}`);
+        if (res.ok) {
+            const data = await res.json();
+            trackingData.value[orderId] = data.tracking?.[0]?.events ?? [];
+        } else {
+            toast.error('No se pudo obtener el seguimiento');
+        }
+    } catch {
+        toast.error('Error al obtener seguimiento');
+    } finally {
+        isLoadingTracking.value = null;
+    }
+};
 </script>
 
 <template>
@@ -179,9 +204,32 @@ const getShippingIcon = (status: string) => {
                         <span :class="{'text-primary': order.shipping_status === 'delivered'}">Entregado</span>
                     </div>
 
-                    <div v-if="order.tracking_number" class="pt-2 border-t border-secondary/10">
+                    <div v-if="order.mc_tracking_number || order.tracking_number" class="pt-2 border-t border-secondary/10">
                         <p class="text-[9px] font-bold text-secondary/40 uppercase">Nº de Seguimiento</p>
-                        <p class="text-sm font-black text-primary mt-1">{{ order.tracking_number }}</p>
+                        <p class="text-sm font-black text-primary mt-1">{{ order.mc_tracking_number || order.tracking_number }}</p>
+                    </div>
+
+                    <!-- MiCorreo tracking button -->
+                    <div v-if="order.mc_shipping_id && order.shipping_type !== 'pickup'" class="pt-2 border-t border-secondary/10">
+                        <button
+                            @click="fetchTracking(order.id)"
+                            :disabled="isLoadingTracking === order.id"
+                            class="text-[10px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50"
+                        >
+                            {{ isLoadingTracking === order.id ? 'Cargando...' : (trackingData[order.id] ? 'Ocultar seguimiento' : 'Ver seguimiento en tiempo real') }}
+                        </button>
+                        <div v-if="trackingData[order.id]" class="mt-3 space-y-2">
+                            <div v-if="trackingData[order.id].length === 0" class="text-xs text-secondary/40 text-center py-2">
+                                Sin eventos de seguimiento todavía
+                            </div>
+                            <div v-for="(ev, i) in trackingData[order.id]" :key="i" class="flex gap-3 items-start">
+                                <div class="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></div>
+                                <div>
+                                    <p class="text-xs font-black text-secondary">{{ ev.event }}</p>
+                                    <p class="text-[10px] text-secondary/40">{{ ev.date }}<span v-if="ev.branch"> · {{ ev.branch }}</span></p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
