@@ -75,6 +75,9 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=80
 
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:80/health || exit 1
+
 EXPOSE 80
 
 ENTRYPOINT ["/app/entrypoint.sh"]
