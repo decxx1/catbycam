@@ -30,6 +30,9 @@ ARG BETTER_AUTH_URL=http://localhost:4321
 ARG ADMIN_NAME=build
 ARG ADMIN_EMAIL=build@build.com
 ARG ADMIN_PASSWORD=build123
+ARG MC_USER=build-placeholder
+ARG MC_PASSWORD=build-placeholder
+ARG MC_CUSTOMER_ID=build-placeholder
 
 RUN IS_PROD=${IS_PROD} \
     BETTER_AUTH_SECRET=${BETTER_AUTH_SECRET} \
@@ -37,6 +40,9 @@ RUN IS_PROD=${IS_PROD} \
     ADMIN_NAME=${ADMIN_NAME} \
     ADMIN_EMAIL=${ADMIN_EMAIL} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD} \
+    MC_USER=${MC_USER} \
+    MC_PASSWORD=${MC_PASSWORD} \
+    MC_CUSTOMER_ID=${MC_CUSTOMER_ID} \
     bun run build
 
 # ---- Release ----
