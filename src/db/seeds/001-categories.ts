@@ -4,7 +4,7 @@ import pool from '../../utils/db-standalone';
 export async function seed() {
   console.log('Seeding categories...');
   
-  const categories = ['Maquinaria', 'Repuestos', 'Filtros', 'Lubricantes', 'Orugas'];
+  const categories = ['Llaveros', 'Réplicas'];
   
   for (const cat of categories) {
     const slug = cat.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
