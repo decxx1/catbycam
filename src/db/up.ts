@@ -28,6 +28,7 @@ const migrations = [
   { name: '015-provinces-code', module: () => import('./migrations/015-provinces-code') },
   { name: '016-orders-micorreo', module: () => import('./migrations/016-orders-micorreo') },
   { name: '017-products-dimensions', module: () => import('./migrations/017-products-dimensions') },
+  { name: '018-products-code', module: () => import('./migrations/018-products-code') },
 ];
 
 async function waitForDatabase(maxRetries = 10, delayMs = 3000): Promise<mysql.Connection> {

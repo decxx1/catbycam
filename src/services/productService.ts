@@ -9,6 +9,7 @@ export interface ProductImage {
 
 export interface Product {
   id?: number;
+  code?: string | null;
   title: string;
   description: string;
   price: number;
@@ -50,8 +51,8 @@ export const ProductService = {
     const params: any[] = [];
 
     if (search) {
-      query += ` AND (p.title LIKE ? OR p.description LIKE ?)`;
-      params.push(`%${search}%`, `%${search}%`);
+      query += ` AND (p.title LIKE ? OR p.description LIKE ? OR p.code LIKE ?)`;
+      params.push(`%${search}%`, `%${search}%`, `%${search}%`);
     }
 
     if (categoryId) {
@@ -88,9 +89,9 @@ export const ProductService = {
     const status = data.stock <= 0 ? 'out_of_stock' : data.status;
     
     const [result]: any = await pool.execute(
-      `INSERT INTO products (title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height, weight, pkg_height, pkg_width, pkg_length)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null]
+      `INSERT INTO products (code, title, description, price, stock, status, item_condition, category_id, main_image, main_image_full, main_image_width, main_image_height, weight, pkg_height, pkg_width, pkg_length)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [data.code?.trim() || null, data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null]
     );
 
     const productId = result.insertId;
@@ -114,9 +115,9 @@ export const ProductService = {
     
     await pool.execute(
       `UPDATE products
-       SET title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?, weight = ?, pkg_height = ?, pkg_width = ?, pkg_length = ?
+       SET code = ?, title = ?, description = ?, price = ?, stock = ?, status = ?, item_condition = ?, category_id = ?, main_image = ?, main_image_full = ?, main_image_width = ?, main_image_height = ?, weight = ?, pkg_height = ?, pkg_width = ?, pkg_length = ?
        WHERE id = ?`,
-      [data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null, id]
+      [data.code?.trim() || null, data.title, data.description, data.price, data.stock, status, data.item_condition, data.category_id, data.main_image, data.main_image_full || null, data.main_image_width || 0, data.main_image_height || 0, data.weight ?? null, data.pkg_height ?? null, data.pkg_width ?? null, data.pkg_length ?? null, id]
     );
 
     // Update images: simplest way is delete and re-insert

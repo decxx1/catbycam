@@ -17,6 +17,7 @@ import { up as ordersShippingType } from './migrations/014-orders-shipping-type'
 import { up as provincesCode } from './migrations/015-provinces-code';
 import { up as ordersMiCorreo } from './migrations/016-orders-micorreo';
 import { up as productsDimensions } from './migrations/017-products-dimensions';
+import { up as productsCode } from './migrations/018-products-code';
 
 async function migrate() {
   console.log('=== Running All Migrations ===\n');
@@ -39,6 +40,7 @@ async function migrate() {
     await provincesCode();
     await ordersMiCorreo();
     await productsDimensions();
+    await productsCode();
 
     console.log('\n=== All Migrations Completed ===');
   } catch (error) {

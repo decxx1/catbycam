@@ -198,7 +198,7 @@ const totalPages = () => Math.ceil(totalProducts.value / limit);
                 <input 
                     v-model="searchQuery"
                     type="text" 
-                    placeholder="Buscar por título o descripción..." 
+                    placeholder="Buscar por código, título o descripción..." 
                     class="w-full bg-accent/50 border border-secondary/10 rounded-xl pl-12 pr-4 py-3 text-sm focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
                 />
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="absolute left-4 top-3 text-secondary/30"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>

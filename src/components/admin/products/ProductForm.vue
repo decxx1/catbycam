@@ -15,6 +15,7 @@ const formRef = ref<HTMLFormElement | null>(null);
 const isUploading = ref(false);
 
 const product = ref<Product>(props.initialData ? { ...props.initialData } : {
+  code: '',
   title: '',
   description: '',
   price: 0,
@@ -119,16 +120,28 @@ const handleSubmit = () => {
       <div class="space-y-6">
         <h4 class="text-lg font-bold border-b border-secondary/5 pb-2">Información Básica</h4>
         
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Título del Producto</label>
-          <input 
-            v-model="product.title"
-            type="text" 
-            required 
-            maxlength="100"
-            placeholder="Ej: Excavadora Michigan Clark 150"
-            class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
-          />
+        <div class="grid grid-cols-3 gap-4">
+          <div class="flex flex-col gap-2 col-span-2">
+            <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Título del Producto</label>
+            <input 
+              v-model="product.title"
+              type="text" 
+              required 
+              maxlength="100"
+              placeholder="Ej: Excavadora Michigan Clark 150"
+              class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+            />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Código</label>
+            <input 
+              v-model="product.code"
+              type="text" 
+              maxlength="100"
+              placeholder="Ej: 85690"
+              class="w-full bg-accent/50 border border-secondary/10 rounded-xl px-5 py-4 focus:outline-none focus:border-primary/40 focus:bg-white transition-all font-bold"
+            />
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
