@@ -277,7 +277,7 @@ const handleSubmit = () => {
     <!-- Shipping Dimensions Section -->
     <div class="space-y-4 pt-4 border-t border-secondary/5">
       <h4 class="text-lg font-bold">Dimensiones de Envío</h4>
-      <p class="text-xs text-secondary/40">Necesario para calcular el costo de envío con Correo Argentino. Dejar vacío si no aplica.</p>
+      <p class="text-xs text-secondary/40">Necesario para calcular el costo de envío con Correo Argentino. Dejar vacío si no aplica. los valores en cm deben estar redondeados a números enteros</p>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="flex flex-col gap-2">
           <label class="text-[10px] uppercase font-bold tracking-widest text-secondary/40 ml-1">Peso (g)</label>
