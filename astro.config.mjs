@@ -8,7 +8,7 @@ import sitemap from "@astrojs/sitemap";
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://campillay.com.ar',
+  site: 'https://catbycam.com.ar',
   output: 'server',
   adapter: node({
     mode: 'standalone'
@@ -22,7 +22,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     server: {
-      allowedHosts: ['mp-astro.px.com.ar', 'localhost', '127.0.0.1', 'campillay.com.ar']
+      allowedHosts: ['mp-astro.px.com.ar', 'localhost', '127.0.0.1', 'campillay.com.ar', 'catbycam.com.ar']
     }
   },
   env: {

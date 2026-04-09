@@ -3,4 +3,4 @@ Allow: /
 
 Disallow: /admin/
 
-Sitemap: https://campillay.com.ar/sitemap-index.xml
+Sitemap: https://catbycam.com.ar/sitemap-index.xml
