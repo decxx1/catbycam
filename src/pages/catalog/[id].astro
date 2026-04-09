@@ -270,6 +270,9 @@ const purchasesEnabled = await SettingsService.isPurchasesEnabled();
 					>
 				</div>
 				<div class="prose prose-lg max-w-none text-secondary/70">
+					{product.code && (
+						<p class="font-bold mb-4 text-secondary">Código: {product.code}</p>
+					)}
 					{
 						product.description
 							.split("\n")
@@ -310,6 +313,7 @@ const purchasesEnabled = await SettingsService.isPurchasesEnabled();
 							<ProductCard
 								id={p.id!}
 								title={p.title}
+								description={p.description}
 								category={p.category_name || "Sin categoría"}
 								image={p.main_image}
 								price={p.price}

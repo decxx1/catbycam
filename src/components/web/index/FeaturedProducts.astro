@@ -33,6 +33,7 @@ const products = await ProductService.getFeatured(4);
 					<ProductCard
 						id={product.id!}
 						title={product.title}
+						description={product.description}
 						category={product.category_name || ""}
 						image={product.main_image}
 						price={product.price}
