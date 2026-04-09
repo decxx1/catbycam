@@ -59,7 +59,7 @@ const canAddToCart = status === 'active';
 		)}
 	</div>
 
-	<div class="p-6 flex flex-col grow gap-2 z-10">
+	<div class="p-6 flex flex-col grow gap-2 z-10 relative">
 		<a
 			href={`/catalog/${id}`}
 			class="hover:text-primary transition-colors duration-300"
@@ -76,14 +76,14 @@ const canAddToCart = status === 'active';
 		<div class="mt-auto pt-2 flex flex-col gap-3">
 			{
 				price && (
-					<div class="flex items-center justify-between gap-2 relative z-20">
+					<div class="flex items-center justify-between gap-2 z-20">
 						<span class="text-secondary font-black text-2xl tracking-tighter">
 							{formatMoney(price, 0, "$")}
 						</span>
 						{canAddToCart ? (
 							<button
 								type="button"
-								class="cursor-pointer add-to-cart-btn p-2 bg-primary/10 hover:bg-primary text-primary hover:text-white rounded-xl transition-all duration-300 group/btn"
+								class="max-xs:absolute max-xs:-top-10 max-xs:right-1 cursor-pointer add-to-cart-btn p-2 bg-primary xs:bg-primary/10 hover:bg-primary text-white xs:text-primary hover:text-white rounded-xl transition-all duration-300 group/btn"
 								data-product={JSON.stringify({
 									id,
 									title,
@@ -114,7 +114,7 @@ const canAddToCart = status === 'active';
 								</svg>
 							</button>
 						) : (
-							<span class="p-2 bg-secondary/10 text-secondary/40 rounded-xl cursor-not-allowed" title="No disponible">
+							<span class="max-xs:absolute max-xs:-top-10 max-xs:right-1 p-2 bg-secondary/10 text-secondary/40 rounded-xl cursor-not-allowed" title="No disponible">
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									width="20"
